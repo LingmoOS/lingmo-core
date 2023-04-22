@@ -36,4 +36,5 @@ add_subdirectory(clipboard)
 add_subdirectory(chotkeys)
 
 install(FILES cute DESTINATION /etc/ COMPONENT Runtime)
+install(FILES opencute_version DESTINATION /etc/ COMPONENT Runtime)
 install(FILES wallpaper-color-pick/cute-wallpaper-color-pick DESTINATION "/usr/bin/")
