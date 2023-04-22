@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Exec=cute-session
+TryExec=cute-session
+Name=Cute Desktop
+Keywords=session
+Comment=session

@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=PolicyKit Handler
+TryExec=cute-polkit-agent
+Exec=cute-polkit-agent
+NoDisplay=true
