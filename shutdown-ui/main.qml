@@ -25,7 +25,7 @@ import QtGraphicalEffects 1.0
 
 import Cute.Accounts 1.0 as Accounts
 import Cute.System 1.0 as System
-import FishUI 1.0 as FishUI
+import CuteUI 1.0 as CuteUI
 
 ApplicationWindow {
     width: Screen.width
@@ -141,7 +141,7 @@ ApplicationWindow {
 
             ColumnLayout {
                 anchors.fill: parent
-                spacing: FishUI.Units.largeSpacing
+                spacing: CuteUI.Units.largeSpacing
 
                 Item {
                     Layout.fillHeight: true

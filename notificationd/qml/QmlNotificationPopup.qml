@@ -22,7 +22,7 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 import QtQuick.Window 2.12
 import QtGraphicalEffects 1.0
-import FishUI 1.0 as FishUI
+import CuteUI 1.0 as CuteUI
 import Cute.Notification 1.0
 
 NotificationPopup {
@@ -36,12 +36,12 @@ NotificationPopup {
 
     property int defaultTimeout: 7000
 
-    FishUI.WindowShadow {
+    CuteUI.WindowShadow {
         view: control
         radius: _background.radius
     }
 
-    FishUI.WindowBlur {
+    CuteUI.WindowBlur {
         view: control
         geometry: Qt.rect(control.x, control.y, control.width, control.height)
         windowRadius: _background.radius
@@ -52,7 +52,7 @@ NotificationPopup {
         id: _background
         anchors.fill: parent
         radius: height * 0.2
-        color: FishUI.Theme.backgroundColor
+        color: CuteUI.Theme.backgroundColor
         opacity: 0.5
     }
 
@@ -75,11 +75,11 @@ NotificationPopup {
 
     RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: FishUI.Units.smallSpacing * 1.5
-        anchors.rightMargin: FishUI.Units.smallSpacing
-        anchors.topMargin: FishUI.Units.smallSpacing
-        anchors.bottomMargin: FishUI.Units.smallSpacing
-        spacing: FishUI.Units.largeSpacing
+        anchors.leftMargin: CuteUI.Units.smallSpacing * 1.5
+        anchors.rightMargin: CuteUI.Units.smallSpacing
+        anchors.topMargin: CuteUI.Units.smallSpacing
+        anchors.bottomMargin: CuteUI.Units.smallSpacing
+        spacing: CuteUI.Units.largeSpacing
 
         Image {
             id: _icon
@@ -118,13 +118,13 @@ NotificationPopup {
                 visible: text
                 elide: Text.ElideRight
                 Layout.fillWidth: true
-                rightPadding: FishUI.Units.smallSpacing
+                rightPadding: CuteUI.Units.smallSpacing
             }
 
             Label {
                 text: model.body
                 visible: text
-                rightPadding: FishUI.Units.smallSpacing
+                rightPadding: CuteUI.Units.smallSpacing
                 maximumLineCount: 2
                 elide: Text.ElideRight
                 wrapMode: Text.Wrap
@@ -142,20 +142,20 @@ NotificationPopup {
     Image {
         anchors.top: parent.top
         anchors.right: parent.right
-        anchors.topMargin: FishUI.Units.smallSpacing / 2
-        anchors.rightMargin: FishUI.Units.smallSpacing
+        anchors.topMargin: CuteUI.Units.smallSpacing / 2
+        anchors.rightMargin: CuteUI.Units.smallSpacing
         width: 24
         height: 24
-        source: "qrc:/images/" + (FishUI.Theme.darkMode ? "dark" : "light") + "/close.svg"
+        source: "qrc:/images/" + (CuteUI.Theme.darkMode ? "dark" : "light") + "/close.svg"
         sourceSize: Qt.size(width, height)
         visible: _mouseArea.containsMouse || _closeBtnArea.containsMouse
         z: 9999
 
         Rectangle {
-            property color hoveredColor: FishUI.Theme.darkMode ? Qt.lighter(FishUI.Theme.backgroundColor, 2)
-                                                               : Qt.darker(FishUI.Theme.backgroundColor, 1.2)
-            property color pressedColor: FishUI.Theme.darkMode ? Qt.lighter(FishUI.Theme.backgroundColor, 1.5)
-                                                               : Qt.darker(FishUI.Theme.backgroundColor, 1.3)
+            property color hoveredColor: CuteUI.Theme.darkMode ? Qt.lighter(CuteUI.Theme.backgroundColor, 2)
+                                                               : Qt.darker(CuteUI.Theme.backgroundColor, 1.2)
+            property color pressedColor: CuteUI.Theme.darkMode ? Qt.lighter(CuteUI.Theme.backgroundColor, 1.5)
+                                                               : Qt.darker(CuteUI.Theme.backgroundColor, 1.3)
 
             z: -1
             anchors.fill: parent

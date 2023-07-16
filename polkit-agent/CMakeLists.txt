@@ -22,7 +22,7 @@ target_link_libraries(cute-polkit-agent
         Qt5::Quick
         Qt5::QuickControls2
 
-        # FishUI
+        # CuteUI
 
         ${POLKITQT-1_CORE_LIBRARY}
         ${POLKITQT-1_AGENT_LIBRARY}

@@ -21,7 +21,7 @@ import QtQuick 2.0
 import QtQuick.Controls 2.5
 import QtQuick.Layouts 1.3
 import QtGraphicalEffects 1.0
-import FishUI 1.0 as FishUI
+import CuteUI 1.0 as CuteUI
 
 Item {
     id: control
@@ -45,7 +45,7 @@ Item {
     ColumnLayout {
         id: layout
         anchors.fill: parent
-        spacing: FishUI.Units.largeSpacing * 1.5
+        spacing: CuteUI.Units.largeSpacing * 1.5
 
         Item {
             Layout.fillHeight: true
@@ -57,8 +57,8 @@ Item {
 
             Rectangle {
                 anchors.centerIn: parent
-                width: parent.height + FishUI.Units.largeSpacing * 2
-                height: parent.height + FishUI.Units.largeSpacing * 2
+                width: parent.height + CuteUI.Units.largeSpacing * 2
+                height: parent.height + CuteUI.Units.largeSpacing * 2
                 z: -1
                 color: "white"
                 opacity: mouseArea.pressed ? 0.1 : mouseArea.containsMouse || control.checked ? 0.2 : 0

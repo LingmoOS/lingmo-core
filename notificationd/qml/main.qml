@@ -10,7 +10,7 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 import QtQuick.Window 2.12
 import QtGraphicalEffects 1.0
-import FishUI 1.0 as FishUI
+import CuteUI 1.0 as CuteUI
 import Cute.Notification 1.0
 
 Item {
@@ -20,8 +20,8 @@ Item {
     height: 0
     visible: false
 
-    property int popupEdgeDistance: FishUI.Units.largeSpacing
-    property int popupSpacing: FishUI.Units.largeSpacing
+    property int popupEdgeDistance: CuteUI.Units.largeSpacing
+    property int popupSpacing: CuteUI.Units.largeSpacing
     readonly property real popupMaximumScreenFill: 0.4
 
     readonly property rect screenRect: {

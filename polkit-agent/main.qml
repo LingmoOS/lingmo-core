@@ -1,12 +1,12 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.5
 import QtQuick.Layouts 1.3
-import FishUI 1.0 as FishUI
+import CuteUI 1.0 as CuteUI
 
 Item {
     id: root
 
-    property var heightValue: mainLayout.implicitHeight + FishUI.Units.largeSpacing * 2
+    property var heightValue: mainLayout.implicitHeight + CuteUI.Units.largeSpacing * 2
 
     width: 450
     height: heightValue
@@ -35,8 +35,8 @@ Item {
     Rectangle {
         id: _background
         anchors.fill: parent
-        radius: FishUI.Theme.bigRadius
-        color: FishUI.Theme.secondBackgroundColor
+        radius: CuteUI.Theme.bigRadius
+        color: CuteUI.Theme.secondBackgroundColor
     }
 
     DragHandler {
@@ -46,11 +46,11 @@ Item {
         onActiveChanged: if (active) { windowHelper.startSystemMove(rootWindow) }
     }
 
-    FishUI.WindowHelper {
+    CuteUI.WindowHelper {
         id: windowHelper
     }
 
-    FishUI.WindowShadow {
+    CuteUI.WindowShadow {
         view: rootWindow
         geometry: Qt.rect(root.x, root.y, root.width, root.height)
         radius: _background.radius
@@ -63,7 +63,7 @@ Item {
     RowLayout {
         id: mainLayout
         anchors.fill: parent
-        anchors.margins: FishUI.Units.largeSpacing
+        anchors.margins: CuteUI.Units.largeSpacing
 
         Image {
             id: icon
@@ -85,12 +85,12 @@ Item {
         }
 
         Item {
-            width: FishUI.Units.largeSpacing
+            width: CuteUI.Units.largeSpacing
         }
 
         ColumnLayout {
             id: column
-            spacing: FishUI.Units.largeSpacing
+            spacing: CuteUI.Units.largeSpacing
 
             Text {
                 text: confirmation.message
@@ -100,7 +100,7 @@ Item {
                 maximumLineCount: 2
                 wrapMode: Text.Wrap
                 elide: Text.ElideRight
-                color: FishUI.Theme.textColor
+                color: CuteUI.Theme.textColor
             }
 
             TextField {
@@ -129,7 +129,7 @@ Item {
             }
 
             RowLayout {
-                spacing: FishUI.Units.largeSpacing
+                spacing: CuteUI.Units.largeSpacing
 
                 Button {
                     text: qsTr("Cancel")

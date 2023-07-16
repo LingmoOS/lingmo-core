@@ -1,22 +1,3 @@
-/*
- * Copyright (C) 2021 CuteOS Team.
- *
- * Author:     revenmartin <revenmartin@gmail.com>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 #include "processmanager.h"
 #include "application.h"
 
@@ -113,28 +94,42 @@ void ProcessManager::startDesktopProcess()
     // In the way, there will be no problem that desktop and launcher can't get wallpaper.
 
     QList<QPair<QString, QStringList>> list;
-    // 桌面启动顺序
-    list << qMakePair(QString("cute-dock"), QStringList());
-    list << qMakePair(QString("cute-statusbar"), QStringList());
-    list << qMakePair(QString("sudo -E calamares"), QStringList());
+    // Next: cute-* => ling-*
+    // list << qMakePair(QString("cute-dock"), QStringList());
+    // list << qMakePair(QString("cute-statusbar"), QStringList());
+    // list << qMakePair(QString("sudo -E calamares"), QStringList());
     list << qMakePair(QString("cute-desktop"), QStringList());
-    list << qMakePair(QString("StartMusic"), QStringList());
+    // list << qMakePair(QString("StartMusic"), QStringList());
+    // Now, StartScrts will be replaced by OpenLingmo-Server
     list << qMakePair(QString("StartScrts"), QStringList());
-    list << qMakePair(QString("cute-launcher"), QStringList());
-    list << qMakePair(QString("cute-powerman"), QStringList());
-    list << qMakePair(QString("cute-wallpaper-color-pick"), QStringList());
+    // list << qMakePair(QString("cute-launcher"), QStringList());
+    // list << qMakePair(QString("cute-powerman"), QStringList());
+    // list << qMakePair(QString("cute-wallpaper-color-pick"), QStringList());
+    // Add OpenLingmo Server
+    // The introduction of OpenLingmo Server is a test and may be unstable
+    list << qMakePair(QString("OpenLingmo-server"), QStringList());//Alpha
     // list << qMakePair(QString("cute-welcome"), QStringList());
     // 修改👇
-   if (QFile("/usr/bin/cute-welcome").exists() &&
+    if (QFile("").exists() &&
            !QFile("/run/live/medium/live/filesystem.squashfs").exists()) {
        QSettings settings("cuteos", "login");
 
        if (!settings.value("Finished", false).toBool()) {
-           list << qMakePair(QString("/usr/bin/cute-welcome"), QStringList());
+           list << qMakePair(QString(""), QStringList());
        } else {
-           list << qMakePair(QString("/usr/bin/cute-welcome"), QStringList() << "-d");
+           list << qMakePair(QString(""), QStringList() << "-d");
        }
    }
+//    if (QFile("/usr/bin/cute-welcome").exists() &&
+//            !QFile("/run/live/medium/live/filesystem.squashfs").exists()) {
+//        QSettings settings("cuteos", "login");
+
+//        if (!settings.value("Finished", false).toBool()) {
+//            list << qMakePair(QString("/usr/bin/cute-welcome"), QStringList());
+//        } else {
+//            list << qMakePair(QString("/usr/bin/cute-welcome"), QStringList() << "-d");
+//        }
+//    }
 
     for (QPair<QString, QStringList> pair : list) {
         QProcess *process = new QProcess;
