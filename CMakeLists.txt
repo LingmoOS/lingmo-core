@@ -37,4 +37,5 @@ add_subdirectory(chotkeys)
 
 install(FILES lingmo DESTINATION /etc/ COMPONENT Runtime)
 install(FILES OpenLingmo_version DESTINATION /etc/OpenLingmo/ COMPONENT Runtime)
+install(FILES build DESTINATION /etc/build/ COMPONENT Runtime)
 install(FILES wallpaper-color-pick/cute-wallpaper-color-pick DESTINATION "/usr/bin/")

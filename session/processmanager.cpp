@@ -95,31 +95,31 @@ void ProcessManager::startDesktopProcess()
 
     QList<QPair<QString, QStringList>> list;
     // Next: cute-* => ling-*
-    // list << qMakePair(QString("cute-dock"), QStringList());
-    // list << qMakePair(QString("cute-statusbar"), QStringList());
+    list << qMakePair(QString("cute-dock"), QStringList());
+    list << qMakePair(QString("cute-statusbar"), QStringList());
     // list << qMakePair(QString("sudo -E calamares"), QStringList());
     list << qMakePair(QString("cute-desktop"), QStringList());
     // list << qMakePair(QString("StartMusic"), QStringList());
     // Now, StartScrts will be replaced by OpenLingmo-Server
     list << qMakePair(QString("StartScrts"), QStringList());
-    // list << qMakePair(QString("cute-launcher"), QStringList());
-    // list << qMakePair(QString("cute-powerman"), QStringList());
-    // list << qMakePair(QString("cute-wallpaper-color-pick"), QStringList());
+    list << qMakePair(QString("cute-launcher"), QStringList());
+    list << qMakePair(QString("cute-powerman"), QStringList());
+    list << qMakePair(QString("cute-wallpaper-color-pick"), QStringList());
     // Add OpenLingmo Server
     // The introduction of OpenLingmo Server is a test and may be unstable
     list << qMakePair(QString("OpenLingmo-server"), QStringList());//Alpha
     // list << qMakePair(QString("cute-welcome"), QStringList());
-    // 修改👇
-    if (QFile("").exists() &&
-           !QFile("/run/live/medium/live/filesystem.squashfs").exists()) {
-       QSettings settings("cuteos", "login");
+    // Change👇
+//     if (QFile("").exists() &&
+//            !QFile("/run/live/medium/live/filesystem.squashfs").exists()) {
+//        QSettings settings("cuteos", "login");
 
-       if (!settings.value("Finished", false).toBool()) {
-           list << qMakePair(QString(""), QStringList());
-       } else {
-           list << qMakePair(QString(""), QStringList() << "-d");
-       }
-   }
+//        if (!settings.value("Finished", false).toBool()) {
+//            list << qMakePair(QString(""), QStringList());
+//        } else {
+//            list << qMakePair(QString(""), QStringList() << "-d");
+//        }
+//    }
 //    if (QFile("/usr/bin/cute-welcome").exists() &&
 //            !QFile("/run/live/medium/live/filesystem.squashfs").exists()) {
 //        QSettings settings("cuteos", "login");

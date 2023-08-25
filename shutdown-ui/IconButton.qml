@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2021 CuteOS Team.
+ * Copyright (C) 2023 LingmoOS Team.
  *
- * Author:     Reion Wong <aj@cutefishos.com>
+ * Author:     LingmoOS team <cuteos@foxmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
