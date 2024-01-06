@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 CuteOS Team.
+ * Copyright (C) 2023-2024 LingmoOS Team.
  *
  * Author:     revenmartin <revenmartin@gmail.com>
  *
@@ -51,7 +51,7 @@ ThemeManager *ThemeManager::self()
 
 ThemeManager::ThemeManager(QObject *parent)
     : QObject(parent)
-    , m_settings(new QSettings(QStringLiteral("cuteos"), QStringLiteral("theme")))
+    , m_settings(new QSettings(QStringLiteral("lingmoos"), QStringLiteral("theme")))
 {
     if (!QFile::exists(m_settings->fileName())) {
         QFile file(m_settings->fileName());
@@ -78,7 +78,7 @@ ThemeManager::ThemeManager(QObject *parent)
     m_Color5 = m_settings->value("Color5", "#FEA042").toString();
     m_Color6 = m_settings->value("Color6", "#4F596B").toString();
 
-    m_wallpaperPath = m_settings->value("Wallpaper", "/usr/share/backgrounds/cuteos/default.jpg").toString();
+    m_wallpaperPath = m_settings->value("Wallpaper", "/usr/share/backgrounds/lingmoos/default.jpg").toString();
     m_accentColor = m_settings->value("AccentColor", 0).toInt();
     m_backgroundType = m_settings->value("BackgroundType", 0).toInt();
     m_backgroundColor = m_settings->value("BackgroundColor", "#2B8ADA").toString();
@@ -95,7 +95,7 @@ ThemeManager::ThemeManager(QObject *parent)
     }
 
     if (!m_settings->contains(s_systemFontName)) {
-        QSettings lanSettings(QStringLiteral("cuteos"), QStringLiteral("language"));
+        QSettings lanSettings(QStringLiteral("lingmoos"), QStringLiteral("language"));
         QString languageCode = lanSettings.value("language").toString();
         QString fontName;
 
@@ -275,7 +275,7 @@ void ThemeManager::setDevicePixelRatio(qreal ratio)
     // SDDM
     QProcess p;
     p.setProgram("pkexec");
-    p.setArguments(QStringList() << "cute-sddm-helper"
+    p.setArguments(QStringList() << "lingmo-sddm-helper"
                                  << "--dpi" << QString::number(fontDpi));
     p.start();
     p.waitForFinished(-1);
@@ -286,7 +286,7 @@ void ThemeManager::setDevicePixelRatio(qreal ratio)
                          QDBusConnection::sessionBus());
     if (iface.isValid()) {
         QList<QVariant> args;
-        args << "cute-settings";
+        args << "lingmo-settings";
         args << ((unsigned int) 0);
         args << "preferences-system";
         args << "";
@@ -312,7 +312,7 @@ void ThemeManager::setWallpaper(const QString &path)
         //启动莫奈取色
         QProcess *proc = new QProcess(this);
         connect(proc, static_cast<void (QProcess::*)(int)>(&QProcess::finished), proc, &QProcess::deleteLater);
-        proc->startDetached("/usr/bin/cute-wallpaper-color-pick");
+        proc->startDetached("/usr/bin/lingmo-wallpaper-color-pick");
 
         emit wallpaperChanged(path);
     }
@@ -460,7 +460,7 @@ void ThemeManager::updateGtk3Config()
     // other
     settings.setValue("gtk-enable-animations", true);
     // theme
-    settings.setValue("gtk-theme-name", isDarkMode() ? "Cute-dark" : "Cute-light");
+    settings.setValue("gtk-theme-name", isDarkMode() ? "Lingmo-dark" : "Lingmo-light");
     settings.sync();
 }
 
@@ -515,7 +515,7 @@ void ThemeManager::updateFontConfig()
 
     const QString &familyFallback = "Noto Sans";
 
-    QSettings settings(QSettings::UserScope, "cuteos", "theme");
+    QSettings settings(QSettings::UserScope, "lingmoos", "theme");
     bool hinting = settings.value("XftAntialias", 1).toBool();
     QString hintStyle = settings.value("XftHintStyle", "hintslight").toString();
 
@@ -594,7 +594,7 @@ void ThemeManager::updateFontConfig()
         }
     }
 
-    QFile file(targetPath + "/99-cute.conf");
+    QFile file(targetPath + "/99-lingmo.conf");
     if (file.open(QIODevice::WriteOnly)) {
         QTextStream s(&file);
         s << xmlOut.toLatin1();

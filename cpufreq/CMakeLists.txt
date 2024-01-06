@@ -1,5 +1,5 @@
-project(cute-cpufreq)
-set(TARGET cute-cpufreq)
+project(lingmo-cpufreq)
+set(TARGET lingmo-cpufreq)
 
 set(SOURCES
     main.cpp
@@ -14,10 +14,10 @@ target_link_libraries(${TARGET}
 )
 
 configure_file(
-    com.cute.cpufreq.pkexec.policy.in
-    com.cute.cpufreq.pkexec.policy
+    com.lingmo.cpufreq.pkexec.policy.in
+    com.lingmo.cpufreq.pkexec.policy
     @ONLY
 )
 
 install(TARGETS ${TARGET} DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/com.cute.cpufreq.pkexec.policy DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/polkit-1/actions/)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/com.lingmo.cpufreq.pkexec.policy DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/polkit-1/actions/)

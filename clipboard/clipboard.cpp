@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2021 CuteOS Team.
+ * Copyright (C) 2023-2024 LingmoOS Team.
  *
- * Author:     Kate Leet <kate@cutefishos.com>
+ * Author:     Kate Leet <kate@lingmoos.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,8 +40,8 @@ void Clipboard::onDataChanged()
     if (mimeData->formats().isEmpty())
         return;
 
-    if (mimeData->hasFormat("application/x-cute-clipboard") &&
-            mimeData->data("application/x-cute-clipboard") == "1")
+    if (mimeData->hasFormat("application/x-lingmo-clipboard") &&
+            mimeData->data("application/x-lingmo-clipboard") == "1")
         return;
 
     QByteArray timeStamp = mimeData->data("TIMESTAMP");
@@ -67,8 +67,8 @@ void Clipboard::onDataChanged()
         newMimeData->setData(key, mimeData->data(key));
     }
 
-    // cute flag.
-    newMimeData->setData("application/x-cute-clipboard", QByteArray("1"));
+    // lingmo flag.
+    newMimeData->setData("application/x-lingmo-clipboard", QByteArray("1"));
 
     m_qtClipboard->setMimeData(newMimeData);
 }

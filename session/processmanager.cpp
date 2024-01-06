@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2023-2024 Lingmo OS Team.
+ */
+
 #include "processmanager.h"
 #include "application.h"
 
@@ -54,7 +58,7 @@ void ProcessManager::logout()
                              QDBusConnection::sessionBus());
 
     if (kwinIface.isValid()) {
-        kwinIface.call("aboutToSaveSession", "cute");
+        kwinIface.call("aboutToSaveSession", "lingmo");
         kwinIface.call("setState", uint(2)); // Quit
     }
 
@@ -90,44 +94,29 @@ void ProcessManager::startWindowManager()
 
 void ProcessManager::startDesktopProcess()
 {
-    // When the cute-settings-daemon theme module is loaded, start the desktop.
+    // When the lingmo-settings-daemon theme module is loaded, start the desktop.
     // In the way, there will be no problem that desktop and launcher can't get wallpaper.
 
     QList<QPair<QString, QStringList>> list;
-    // Next: cute-* => ling-*
-    list << qMakePair(QString("cute-dock"), QStringList());
-    list << qMakePair(QString("cute-statusbar"), QStringList());
-    // list << qMakePair(QString("sudo -E calamares"), QStringList());
-    list << qMakePair(QString("cute-desktop"), QStringList());
-    // list << qMakePair(QString("StartMusic"), QStringList());
-    // Now, StartScrts will be replaced by OpenLingmo-Server
-    list << qMakePair(QString("StartScrts"), QStringList());
-    list << qMakePair(QString("cute-launcher"), QStringList());
-    list << qMakePair(QString("cute-powerman"), QStringList());
-    list << qMakePair(QString("cute-wallpaper-color-pick"), QStringList());
-    // Add OpenLingmo Server
-    // The introduction of OpenLingmo Server is a test and may be unstable
-    list << qMakePair(QString("OpenLingmo-server"), QStringList());//Alpha
-    // list << qMakePair(QString("cute-welcome"), QStringList());
-    // Change👇
-//     if (QFile("").exists() &&
+    // Desktop components
+    list << qMakePair(QString("lingmo-notificationd"), QStringList());
+    list << qMakePair(QString("lingmo-statusbar"), QStringList());
+    list << qMakePair(QString("lingmo-dock"), QStringList());
+//    list << qMakePair(QString("lingmo-filemanager"), QStringList("--desktop"));
+    list << qMakePair(QString("lingmo-launcher"), QStringList());
+    list << qMakePair(QString("lingmo-powerman"), QStringList());
+    list << qMakePair(QString("lingmo-clipboard"), QStringList());
+    list << qMakePair(QString("lingmo-wallpaper-color-pick"), QStringList());
+    
+    // For LingmoOS.
+//    if (QFile("/usr/bin/lingmo-welcome").exists() &&
 //            !QFile("/run/live/medium/live/filesystem.squashfs").exists()) {
-//        QSettings settings("cuteos", "login");
-
+//        QSettings settings("lingmoos", "login");
+//
 //        if (!settings.value("Finished", false).toBool()) {
-//            list << qMakePair(QString(""), QStringList());
+//            list << qMakePair(QString("/usr/bin/lingmo-welcome"), QStringList());
 //        } else {
-//            list << qMakePair(QString(""), QStringList() << "-d");
-//        }
-//    }
-//    if (QFile("/usr/bin/cute-welcome").exists() &&
-//            !QFile("/run/live/medium/live/filesystem.squashfs").exists()) {
-//        QSettings settings("cuteos", "login");
-
-//        if (!settings.value("Finished", false).toBool()) {
-//            list << qMakePair(QString("/usr/bin/cute-welcome"), QStringList());
-//        } else {
-//            list << qMakePair(QString("/usr/bin/cute-welcome"), QStringList() << "-d");
+//            list << qMakePair(QString("/usr/bin/lingmo-welcome"), QStringList() << "-d");
 //        }
 //    }
 
@@ -156,13 +145,12 @@ void ProcessManager::startDesktopProcess()
 void ProcessManager::startDaemonProcess()
 {
     QList<QPair<QString, QStringList>> list;
-    list << qMakePair(QString("cute-settings-daemon"), QStringList());
-    list << qMakePair(QString("cute-xembedsniproxy"), QStringList());
-    list << qMakePair(QString("cute-gmenuproxy"), QStringList());
-    list << qMakePair(QString("cute-permission-surveillance"),QStringList());
-    list << qMakePair(QString("cute-clipboard"), QStringList());
-    list << qMakePair(QString("cute-chotkeys"), QStringList());
-    list << qMakePair(QString("cute-notificationd"), QStringList());
+    list << qMakePair(QString("lingmo-settings-daemon"), QStringList());
+    list << qMakePair(QString("lingmo-xembedsniproxy"), QStringList());
+    list << qMakePair(QString("lingmo-gmenuproxy"), QStringList());
+    list << qMakePair(QString("lingmo-permission-surveillance"),QStringList());
+//    list << qMakePair(QString("lingmo-clipboard"), QStringList());
+    list << qMakePair(QString("lingmo-chotkeys"), QStringList());
 
     for (QPair<QString, QStringList> pair : list) {
         QProcess *process = new QProcess;

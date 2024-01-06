@@ -18,7 +18,7 @@ set -e
 
 case "$1" in
     remove)
-        update-alternatives --remove x-session-manager /usr/bin/cute-session
+        update-alternatives --remove x-session-manager /usr/bin/lingmo-session
     ;;
 
     upgrade|deconfigure)

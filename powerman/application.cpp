@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 CuteOS Team.
+ * Copyright (C) 2023-2024 LingmoOS Team.
  *
  * Author:     Reion Wong <reionwong@gmail.com>
  *
@@ -27,7 +27,7 @@ Application::Application(QObject *parent)
     : QObject(parent)
     , m_lidWatcher(new LidWatcher)
     , m_cpuManagement(new CPUManagement)
-    , m_settings("cuteos", "power")
+    , m_settings("lingmoos", "power")
     , m_dimDisplayAction(new DimDisplayAction)
 {
     m_closeScreenTimeout = m_settings.value("CloseScreenTimeout", 600).toInt();
@@ -43,7 +43,7 @@ Application::Application(QObject *parent)
     m_dimDisplayAction->setSleep(m_sleepWhenClosedScreen);
     m_dimDisplayAction->setLock(m_lockWhenClosedScreen);
 
-    QDBusConnection::sessionBus().registerService(QStringLiteral("com.cute.PowerManager"));
+    QDBusConnection::sessionBus().registerService(QStringLiteral("com.lingmo.PowerManager"));
     QDBusConnection::sessionBus().registerObject(QStringLiteral("/PowerManager"), this);
     new PowerManagerAdaptor(this);
 }

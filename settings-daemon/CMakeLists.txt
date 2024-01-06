@@ -1,5 +1,5 @@
-project(cute-settings-daemon)
-set(TARGET cute-settings-daemon)
+project(lingmo-settings-daemon)
+set(TARGET lingmo-settings-daemon)
 
 find_package(X11 REQUIRED)
 find_package(X11_XCB REQUIRED)
@@ -37,25 +37,25 @@ set(FORMS "")
 set(RESOURCES "")
 
 qt5_add_dbus_adaptor(DBUS_SOURCES
-                     brightness/com.cute.Brightness.xml
+                     brightness/com.lingmo.Brightness.xml
                      brightness/brightnessmanager.h BrightnessManager)
 qt5_add_dbus_adaptor(DBUS_SOURCES
-                     theme/com.cute.Theme.xml
+                     theme/com.lingmo.Theme.xml
                      theme/thememanager.h ThemeManager)
 qt5_add_dbus_adaptor(DBUS_SOURCES
-                     battery/com.cute.PrimaryBattery.xml
+                     battery/com.lingmo.PrimaryBattery.xml
                      battery/battery.h Battery)
 qt5_add_dbus_adaptor(DBUS_SOURCES
-                     language/com.cute.Language.xml
+                     language/com.lingmo.Language.xml
                      language/language.h Language)
 qt5_add_dbus_adaptor(DBUS_SOURCES
-                     dock/com.cute.Dock.xml
+                     dock/com.lingmo.Dock.xml
                      dock/dock.h Dock)
 qt5_add_dbus_adaptor(DBUS_SOURCES
-                     mouse/com.cute.Mouse.xml
+                     mouse/com.lingmo.Mouse.xml
                      mouse/mousemanager.h Mouse)
 qt5_add_dbus_adaptor(DBUS_SOURCES
-                     touchpad/com.cute.Touchpad.xml
+                     touchpad/com.lingmo.Touchpad.xml
                      touchpad/touchpadmanager.h TouchpadManager)
 set_source_files_properties(${DBUS_SOURCES} PROPERTIES SKIP_AUTOGEN ON)
 

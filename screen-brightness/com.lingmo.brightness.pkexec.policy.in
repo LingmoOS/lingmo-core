@@ -2,7 +2,7 @@
  "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
  "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
 <policyconfig>
-  <action id="com.cute.brightness.pkexec">
+  <action id="com.lingmo.brightness.pkexec">
     <message>Authentication is required to Change Brightness</message>
     <icon_name>battery</icon_name>
     <defaults>
@@ -10,6 +10,6 @@
       <allow_inactive>no</allow_inactive>
       <allow_active>yes</allow_active>
     </defaults>
-    <annotate key="org.freedesktop.policykit.exec.path">@CMAKE_INSTALL_FULL_BINDIR@/cute-screen-brightness</annotate>
+    <annotate key="org.freedesktop.policykit.exec.path">@CMAKE_INSTALL_FULL_BINDIR@/lingmo-screen-brightness</annotate>
   </action>
 </policyconfig>

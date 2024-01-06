@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2023-2024 LingmoOS Team.
+ *
+ * Author:     revenmartin <revenmartin@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
@@ -15,7 +34,7 @@ int main(int argc, char *argv[])
 
     QGuiApplication app(argc, argv);
 
-    if (!QDBusConnection::sessionBus().registerService("com.cute.ShutdownUI")) {
+    if (!QDBusConnection::sessionBus().registerService("com.lingmo.ShutdownUI")) {
         return -1;
     }
 
@@ -25,7 +44,7 @@ int main(int argc, char *argv[])
 
     // Translations
     QLocale locale;
-    QString qmFilePath = QString("%1/%2.qm").arg("/usr/share/cute-shutdown/translations/").arg(locale.name());
+    QString qmFilePath = QString("%1/%2.qm").arg("/usr/share/lingmo-shutdown/translations/").arg(locale.name());
     if (QFile::exists(qmFilePath)) {
         QTranslator *translator = new QTranslator(QGuiApplication::instance());
         if (translator->load(qmFilePath)) {

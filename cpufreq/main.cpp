@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 CuteOS Team.
+ * Copyright (C) 2023-2024 LingmoOS Team.
  *
  * Author:     Reion Wong <reionwong@gmail.com>
  *
@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
 
     QCommandLineParser parser;
-    parser.setApplicationDescription(QStringLiteral("Cute CPU frequency tool"));
+    parser.setApplicationDescription(QStringLiteral("Lingmo CPU frequency tool"));
     parser.addHelpOption();
 
     QCommandLineOption setOption(QStringList() << "s" << "set" << "Setting");
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 
     parser.process(a);
 
-    // cute-cpufreq --set -n 0 -m performance
+    // lingmo-cpufreq --set -n 0 -m performance
     if (parser.isSet(setOption) && parser.isSet(numberOption) && parser.isSet(modeOption)) {
         QString modeStr = parser.positionalArguments().last();
 

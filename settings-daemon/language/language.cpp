@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2023-2024 LingmoOS Team.
+ *
+ * Author:     revenmartin <revenmartin@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "language.h"
 #include "languageadaptor.h"
 #include "theme/thememanager.h"
@@ -13,7 +32,7 @@ Language *Language::self()
 
 Language::Language(QObject *parent)
     : QObject(parent)
-    , m_settings(new QSettings(QStringLiteral("cuteos"), QStringLiteral("language")))
+    , m_settings(new QSettings(QStringLiteral("lingmoos"), QStringLiteral("language")))
 {
     new LanguageAdaptor(this);
     QDBusConnection::sessionBus().registerObject(QStringLiteral("/Language"), this);
@@ -35,7 +54,7 @@ void Language::setLanguage(const QString &code)
         return;
     }
 
-    QSettings settings(QStringLiteral("cuteos"), QStringLiteral("theme"));
+    QSettings settings(QStringLiteral("lingmoos"), QStringLiteral("theme"));
 
     // Change fonts
     if (code == "zh_CN") {
@@ -59,7 +78,7 @@ void Language::setLanguage(const QString &code)
                          QDBusConnection::sessionBus());
     if (iface.isValid()) {
         QList<QVariant> args;
-        args << "cute-settings";
+        args << "lingmo-settings";
         args << ((unsigned int) 0);
         args << "preferences-system";
         args << "";

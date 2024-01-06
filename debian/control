@@ -1,7 +1,7 @@
-Source: cute-core
+Source: lingmo-core
 Section: devel
 Priority: optional
-Maintainer: LingmoOS Team <cuteos@foxmail.com>
+Maintainer: LingmoOS <lingmo@lingmo.org>
 Build-Depends: cmake,
                debhelper (>= 9),
                extra-cmake-modules,
@@ -41,10 +41,10 @@ Build-Depends: cmake,
                qtquickcontrols2-5-dev,
                qttools5-dev,
                qttools5-dev-tools
-Standards-Version: 1.0.6
-Homepage: https://github.com/LingmoOS/OpenLingmo
+Standards-Version: 4.5.0
+Homepage: https://github.com/LingmoOS/core
 
-Package: cute-core
+Package: lingmo-core
 Architecture: any
 Depends: accountsservice,
          python3-dbus,
@@ -62,4 +62,4 @@ Depends: accountsservice,
          appmenu-gtk3-module,
          ${misc:Depends},
          ${shlibs:Depends}
-Description:  Lingmo System Components
+Description: LingmoOS System Components

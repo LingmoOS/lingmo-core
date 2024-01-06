@@ -1,5 +1,5 @@
-project(cute-powerman)
-set(TARGET cute-powerman)
+project(lingmo-powerman)
+set(TARGET lingmo-powerman)
 
 find_package(KF5IdleTime)
 find_package(X11)
@@ -26,10 +26,10 @@ set(SOURCES
 )
 
 qt5_add_dbus_adaptor(DBUS_SOURCES
-                     cpu/com.cute.CPUManagement.xml
+                     cpu/com.lingmo.CPUManagement.xml
                      cpu/cpumanagement.h CPUManagement)
 qt5_add_dbus_adaptor(DBUS_SOURCES
-                     com.cute.PowerManager.xml
+                     com.lingmo.PowerManager.xml
                      application.h Application)
 qt_add_dbus_interface(DBUS_SOURCES org.freedesktop.ScreenSaver.xml screenlocker_interface)
 set_source_files_properties(${DBUS_SOURCES} PROPERTIES SKIP_AUTOGEN ON)

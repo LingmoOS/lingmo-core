@@ -1,5 +1,5 @@
-project(cute-screen-brightness)
-set(PROJECT_NAME cute-screen-brightness)
+project(lingmo-screen-brightness)
+set(PROJECT_NAME lingmo-screen-brightness)
 
 set(SRCS
     main.cpp
@@ -18,10 +18,10 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 configure_file(
-    com.cute.brightness.pkexec.policy.in
-    com.cute.brightness.pkexec.policy
+    com.lingmo.brightness.pkexec.policy.in
+    com.lingmo.brightness.pkexec.policy
     @ONLY
 )
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/com.cute.brightness.pkexec.policy DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/polkit-1/actions/)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/com.lingmo.brightness.pkexec.policy DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/polkit-1/actions/)

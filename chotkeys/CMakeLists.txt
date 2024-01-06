@@ -5,15 +5,16 @@ find_package(X11)
 set(PROJECT_SOURCES
     main.cpp
     application.cpp
+    hotkeys.cpp
     QHotkey/qhotkey.cpp
     QHotkey/qhotkey_x11.cpp
 )
 
-add_executable(cute-chotkeys
+add_executable(lingmo-chotkeys
     ${PROJECT_SOURCES}
 )
 
-target_link_libraries(cute-chotkeys
+target_link_libraries(lingmo-chotkeys
     PRIVATE
     Qt5::Core
     Qt5::Widgets
@@ -24,4 +25,4 @@ target_link_libraries(cute-chotkeys
     XCB::KEYSYMS
 )
 
-install(TARGETS cute-chotkeys RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(TARGETS lingmo-chotkeys RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

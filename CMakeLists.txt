@@ -13,7 +13,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake;${CMAKE_CURRENT
 
 set(QT Core Gui Widgets Quick QuickControls2 DBus Xml X11Extras LinguistTools)
 find_package(Qt5 REQUIRED ${QT})
-# find_package(CuteUI REQUIRED)
+# find_package(LingmoUI REQUIRED)
 find_package(PkgConfig REQUIRED)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH})
@@ -36,6 +36,4 @@ add_subdirectory(clipboard)
 add_subdirectory(chotkeys)
 
 install(FILES lingmo DESTINATION /etc/ COMPONENT Runtime)
-install(FILES OpenLingmo_version DESTINATION /etc/OpenLingmo/ COMPONENT Runtime)
-install(FILES build DESTINATION /etc/build/ COMPONENT Runtime)
-install(FILES wallpaper-color-pick/cute-wallpaper-color-pick DESTINATION "/usr/bin/")
+install(FILES wallpaper-color-pick/lingmo-wallpaper-color-pick DESTINATION "/usr/bin/")

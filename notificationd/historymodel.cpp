@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2021 CuteOS Team.
+ * Copyright (C) 2023-2024 LingmoOS Team.
  *
- * Author:     Reion Wong <reion@cuteos.com>
+ * Author:     Reion Wong <reion@lingmoos.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -132,7 +132,7 @@ void HistoryModel::clearAll()
 
 void HistoryModel::save()
 {
-    QSettings settings(QSettings::UserScope, "cuteos", "notifications");
+    QSettings settings(QSettings::UserScope, "lingmoos", "notifications");
     settings.clear();
 
     QByteArray datas;
@@ -145,7 +145,7 @@ void HistoryModel::save()
 
 void HistoryModel::initDatas()
 {
-    QSettings settings(QSettings::UserScope, "cuteos", "notifications");
+    QSettings settings(QSettings::UserScope, "lingmoos", "notifications");
     QByteArray listByteArray = settings.value("datas").toByteArray();
     QDataStream in(&listByteArray, QIODevice::ReadOnly);
     in >> m_notifications;

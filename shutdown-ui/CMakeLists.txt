@@ -1,12 +1,12 @@
-project(cute-shutdown)
+project(lingmo-shutdown)
 
-add_executable(cute-shutdown
+add_executable(lingmo-shutdown
     main.cpp
     actions.cpp
     qml.qrc
 )
 
-target_link_libraries(cute-shutdown
+target_link_libraries(lingmo-shutdown
         Qt5::Core
         Qt5::Widgets
         Qt5::Quick
@@ -17,7 +17,7 @@ target_link_libraries(cute-shutdown
 file(GLOB TS_FILES translations/*.ts)
 qt5_create_translation(QM_FILES ${TS_FILES})
 add_custom_target(shutdown-translations DEPENDS ${QM_FILES} SOURCES ${TS_FILES})
-add_dependencies(cute-shutdown shutdown-translations)
-install(FILES ${QM_FILES} DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/cute-shutdown/translations)
+add_dependencies(lingmo-shutdown shutdown-translations)
+install(FILES ${QM_FILES} DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/lingmo-shutdown/translations)
 
-install(TARGETS cute-shutdown RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(TARGETS lingmo-shutdown RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

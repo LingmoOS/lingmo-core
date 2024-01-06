@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
 Name=PolicyKit Handler
-TryExec=cute-polkit-agent
-Exec=cute-polkit-agent
+TryExec=lingmo-polkit-agent
+Exec=lingmo-polkit-agent
 NoDisplay=true

@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2021 CuteOS Team.
+ * Copyright (C) 2023-2024 LingmoOS Team.
  *
- * Author:     Reion Wong <aj@cuteos.com>
+ * Author:     Reion Wong <aj@lingmoos.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,9 +23,9 @@ import QtQuick.Controls 2.5
 import QtQuick.Layouts 1.3
 import QtGraphicalEffects 1.0
 
-import Cute.Accounts 1.0 as Accounts
-import Cute.System 1.0 as System
-import CuteUI 1.0 as CuteUI
+import Lingmo.Accounts 1.0 as Accounts
+import Lingmo.System 1.0 as System
+import LingmoUI 1.0 as LingmoUI
 
 ApplicationWindow {
     width: Screen.width
@@ -141,7 +141,7 @@ ApplicationWindow {
 
             ColumnLayout {
                 anchors.fill: parent
-                spacing: CuteUI.Units.largeSpacing
+                spacing: LingmoUI.Units.largeSpacing
 
                 Item {
                     Layout.fillHeight: true

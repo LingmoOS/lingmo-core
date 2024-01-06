@@ -441,11 +441,11 @@ def paletteSort(palette):
 
 if __name__ == "__main__":
     bus = dbus.SessionBus()
-    proxy = bus.get_object('com.cute.Settings', 
+    proxy = bus.get_object('com.lingmo.Settings', 
                             '/Theme')
     iface = dbus.Interface(proxy,dbus.PROPERTIES_IFACE)
-    wallpaper = iface.Get('com.cute.Theme', 'wallpaper')
-    iface = dbus.Interface(proxy, dbus_interface='com.cute.Theme')
+    wallpaper = iface.Get('com.lingmo.Theme', 'wallpaper')
+    iface = dbus.Interface(proxy, dbus_interface='com.lingmo.Theme')
 
     color_thief = ColorThief(wallpaper)
     palette = color_thief.get_palette(color_count=7,quality=10)

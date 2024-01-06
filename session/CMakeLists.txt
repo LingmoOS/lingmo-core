@@ -1,5 +1,5 @@
-project(cute-session)
-set(TARGET cute-session)
+project(lingmo-session)
+set(TARGET lingmo-session)
 
 set(SOURCES
     application.cpp
@@ -13,7 +13,7 @@ set(SOURCES
 )
 
 qt5_add_dbus_adaptor(DBUS_SOURCES
-                     com.cute.Session.xml
+                     com.lingmo.Session.xml
                      application.h Application
                      sessionadaptor SessionAdaptor)
 set_source_files_properties(${DBUS_SOURCES} PROPERTIES SKIP_AUTOGEN ON)
@@ -32,4 +32,4 @@ target_link_libraries(${TARGET}
 )
 
 install(TARGETS ${TARGET} DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(FILES cute-xsession.desktop DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/xsessions/)
+install(FILES lingmo-xsession.desktop DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/xsessions/)

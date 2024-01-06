@@ -55,5 +55,5 @@ build/*
 .vscode/
 debian/.debhelper
 debian/files
-debian/cute-core*
+debian/lingmo-core*
 obj-x86_64*

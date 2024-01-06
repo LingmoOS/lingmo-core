@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2023 LingmoOS Team.
+ * Copyright (C) 2023-2024 LingmoOS Team.
  *
- * Author:     LingmoOS team <cuteos@foxmail.com>
+ * Author:     Reion Wong <aj@lingmoos.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ import QtQuick 2.0
 import QtQuick.Controls 2.5
 import QtQuick.Layouts 1.3
 import QtGraphicalEffects 1.0
-import CuteUI 1.0 as CuteUI
+import LingmoUI 1.0 as LingmoUI
 
 Item {
     id: control
@@ -45,7 +45,7 @@ Item {
     ColumnLayout {
         id: layout
         anchors.fill: parent
-        spacing: CuteUI.Units.largeSpacing * 1.5
+        spacing: LingmoUI.Units.largeSpacing * 1.5
 
         Item {
             Layout.fillHeight: true
@@ -57,8 +57,8 @@ Item {
 
             Rectangle {
                 anchors.centerIn: parent
-                width: parent.height + CuteUI.Units.largeSpacing * 2
-                height: parent.height + CuteUI.Units.largeSpacing * 2
+                width: parent.height + LingmoUI.Units.largeSpacing * 2
+                height: parent.height + LingmoUI.Units.largeSpacing * 2
                 z: -1
                 color: "white"
                 opacity: mouseArea.pressed ? 0.1 : mouseArea.containsMouse || control.checked ? 0.2 : 0

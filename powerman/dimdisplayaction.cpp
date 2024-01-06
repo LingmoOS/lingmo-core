@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2021 by Reion Wong <reion@cutefishos.com>               *
+ *   Copyright (C) 2023-2024 by Reion Wong <reion@lingmoos.com>               *
  *   Copyright (C) 2010 by Dario Freddi <drf@kde.org>                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -31,9 +31,9 @@
 
 DimDisplayAction::DimDisplayAction(QObject *parent)
     : Action(parent)
-    , m_iface("com.cute.Settings",
+    , m_iface("com.lingmo.Settings",
               "/Brightness",
-              "com.cute.Brightness", QDBusConnection::sessionBus())
+              "com.lingmo.Brightness", QDBusConnection::sessionBus())
 {
     if (QX11Info::isPlatformX11()) {
         // Disable a default timeout, if any
@@ -73,9 +73,9 @@ void DimDisplayAction::onIdleTimeout(int msec)
 
         // Sleep
         if (m_sleep) {
-            QDBusInterface iface("com.cute.Session",
+            QDBusInterface iface("com.lingmo.Session",
                                  "/Session",
-                                 "com.cute.Session", QDBusConnection::sessionBus());
+                                 "com.lingmo.Session", QDBusConnection::sessionBus());
 
             if (iface.isValid()) {
                 iface.call("suspend");
@@ -83,7 +83,7 @@ void DimDisplayAction::onIdleTimeout(int msec)
         }
 
         if (m_lock) {
-            QProcess::startDetached("cute-screenlocker", QStringList());
+            QProcess::startDetached("lingmo-screenlocker", QStringList());
         }
 
     } else if (sec == (m_dimOnIdleTime * 3 / 4)) {

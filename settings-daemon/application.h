@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 CuteOS Team.
+ * Copyright (C) 2023-2024 LingmoOS Team.
  *
  * Author:     revenmartin <revenmartin@gmail.com>
  *
@@ -41,7 +41,7 @@ public:
     void invokeDesktopProcess();
     void initTrash();
 
-//    void initKWin();
+   void initKWin();
 
 private:
     ThemeManager *m_themeManager;
@@ -51,8 +51,8 @@ private:
     Mouse *m_mouse;
     TouchpadManager *m_touchpad;
     DefaultApplications *m_defaultApps;
-
-//    QTimer *m_kwinTimer;
+//
+   QTimer *m_kwinTimer;
 };
 
 #endif // APPLICATION_H

@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2021 Reion Wong <reion@cutefishos.com>
+ * SPDX-FileCopyrightText: 2023-2024 Reion Wong <reion@lingmoos.com>
  * SPDX-FileCopyrightText: 2018-2019 Kai Uwe Broulik <kde@privat.broulik.de>
  * SPDX-License-Identifier: LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
 */

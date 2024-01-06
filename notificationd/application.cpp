@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2021 CuteOS Team.
+ * Copyright (C) 2023-2024 LingmoOS Team.
  *
- * Author:     Reion Wong <reion@cutefishos.com>
+ * Author:     Reion Wong <reion@lingmoos.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,12 +47,12 @@ Application::Application(int& argc, char** argv)
     , m_settings(Settings::self())
     , m_instance(false)
 {
-    if (QDBusConnection::sessionBus().registerService("com.cute.Notification")) {
-        setOrganizationName("cuteos");
+    if (QDBusConnection::sessionBus().registerService("com.lingmo.Notification")) {
+        setOrganizationName("lingmoos");
 
         // Translations
         QLocale locale;
-        QString qmFilePath = QString("%1/%2.qm").arg("/usr/share/cute-notificationd/translations/").arg(locale.name());
+        QString qmFilePath = QString("%1/%2.qm").arg("/usr/share/lingmo-notificationd/translations/").arg(locale.name());
         if (QFile::exists(qmFilePath)) {
             QTranslator *translator = new QTranslator(this);
             if (translator->load(qmFilePath)) {
@@ -65,10 +65,10 @@ Application::Application(int& argc, char** argv)
         new NotificationAdaptor(this);
         QDBusConnection::sessionBus().registerObject("/Notification", this);
 
-        qmlRegisterType<NotificationsModel>("Cute.Notification", 1, 0, "NotificationsModel");
-        qmlRegisterType<HistoryModel>("Cute.Notification", 1, 0, "HistoryModel");
-        qmlRegisterType<ScreenHelper>("Cute.Notification", 1, 0, "ScreenHelper");
-        qmlRegisterType<NotificationPopup>("Cute.Notification", 1, 0, "NotificationPopup");
+        qmlRegisterType<NotificationsModel>("Lingmo.Notification", 1, 0, "NotificationsModel");
+        qmlRegisterType<HistoryModel>("Lingmo.Notification", 1, 0, "HistoryModel");
+        qmlRegisterType<ScreenHelper>("Lingmo.Notification", 1, 0, "ScreenHelper");
+        qmlRegisterType<NotificationPopup>("Lingmo.Notification", 1, 0, "NotificationPopup");
 
         m_instance = true;
     }
@@ -121,9 +121,9 @@ bool Application::parseCommandLineArgs()
     if (m_instance) {
         QPixmapCache::setCacheLimit(2048);
     } else {
-        QDBusInterface iface("com.cute.Notification",
+        QDBusInterface iface("com.lingmo.Notification",
                              "/Notification",
-                             "com.cute.Notification",
+                             "com.lingmo.Notification",
                              QDBusConnection::sessionBus(), this);
         if (iface.isValid() && parser.isSet(showOption)) {
             iface.call("showWindow");

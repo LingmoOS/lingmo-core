@@ -1,5 +1,5 @@
-project(cute-sddm-helper)
-set(PROJECT_NAME cute-sddm-helper)
+project(lingmo-sddm-helper)
+set(PROJECT_NAME lingmo-sddm-helper)
 
 set(SRCS
     main.cpp
@@ -15,10 +15,10 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 configure_file(
-    com.cute.sddm.helper.pkexec.policy.in
-    com.cute.sddm.helper.pkexec.policy
+    com.lingmo.sddm.helper.pkexec.policy.in
+    com.lingmo.sddm.helper.pkexec.policy
     @ONLY
 )
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/com.cute.sddm.helper.pkexec.policy DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/polkit-1/actions/)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/com.lingmo.sddm.helper.pkexec.policy DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/polkit-1/actions/)

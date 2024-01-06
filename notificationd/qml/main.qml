@@ -1,5 +1,5 @@
 /*
-    SPDX-FileCopyrightText: 2021 Reion Wong <reion@cutefishos.com>
+    SPDX-FileCopyrightText: 2023-2024 Reion Wong <reion@lingmoos.com>
     SPDX-FileCopyrightText: 2019 Kai Uwe Broulik <kde@privat.broulik.de>
     SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted-GPL
 */
@@ -10,8 +10,8 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 import QtQuick.Window 2.12
 import QtGraphicalEffects 1.0
-import CuteUI 1.0 as CuteUI
-import Cute.Notification 1.0
+import LingmoUI 1.0 as LingmoUI
+import Lingmo.Notification 1.0
 
 Item {
     id: root
@@ -20,8 +20,8 @@ Item {
     height: 0
     visible: false
 
-    property int popupEdgeDistance: CuteUI.Units.largeSpacing
-    property int popupSpacing: CuteUI.Units.largeSpacing
+    property int popupEdgeDistance: LingmoUI.Units.largeSpacing
+    property int popupSpacing: LingmoUI.Units.largeSpacing
     readonly property real popupMaximumScreenFill: 0.4
 
     readonly property rect screenRect: {

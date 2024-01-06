@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2023 LingmoOS Team.
+ * Copyright (C) 2023-2024 LingmoOS Team.
  *
- * Author:     LingmoOS <cuteos@foxmail.com>
+ * Author:     revenmartin <revenmartin@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,9 +23,9 @@
 #include <QApplication>
 #include <QProcess>
 
-const static QString s_dbusName = "com.cute.Session";
+const static QString s_dbusName = "com.lingmo.Session";
 const static QString s_pathName = "/Session";
-const static QString s_interfaceName = "com.cute.Session";
+const static QString s_interfaceName = "com.lingmo.Session";
 
 Actions::Actions(QObject *parent)
     : QObject(parent)
@@ -59,7 +59,7 @@ void Actions::reboot()
 
 void Actions::lockScreen()
 {
-    QProcess::startDetached("cute-screenlocker", QStringList());
+    QProcess::startDetached("lingmo-screenlocker", QStringList());
     qApp->exit(0);
 }
 

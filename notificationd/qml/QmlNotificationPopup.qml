@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2021 CuteOS Team.
+ * Copyright (C) 2023-2024 LingmoOS Team.
  *
- * Author:     Reion Wong <reion@cutefishos.com>
+ * Author:     Reion Wong <reion@lingmoos.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 import QtQuick.Window 2.12
 import QtGraphicalEffects 1.0
-import CuteUI 1.0 as CuteUI
-import Cute.Notification 1.0
+import LingmoUI 1.0 as LingmoUI
+import Lingmo.Notification 1.0
 
 NotificationPopup {
     id: control
@@ -36,12 +36,12 @@ NotificationPopup {
 
     property int defaultTimeout: 7000
 
-    CuteUI.WindowShadow {
+    LingmoUI.WindowShadow {
         view: control
         radius: _background.radius
     }
 
-    CuteUI.WindowBlur {
+    LingmoUI.WindowBlur {
         view: control
         geometry: Qt.rect(control.x, control.y, control.width, control.height)
         windowRadius: _background.radius
@@ -52,7 +52,7 @@ NotificationPopup {
         id: _background
         anchors.fill: parent
         radius: height * 0.2
-        color: CuteUI.Theme.backgroundColor
+        color: LingmoUI.Theme.backgroundColor
         opacity: 0.5
     }
 
@@ -75,11 +75,11 @@ NotificationPopup {
 
     RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: CuteUI.Units.smallSpacing * 1.5
-        anchors.rightMargin: CuteUI.Units.smallSpacing
-        anchors.topMargin: CuteUI.Units.smallSpacing
-        anchors.bottomMargin: CuteUI.Units.smallSpacing
-        spacing: CuteUI.Units.largeSpacing
+        anchors.leftMargin: LingmoUI.Units.smallSpacing * 1.5
+        anchors.rightMargin: LingmoUI.Units.smallSpacing
+        anchors.topMargin: LingmoUI.Units.smallSpacing
+        anchors.bottomMargin: LingmoUI.Units.smallSpacing
+        spacing: LingmoUI.Units.largeSpacing
 
         Image {
             id: _icon
@@ -118,13 +118,13 @@ NotificationPopup {
                 visible: text
                 elide: Text.ElideRight
                 Layout.fillWidth: true
-                rightPadding: CuteUI.Units.smallSpacing
+                rightPadding: LingmoUI.Units.smallSpacing
             }
 
             Label {
                 text: model.body
                 visible: text
-                rightPadding: CuteUI.Units.smallSpacing
+                rightPadding: LingmoUI.Units.smallSpacing
                 maximumLineCount: 2
                 elide: Text.ElideRight
                 wrapMode: Text.Wrap
@@ -142,20 +142,20 @@ NotificationPopup {
     Image {
         anchors.top: parent.top
         anchors.right: parent.right
-        anchors.topMargin: CuteUI.Units.smallSpacing / 2
-        anchors.rightMargin: CuteUI.Units.smallSpacing
+        anchors.topMargin: LingmoUI.Units.smallSpacing / 2
+        anchors.rightMargin: LingmoUI.Units.smallSpacing
         width: 24
         height: 24
-        source: "qrc:/images/" + (CuteUI.Theme.darkMode ? "dark" : "light") + "/close.svg"
+        source: "qrc:/images/" + (LingmoUI.Theme.darkMode ? "dark" : "light") + "/close.svg"
         sourceSize: Qt.size(width, height)
         visible: _mouseArea.containsMouse || _closeBtnArea.containsMouse
         z: 9999
 
         Rectangle {
-            property color hoveredColor: CuteUI.Theme.darkMode ? Qt.lighter(CuteUI.Theme.backgroundColor, 2)
-                                                               : Qt.darker(CuteUI.Theme.backgroundColor, 1.2)
-            property color pressedColor: CuteUI.Theme.darkMode ? Qt.lighter(CuteUI.Theme.backgroundColor, 1.5)
-                                                               : Qt.darker(CuteUI.Theme.backgroundColor, 1.3)
+            property color hoveredColor: LingmoUI.Theme.darkMode ? Qt.lighter(LingmoUI.Theme.backgroundColor, 2)
+                                                               : Qt.darker(LingmoUI.Theme.backgroundColor, 1.2)
+            property color pressedColor: LingmoUI.Theme.darkMode ? Qt.lighter(LingmoUI.Theme.backgroundColor, 1.5)
+                                                               : Qt.darker(LingmoUI.Theme.backgroundColor, 1.3)
 
             z: -1
             anchors.fill: parent

@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2021 CuteOS Team.
+ * Copyright (C) 2023-2024 LingmoOS Team.
  *
- * Author:     Reion Wong <reion@cutefishos.com>
+ * Author:     Reion Wong <reion@lingmoos.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,8 +23,8 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 import QtQuick.Window 2.12
 import QtGraphicalEffects 1.0
-import CuteUI 1.0 as CuteUI
-import Cute.Notification 1.0
+import LingmoUI 1.0 as LingmoUI
+import Lingmo.Notification 1.0
 
 Item {
     id: control
@@ -34,13 +34,13 @@ Item {
     Rectangle {
         id: _background
         anchors.fill: parent
-        color: CuteUI.Theme.secondBackgroundColor
+        color: LingmoUI.Theme.secondBackgroundColor
         radius: NotificationDialog.width * 0.05
         opacity: 0.7
 
-        border.width: 1 / CuteUI.Units.devicePixelRatio
+        border.width: 1 / LingmoUI.Units.devicePixelRatio
         border.pixelAligned: Screen.devicePixelRatio > 1 ? false : true
-        border.color: CuteUI.Theme.darkMode ? Qt.rgba(255, 255, 255, 0.1)
+        border.color: LingmoUI.Theme.darkMode ? Qt.rgba(255, 255, 255, 0.1)
                                             : Qt.rgba(0, 0, 0, 0.05)
     }
 
@@ -54,25 +54,25 @@ Item {
 
     onScreenRectChanged: {
         NotificationDialog.width = 350
-        NotificationDialog.height = screenRect.height - CuteUI.Units.smallSpacing * 3
-        NotificationDialog.x = screenRect.x + screenRect.width - NotificationDialog.width - CuteUI.Units.smallSpacing * 1.5
-        NotificationDialog.y = screenRect.y + CuteUI.Units.smallSpacing * 1.5
+        NotificationDialog.height = screenRect.height - LingmoUI.Units.smallSpacing * 3
+        NotificationDialog.x = screenRect.x + screenRect.width - NotificationDialog.width - LingmoUI.Units.smallSpacing * 1.5
+        NotificationDialog.y = screenRect.y + LingmoUI.Units.smallSpacing * 1.5
     }
 
     ScreenHelper {
         id: screen
     }
 
-    CuteUI.WindowHelper {
+    LingmoUI.WindowHelper {
         id: windowHelper
     }
 
-    CuteUI.WindowShadow {
+    LingmoUI.WindowShadow {
         view: NotificationDialog
         radius: _background.radius
     }
 
-    CuteUI.WindowBlur {
+    LingmoUI.WindowBlur {
         view: NotificationDialog
         geometry: Qt.rect(NotificationDialog.x,
                           NotificationDialog.y,
@@ -94,20 +94,20 @@ Item {
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.topMargin: CuteUI.Units.largeSpacing
-        anchors.bottomMargin: CuteUI.Units.largeSpacing
-        spacing: CuteUI.Units.largeSpacing
+        anchors.topMargin: LingmoUI.Units.largeSpacing
+        anchors.bottomMargin: LingmoUI.Units.largeSpacing
+        spacing: LingmoUI.Units.largeSpacing
 
         RowLayout {
-            Layout.leftMargin: CuteUI.Units.largeSpacing
-            Layout.rightMargin: CuteUI.Units.largeSpacing
+            Layout.leftMargin: LingmoUI.Units.largeSpacing
+            Layout.rightMargin: LingmoUI.Units.largeSpacing
 
             Label {
                 text: qsTr("Notification Center")
                 Layout.fillWidth: true
                 elide: Text.ElideRight
-                leftPadding: CuteUI.Units.smallSpacing
-                color: CuteUI.Theme.textColor
+                leftPadding: LingmoUI.Units.smallSpacing
+                color: LingmoUI.Theme.textColor
                 font.pointSize: 15
 
                 MouseArea {
@@ -127,7 +127,7 @@ Item {
                 visible: _view.count > 0
                 Layout.preferredHeight: 30
                 Layout.preferredWidth: 30
-                source: CuteUI.Theme.darkMode ? "qrc:/images/dark/clear.svg"
+                source: LingmoUI.Theme.darkMode ? "qrc:/images/dark/clear.svg"
                                               : "qrc:/images/light/clear.svg"
                 onLeftButtonClicked: historyModel.clearAll()
             }
@@ -141,19 +141,19 @@ Item {
                 id: _view
                 anchors.fill: parent
                 model: historyModel
-                spacing: CuteUI.Units.largeSpacing
+                spacing: LingmoUI.Units.largeSpacing
                 highlightFollowsCurrentItem: true
                 clip: true
 
-                leftMargin: CuteUI.Units.largeSpacing
-                rightMargin: CuteUI.Units.largeSpacing
+                leftMargin: LingmoUI.Units.largeSpacing
+                rightMargin: LingmoUI.Units.largeSpacing
 
                 ScrollBar.vertical: ScrollBar {}
 
                 Label {
                     anchors.centerIn: parent
                     text: qsTr("No notifications")
-                    color: CuteUI.Theme.disabledTextColor
+                    color: LingmoUI.Theme.disabledTextColor
                     font.pointSize: 15
                     visible: _view.count === 0
                 }
@@ -168,10 +168,10 @@ Item {
 
                     Rectangle {
                         anchors.fill: parent
-                        color: CuteUI.Theme.darkMode ? "white"
+                        color: LingmoUI.Theme.darkMode ? "white"
                                                      : "black"
-                        radius: CuteUI.Theme.bigRadius
-                        opacity: CuteUI.Theme.darkMode ? 0.1
+                        radius: LingmoUI.Theme.bigRadius
+                        opacity: LingmoUI.Theme.darkMode ? 0.1
                                                        : 0.03
                     }
 
@@ -184,10 +184,10 @@ Item {
 
                     RowLayout {
                         anchors.fill: parent
-                        anchors.margins: CuteUI.Units.largeSpacing
-                        anchors.leftMargin: CuteUI.Units.smallSpacing * 1.5
-                        anchors.rightMargin: CuteUI.Units.smallSpacing * 1.5
-                        spacing: CuteUI.Units.smallSpacing
+                        anchors.margins: LingmoUI.Units.largeSpacing
+                        anchors.leftMargin: LingmoUI.Units.smallSpacing * 1.5
+                        anchors.rightMargin: LingmoUI.Units.smallSpacing * 1.5
+                        spacing: LingmoUI.Units.smallSpacing
 
                         Image {
                             id: _icon
@@ -226,7 +226,7 @@ Item {
                                 visible: text
                                 elide: Text.ElideRight
                                 Layout.fillWidth: true
-                                rightPadding: CuteUI.Units.smallSpacing
+                                rightPadding: LingmoUI.Units.smallSpacing
                             }
 
                             RowLayout {
@@ -234,7 +234,7 @@ Item {
                                     id: bodyLabel
                                     text: model.body
                                     visible: text
-                                    rightPadding: CuteUI.Units.smallSpacing
+                                    rightPadding: LingmoUI.Units.smallSpacing
                                     maximumLineCount: 2
                                     elide: Text.ElideRight
                                     wrapMode: Text.Wrap
@@ -245,7 +245,7 @@ Item {
 
                                 Label {
                                     text: model.created
-                                    rightPadding: CuteUI.Units.smallSpacing
+                                    rightPadding: LingmoUI.Units.smallSpacing
                                     Layout.alignment: Qt.AlignRight
                                 }
                             }
@@ -259,20 +259,20 @@ Item {
                     Image {
                         anchors.top: parent.top
                         anchors.right: parent.right
-                        anchors.topMargin: CuteUI.Units.smallSpacing / 2
-                        anchors.rightMargin: CuteUI.Units.smallSpacing / 2
+                        anchors.topMargin: LingmoUI.Units.smallSpacing / 2
+                        anchors.rightMargin: LingmoUI.Units.smallSpacing / 2
                         width: 24
                         height: 24
-                        source: "qrc:/images/" + (CuteUI.Theme.darkMode ? "dark" : "light") + "/close.svg"
+                        source: "qrc:/images/" + (LingmoUI.Theme.darkMode ? "dark" : "light") + "/close.svg"
                         sourceSize: Qt.size(width, height)
                         visible: _itemMouseArea.containsMouse
                         z: 9999
 
                         Rectangle {
-                            property color hoveredColor: CuteUI.Theme.darkMode ? Qt.lighter(CuteUI.Theme.backgroundColor, 2)
-                                                                               : Qt.darker(CuteUI.Theme.backgroundColor, 1.2)
-                            property color pressedColor: CuteUI.Theme.darkMode ? Qt.lighter(CuteUI.Theme.backgroundColor, 1.5)
-                                                                               : Qt.darker(CuteUI.Theme.backgroundColor, 1.3)
+                            property color hoveredColor: LingmoUI.Theme.darkMode ? Qt.lighter(LingmoUI.Theme.backgroundColor, 2)
+                                                                               : Qt.darker(LingmoUI.Theme.backgroundColor, 1.2)
+                            property color pressedColor: LingmoUI.Theme.darkMode ? Qt.lighter(LingmoUI.Theme.backgroundColor, 1.5)
+                                                                               : Qt.darker(LingmoUI.Theme.backgroundColor, 1.3)
 
                             z: -1
                             anchors.fill: parent

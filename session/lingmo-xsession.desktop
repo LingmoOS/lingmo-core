@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
-Exec=cute-session
-TryExec=cute-session
-Name=Cute Desktop
+Exec=lingmo-session
+TryExec=lingmo-session
+Name=Lingmo Desktop
 Keywords=session
 Comment=session

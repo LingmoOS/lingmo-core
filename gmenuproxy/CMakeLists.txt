@@ -29,11 +29,11 @@ set(GMENU_DBUSMENU_PROXY_SRCS
 
 # qt_add_dbus_adaptor(GMENU_DBUSMENU_PROXY_SRCS ./com.canonical.dbusmenu.xml window.h Window)
 
-add_executable(cute-gmenuproxy ${GMENU_DBUSMENU_PROXY_SRCS})
+add_executable(lingmo-gmenuproxy ${GMENU_DBUSMENU_PROXY_SRCS})
 
 set_package_properties(XCB PROPERTIES TYPE REQUIRED)
 
-target_link_libraries(cute-gmenuproxy
+target_link_libraries(lingmo-gmenuproxy
     Qt5::Core
     Qt5::X11Extras
     Qt5::DBus
@@ -44,10 +44,10 @@ target_link_libraries(cute-gmenuproxy
 )
 
 configure_file(
-    cute-gmenuproxy.service.in
-    cute-gmenuproxy.service
+    lingmo-gmenuproxy.service.in
+    lingmo-gmenuproxy.service
     @ONLY
 )
 
-install(TARGETS cute-gmenuproxy DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cute-gmenuproxy.service DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/systemd/user/)
+install(TARGETS lingmo-gmenuproxy DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lingmo-gmenuproxy.service DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/systemd/user/)

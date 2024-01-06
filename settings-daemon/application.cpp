@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 CuteOS Team.
+ * Copyright (C) 2023-2024 LingmoOS Team.
  *
  * Author:     revenmartin <revenmartin@gmail.com>
  *
@@ -45,22 +45,24 @@ Application::Application(int &argc, char **argv)
     , m_mouse(new Mouse)
     , m_touchpad(new TouchpadManager)
     , m_defaultApps(new DefaultApplications)
-//    , m_kwinTimer(new QTimer(this))
+    //
+   , m_kwinTimer(new QTimer(this))
 {
     initTrash();
 
     new DBusAdaptor(this);
     // connect to D-Bus and register as an object:
-    QDBusConnection::sessionBus().registerService(QStringLiteral("com.cute.Settings"));
+    QDBusConnection::sessionBus().registerService(QStringLiteral("com.lingmo.Settings"));
 
-//    m_kwinTimer->setSingleShot(false);
-//    m_kwinTimer->setInterval(50);
-//    connect(m_kwinTimer, &QTimer::timeout, this, &Application::initKWin);
-//    m_kwinTimer->start();
+//
+   m_kwinTimer->setSingleShot(false);
+   m_kwinTimer->setInterval(50);
+   connect(m_kwinTimer, &QTimer::timeout, this, &Application::initKWin);
+   m_kwinTimer->start();
 
     // Translations
     QLocale locale;
-    QString qmFilePath = QString("%1/%2.qm").arg("/usr/share/cute-settings-daemon/translations/").arg(locale.name());
+    QString qmFilePath = QString("%1/%2.qm").arg("/usr/share/lingmo-settings-daemon/translations/").arg(locale.name());
     if (QFile::exists(qmFilePath)) {
         QTranslator *translator = new QTranslator(QApplication::instance());
         if (translator->load(qmFilePath)) {
@@ -76,7 +78,7 @@ Application::Application(int &argc, char **argv)
 void Application::invokeDesktopProcess()
 {
     // Start desktop UI component.
-    QDBusInterface sessionInterface("com.cute.Session", "/Session", "com.cute.Session",
+    QDBusInterface sessionInterface("com.lingmo.Session", "/Session", "com.lingmo.Session",
                                     QDBusConnection::sessionBus());
 
     if (sessionInterface.isValid()) {
@@ -113,27 +115,27 @@ void Application::initTrash()
     }
 }
 
-//void Application::initKWin()
-//{
-//    QDBusInterface effect("org.kde.KWin", "/Effects", "org.kde.kwin.Effects",
-//                           QDBusConnection::sessionBus());
+void Application::initKWin()
+{
+   QDBusInterface effect("org.kde.KWin", "/Effects", "org.kde.kwin.Effects",
+                          QDBusConnection::sessionBus());
 
-//    if (effect.isValid() && !effect.lastError().isValid()) {
-//        // KWin
-//        effect.call("loadEffect", "kwin4_effect_dialogparent");
+   if (effect.isValid() && !effect.lastError().isValid()) {
+       // KWin
+       effect.call("loadEffect", "kwin4_effect_dialogparent");
 
-//        effect.call("unloadEffect", "kwin4_effect_fadingpopups");
-//        effect.call("unloadEffect", "kwin4_effect_fade");
-//        effect.call("unloadEffect", "kwin4_effect_scale");
-//        effect.call("unloadEffect", "kwin4_effect_grayscale");
-//        effect.call("unloadEffect", "kwin4_effect_squash");
-//        effect.call("unloadEffect", "kwin4_effect_translucency");
-//        effect.call("unloadEffect", "magiclamp");
+       effect.call("unloadEffect", "kwin4_effect_fadingpopups");
+       effect.call("unloadEffect", "kwin4_effect_fade");
+       effect.call("unloadEffect", "kwin4_effect_scale");
+       effect.call("unloadEffect", "kwin4_effect_grayscale");
+       effect.call("unloadEffect", "kwin4_effect_squash");
+       effect.call("unloadEffect", "kwin4_effect_translucency");
+       effect.call("unloadEffect", "magiclamp");
 
-//        effect.call("loadEffect", "cute_popups");
-//        effect.call("loadEffect", "cute_scale");
-//        effect.call("loadEffect", "cute_squash");
+       effect.call("loadEffect", "lingmo_popups");
+       effect.call("loadEffect", "lingmo_scale");
+       effect.call("loadEffect", "lingmo_squash");
 
-//        m_kwinTimer->stop();
-//    }
-//}
+       m_kwinTimer->stop();
+   }
+}

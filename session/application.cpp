@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2023-2024 LingmoOS Team.
+ *
+ * Author:     revenmartin <revenmartin@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "application.h"
 #include "sessionadaptor.h"
 
@@ -71,11 +90,11 @@ Application::Application(int &argc, char **argv)
     new SessionAdaptor(this);
 
     // connect to D-Bus and register as an object:
-    QDBusConnection::sessionBus().registerService(QStringLiteral("com.cute.Session"));
+    QDBusConnection::sessionBus().registerService(QStringLiteral("com.lingmo.Session"));
     QDBusConnection::sessionBus().registerObject(QStringLiteral("/Session"), this);
 
     QCommandLineParser parser;
-    parser.setApplicationDescription(QStringLiteral("Cute Session"));
+    parser.setApplicationDescription(QStringLiteral("Lingmo Session"));
     parser.addHelpOption();
 
     QCommandLineOption waylandOption(QStringList() << "w" << "wayland" << "Wayland Mode");
@@ -155,13 +174,13 @@ void Application::initEnvironments()
         qputenv("XDG_CONFIG_DIRS", "/etc/xdg");
 
     // Environment
-    qputenv("DESKTOP_SESSION", "Cute");
-    qputenv("XDG_CURRENT_DESKTOP", "Cute");
-    qputenv("XDG_SESSION_DESKTOP", "Cute");
+    qputenv("DESKTOP_SESSION", "Lingmo");
+    qputenv("XDG_CURRENT_DESKTOP", "Lingmo");
+    qputenv("XDG_SESSION_DESKTOP", "Lingmo");
 
     // Qt
-    qputenv("QT_QPA_PLATFORMTHEME", "cute");
-    qputenv("QT_PLATFORM_PLUGIN", "cute");
+    qputenv("QT_QPA_PLATFORMTHEME", "lingmo");
+    qputenv("QT_PLATFORM_PLUGIN", "lingmo");
     
     // ref: https://stackoverflow.com/questions/34399993/qml-performance-issue-when-updating-an-item-in-presence-of-many-non-overlapping
     qputenv("QT_QPA_UPDATE_IDLE_TIME", "10");
@@ -178,7 +197,7 @@ void Application::initEnvironments()
 
 void Application::initLanguage()
 {
-    QSettings settings(QSettings::UserScope, "cuteos", "language");
+    QSettings settings(QSettings::UserScope, "lingmoos", "language");
     QString value = settings.value("language", "").toString();
 
     // Init Language
@@ -224,7 +243,7 @@ void Application::initLanguage()
 
 void Application::initScreenScaleFactors()
 {
-    QSettings settings(QSettings::UserScope, "cuteos", "theme");
+    QSettings settings(QSettings::UserScope, "lingmoos", "theme");
     qreal scaleFactor = settings.value("PixelRatio", 1.0).toReal();
 
     qputenv("QT_SCREEN_SCALE_FACTORS", QByteArray::number(scaleFactor));
@@ -241,7 +260,7 @@ void Application::initScreenScaleFactors()
 
 void Application::initXResource()
 {
-    QSettings settings(QSettings::UserScope, "cuteos", "theme");
+    QSettings settings(QSettings::UserScope, "lingmoos", "theme");
     qreal scaleFactor = settings.value("PixelRatio", 1.0).toReal();
     int fontDpi = 96 * scaleFactor;
     QString cursorTheme = settings.value("CursorTheme", "default").toString();
@@ -268,8 +287,8 @@ void Application::initXResource()
     p.closeWriteChannel();
     p.waitForFinished(-1);
 
-    // For cute-wine
-    qputenv("CUTE_FONT_DPI", QByteArray::number(fontDpi));
+    // For lingmo-wine
+    qputenv("LINGMO_FONT_DPI", QByteArray::number(fontDpi));
 
     // Init cursor
     runSync("cupdatecursor", {cursorTheme, QString::number(cursorSize)});
@@ -298,7 +317,7 @@ void Application::initKWinConfig()
     settings.setValue("BorderSize", "Normal");
     settings.setValue("ButtonsOnLeft", "");
     settings.setValue("ButtonsOnRight", "HIAX");
-    settings.setValue("library", "org.cute.decoration");
+    settings.setValue("library", "org.lingmo.decoration");
     settings.setValue("theme", "");
     settings.endGroup();
 }
@@ -317,7 +336,7 @@ bool Application::syncDBusEnvironment()
 
 // Import systemd user environment.
 // Systemd read ~/.config/environment.d which applies to all systemd user unit.
-// But it won't work if cuteDE is not started by systemd.
+// But it won't work if lingmoDE is not started by systemd.
 void Application::importSystemdEnvrionment()
 {
     auto environment = getSystemdEnvironment();
@@ -350,9 +369,9 @@ void Application::createConfigDirectory()
 
 void Application::updateUserDirs()
 {
-    // bool isCuteOS = QFile::exists("/etc/cuteos");
+    // bool isLingmoOS = QFile::exists("/etc/lingmoos");
 
-    // if (!isCuteOS)
+    // if (!isLingmoOS)
     //     return;
 
     // QProcess p;

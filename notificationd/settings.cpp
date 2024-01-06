@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2021 CuteOS Team.
+ * Copyright (C) 2023-2024 LingmoOS Team.
  *
- * Author:     Kate Leet <kateleet@cutefishos.com>
+ * Author:     Kate Leet <kateleet@lingmoos.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ Settings *Settings::self()
 
 Settings::Settings(QObject *parent)
     : QObject(parent)
-    , m_settings(QSettings::UserScope, "cuteos", "notification")
+    , m_settings(QSettings::UserScope, "lingmoos", "notification")
 {
     m_doNotDisturb = m_settings.value("DoNotDisturb", false).toBool();
 }

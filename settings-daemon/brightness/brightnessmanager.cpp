@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 CuteOS Team.
+ * Copyright (C) 2023-2024 LingmoOS Team.
  *
  * Author:     rekols <rekols@foxmail.com>
  *
@@ -77,7 +77,7 @@ int BrightnessManager::brightness()
 void BrightnessManager::setValue(int value)
 {
     QProcess process;
-    process.start("pkexec", QStringList() << "cute-screen-brightness" << "--set" << QString::number(value));
+    process.start("pkexec", QStringList() << "lingmo-screen-brightness" << "--set" << QString::number(value));
     process.waitForFinished(-1);
 }
 

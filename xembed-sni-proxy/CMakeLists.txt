@@ -1,4 +1,4 @@
-project(cute-xembedsniproxy)
+project(lingmo-xembedsniproxy)
 
 add_definitions(-DQT_NO_CAST_TO_ASCII
 -DQT_NO_CAST_FROM_ASCII
@@ -66,9 +66,9 @@ qt5_add_dbus_interface(DBUS_SOURCES ${statusnotifierwatcher_xml} statusnotifierw
 
 set_source_files_properties(${DBUS_SOURCES} PROPERTIES SKIP_AUTOGEN ON)
 
-add_executable(cute-xembedsniproxy ${XEMBED_SNI_PROXY_SOURCES} ${DBUS_SOURCES})
+add_executable(lingmo-xembedsniproxy ${XEMBED_SNI_PROXY_SOURCES} ${DBUS_SOURCES})
 set_package_properties(XCB PROPERTIES TYPE REQUIRED)
-target_link_libraries(cute-xembedsniproxy
+target_link_libraries(lingmo-xembedsniproxy
     Qt5::Core
     Qt5::X11Extras
     Qt5::DBus
@@ -77,4 +77,4 @@ target_link_libraries(cute-xembedsniproxy
     ${X11_XTest_LIB}
 )
 
-install(TARGETS cute-xembedsniproxy DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(TARGETS lingmo-xembedsniproxy DESTINATION ${CMAKE_INSTALL_BINDIR})
