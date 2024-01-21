@@ -1,28 +1,15 @@
 #include "application.h"
-#include "hotkeys.h"
 #include <QFileSystemWatcher>
 
 Application::Application(QObject *parent)
     : QObject{parent}
-    , m_hotKeys(new Hotkeys)
 {
     initSetting();
-    setupShortcuts();
-
-    connect(m_hotKeys, &Hotkeys::pressed, this, &Application::onPressed);
-    connect(m_hotKeys, &Hotkeys::released, this, &Application::onReleased);
     QFileSystemWatcher *m_FileWatcher = new QFileSystemWatcher(this);
     m_FileWatcher->addPath(QStandardPaths::writableLocation(QStandardPaths::HomeLocation)+"/.config/lingmoglobalshortcutsrc");
     connect(m_FileWatcher, &QFileSystemWatcher::fileChanged, this, &Application::initSetting);
 }
 
-void Application::setupShortcuts()
-{
-    m_hotKeys->registerKey(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_Delete));
-    m_hotKeys->registerKey(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_A));
-    m_hotKeys->registerKey(QKeySequence(Qt::META + Qt::Key_L));
-    // m_hotKeys->registerKey(QKeySequence(Qt::Key_Super_L));
-}
 void Application::initSetting()
 {
     cleanSetting();
@@ -60,12 +47,6 @@ void Application::initSetting()
             QProcess::startDetached(allexec.at(i));
         });
         setting.endGroup();
-    }
-}
-void Application::onReleased(QKeySequence keySeq)
-{
-    if (keySeq == QKeySequence(Qt::Key_Super_L)) {
-        QProcess::startDetached("lingmo-launcher", QStringList());
     }
 }
 void Application::cleanSetting()

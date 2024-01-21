@@ -55,10 +55,10 @@ Application::Application(int &argc, char **argv)
     QDBusConnection::sessionBus().registerService(QStringLiteral("com.lingmo.Settings"));
 
 //
-   m_kwinTimer->setSingleShot(false);
-   m_kwinTimer->setInterval(50);
-   connect(m_kwinTimer, &QTimer::timeout, this, &Application::initKWin);
-   m_kwinTimer->start();
+//   m_kwinTimer->setSingleShot(false);
+//   m_kwinTimer->setInterval(50);
+//   connect(m_kwinTimer, &QTimer::timeout, this, &Application::initKWin);
+//   m_kwinTimer->start();
 
     // Translations
     QLocale locale;

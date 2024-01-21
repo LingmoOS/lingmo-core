@@ -18,12 +18,9 @@ public:
 
 private slots:
     void initSetting();
-    void onPressed(QKeySequence keySeq);
-    void onReleased(QKeySequence keySeq);
 
 private:
     void cleanSetting();
-    Hotkeys *m_hotKeys;
     QStringList all;
     QStringList allexec;
     QList<QHotkey*> allkey;
