@@ -1,3 +1,9 @@
+lingmo-core (1.9.9-18) UNRELEASED; urgency=high
+
+  * Initial release (LingmoOS)  <lingmo@lingmo.org>
+
+ -- Lingmo OS Team <lingmo@lingmo.org>  Sun, 21 Jan 2024 10:20:21 +0800
+
 lingmo-core (1.9.9-10) UNRELEASED; urgency=high
 
   * Initial release (LingmoOS)  <lingmo@lingmo.org>

@@ -115,27 +115,27 @@ void Application::initTrash()
     }
 }
 
-void Application::initKWin()
-{
-   QDBusInterface effect("org.kde.KWin", "/Effects", "org.kde.kwin.Effects",
-                          QDBusConnection::sessionBus());
+// void Application::initKWin()
+// {
+//    QDBusInterface effect("org.kde.KWin", "/Effects", "org.kde.kwin.Effects",
+//                           QDBusConnection::sessionBus());
 
-   if (effect.isValid() && !effect.lastError().isValid()) {
-       // KWin
-       effect.call("loadEffect", "kwin4_effect_dialogparent");
+//    if (effect.isValid() && !effect.lastError().isValid()) {
+//        // KWin
+//        effect.call("loadEffect", "kwin4_effect_dialogparent");
 
-       effect.call("unloadEffect", "kwin4_effect_fadingpopups");
-       effect.call("unloadEffect", "kwin4_effect_fade");
-       effect.call("unloadEffect", "kwin4_effect_scale");
-       effect.call("unloadEffect", "kwin4_effect_grayscale");
-       effect.call("unloadEffect", "kwin4_effect_squash");
-       effect.call("unloadEffect", "kwin4_effect_translucency");
-       effect.call("unloadEffect", "magiclamp");
+//        effect.call("unloadEffect", "kwin4_effect_fadingpopups");
+//        effect.call("unloadEffect", "kwin4_effect_fade");
+//        effect.call("unloadEffect", "kwin4_effect_scale");
+//        effect.call("unloadEffect", "kwin4_effect_grayscale");
+//        effect.call("unloadEffect", "kwin4_effect_squash");
+//        effect.call("unloadEffect", "kwin4_effect_translucency");
+//        effect.call("unloadEffect", "magiclamp");
 
-       effect.call("loadEffect", "lingmo_popups");
-       effect.call("loadEffect", "lingmo_scale");
-       effect.call("loadEffect", "lingmo_squash");
+//        effect.call("loadEffect", "lingmo_popups");
+//        effect.call("loadEffect", "lingmo_scale");
+//        effect.call("loadEffect", "lingmo_squash");
 
-       m_kwinTimer->stop();
-   }
-}
+//        m_kwinTimer->stop();
+//    }
+// }

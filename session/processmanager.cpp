@@ -102,23 +102,23 @@ void ProcessManager::startDesktopProcess()
     list << qMakePair(QString("lingmo-notificationd"), QStringList());
     list << qMakePair(QString("lingmo-statusbar"), QStringList());
     list << qMakePair(QString("lingmo-dock"), QStringList());
-//    list << qMakePair(QString("lingmo-filemanager"), QStringList("--desktop"));
+    list << qMakePair(QString("cutefish-filemanager"), QStringList("--desktop"));
     list << qMakePair(QString("lingmo-launcher"), QStringList());
     list << qMakePair(QString("lingmo-powerman"), QStringList());
     list << qMakePair(QString("lingmo-clipboard"), QStringList());
     list << qMakePair(QString("lingmo-wallpaper-color-pick"), QStringList());
     
     // For LingmoOS.
-//    if (QFile("/usr/bin/lingmo-welcome").exists() &&
-//            !QFile("/run/live/medium/live/filesystem.squashfs").exists()) {
-//        QSettings settings("lingmoos", "login");
-//
-//        if (!settings.value("Finished", false).toBool()) {
-//            list << qMakePair(QString("/usr/bin/lingmo-welcome"), QStringList());
-//        } else {
-//            list << qMakePair(QString("/usr/bin/lingmo-welcome"), QStringList() << "-d");
-//        }
-//    }
+   if (QFile("/usr/bin/lingmo-welcome").exists() &&
+           !QFile("/run/live/medium/live/filesystem.squashfs").exists()) {
+       QSettings settings("lingmoos", "login");
+
+       if (!settings.value("Finished", false).toBool()) {
+           list << qMakePair(QString("/usr/bin/lingmo-welcome"), QStringList());
+       } else {
+           list << qMakePair(QString("/usr/bin/lingmo-welcome"), QStringList() << "-d");
+       }
+   }
 
     for (QPair<QString, QStringList> pair : list) {
         QProcess *process = new QProcess;
