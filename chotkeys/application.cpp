@@ -32,6 +32,21 @@ void Application::initSetting()
         setting.setValue("Exec","lingmo-terminal");
         setting.endGroup();
 
+        setting.beginGroup("Meta");
+        setting.setValue("Comment","Launcher");
+        setting.setValue("Exec","lingmo-launcher");
+        setting.endGroup();
+
+        setting.beginGroup("Ctrl+Alt+F");
+        setting.setValue("Comment","Filemanager");
+        setting.setValue("Exec","lingmo-filemanager");
+        setting.endGroup();
+
+        setting.beginGroup("Ctrl+Alt+I");
+        setting.setValue("Comment","Debinstaller");
+        setting.setValue("Exec","lingmo-debinstaller");
+        setting.endGroup();
+
     }
     
     all = setting.childGroups();
