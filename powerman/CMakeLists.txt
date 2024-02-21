@@ -1,6 +1,9 @@
 project(lingmo-powerman)
 set(TARGET lingmo-powerman)
 
+find_package(ECM REQUIRED NO_MODULE)
+list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
+
 find_package(KF5IdleTime)
 find_package(X11)
 find_package(XCB

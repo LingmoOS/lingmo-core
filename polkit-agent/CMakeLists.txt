@@ -16,6 +16,13 @@ add_executable(lingmo-polkit-agent
     qml.qrc
 )
 
+file(GLOB TS_FILES translations/*.ts)
+foreach(filepath ${TS_FILES})
+    string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" filename ${filepath})
+    list(APPEND ts_files_replaced ${filename})
+endforeach()
+qt5_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${ts_files_replaced})
+
 target_link_libraries(lingmo-polkit-agent
         Qt5::Core
         Qt5::Widgets
@@ -29,9 +36,7 @@ target_link_libraries(lingmo-polkit-agent
         ${POLKIT_AGENT_LDFLAGS}
 )
 
-file(GLOB TS_FILES translations/*.ts)
-qt5_create_translation(QM_FILES ${TS_FILES})
-add_custom_target(polkit-agent-translations DEPENDS ${QM_FILES} SOURCES ${TS_FILES})
+add_custom_target(polkit-agent-translations DEPENDS ${QM_FILES} SOURCES ${ts_files_replaced})
 add_dependencies(lingmo-polkit-agent polkit-agent-translations)
 
 install(TARGETS lingmo-polkit-agent

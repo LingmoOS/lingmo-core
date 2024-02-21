@@ -1,3 +1,6 @@
+find_package(ECM REQUIRED NO_MODULE)
+list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
+
 find_package(Qt5 COMPONENTS Core Widgets DBus X11Extras REQUIRED)
 find_package(XCB MODULE REQUIRED COMPONENTS XCB KEYSYMS)
 find_package(X11)
