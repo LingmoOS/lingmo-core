@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.16)
 project(core)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -9,14 +9,13 @@ set(CMAKE_AUTORCC ON)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake;${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/)
 
 set(QT Core Gui Widgets Quick QuickControls2 DBus Xml X11Extras LinguistTools)
 find_package(Qt5 REQUIRED ${QT})
 # find_package(LingmoUI REQUIRED)
 find_package(PkgConfig REQUIRED)
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH})
 
 include(GNUInstallDirs)
 

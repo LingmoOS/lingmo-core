@@ -5,6 +5,9 @@ add_definitions(-DQT_NO_CAST_TO_ASCII
 -DQT_NO_URL_CAST_FROM_STRING
 -DQT_NO_CAST_FROM_BYTEARRAY)
 
+find_package(ECM REQUIRED NO_MODULE)
+list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
+
 find_package(X11)
 set_package_properties(X11 PROPERTIES DESCRIPTION "X11 libraries"
                         URL "http://www.x.org"

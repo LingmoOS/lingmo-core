@@ -1,3 +1,7 @@
+find_package(ECM REQUIRED NO_MODULE)
+list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
+
+
 find_package(AppMenuGtkModule)
 find_package(KF5WindowSystem)
 find_package(KF5CoreAddons)
@@ -41,6 +45,7 @@ target_link_libraries(lingmo-gmenuproxy
     KF5::CoreAddons
     KF5::WindowSystem
     XCB::XCB
+    ${AppMenuGtkModule}
 )
 
 configure_file(

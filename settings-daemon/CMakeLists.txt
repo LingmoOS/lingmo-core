@@ -1,6 +1,9 @@
 project(lingmo-settings-daemon)
 set(TARGET lingmo-settings-daemon)
 
+find_package(ECM REQUIRED NO_MODULE)
+list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
+
 find_package(X11 REQUIRED)
 find_package(X11_XCB REQUIRED)
 find_package(XCB REQUIRED)
