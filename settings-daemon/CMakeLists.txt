@@ -63,6 +63,14 @@ qt5_add_dbus_adaptor(DBUS_SOURCES
 set_source_files_properties(${DBUS_SOURCES} PROPERTIES SKIP_AUTOGEN ON)
 
 add_executable(${TARGET} ${SOURCES} ${DBUS_SOURCES} ${HEADERS} ${FORMS} ${RESOURCES})
+
+file(GLOB TS_FILES translations/*.ts)
+foreach(filepath ${TS_FILES})
+    string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" filename ${filepath})
+    list(APPEND ts_files_replaced ${filename})
+endforeach()
+qt5_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${ts_files_replaced})
+
 target_link_libraries(${TARGET}
         Qt5::Core
         Qt5::Gui
@@ -80,9 +88,7 @@ target_link_libraries(${TARGET}
         PkgConfig::SYNAPTICS
 )
 
-file(GLOB TS_FILES translations/*.ts)
-qt5_create_translation(QM_FILES ${TS_FILES})
-add_custom_target(translations DEPENDS ${QM_FILES} SOURCES ${TS_FILES})
+add_custom_target(translations DEPENDS ${QM_FILES} SOURCES ${ts_files_replaced})
 add_dependencies(${TARGET} translations)
 
 install(TARGETS ${TARGET} DESTINATION ${CMAKE_INSTALL_BINDIR})
