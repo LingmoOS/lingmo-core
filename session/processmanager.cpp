@@ -52,26 +52,22 @@ void ProcessManager::start()
 
 void ProcessManager::logout()
 {
-    QDBusInterface kwinIface("org.kde.KWin",
-                             "/Session",
-                             "org.kde.KWin.Session",
-                             QDBusConnection::sessionBus());
+    QMapIterator<QString, QProcess *> i(m_systemProcess);
 
-    if (kwinIface.isValid()) {
-        kwinIface.call("aboutToSaveSession", "lingmo");
-        kwinIface.call("setState", uint(2)); // Quit
+    while (i.hasNext()) {
+        i.next();
+        QProcess *p = i.value();
+        p->terminate();
     }
+    i.toFront();
 
-    QProcess s;
-    s.start("killall", QStringList() << "kglobalaccel5");
-    s.waitForFinished(-1);
-
-    QDBusInterface iface("org.freedesktop.login1",
-                        "/org/freedesktop/login1/session/self",
-                        "org.freedesktop.login1.Session",
-                        QDBusConnection::systemBus());
-    if (iface.isValid())
-        iface.call("Terminate");
+    while (i.hasNext()) {
+        i.next();
+        QProcess *p = i.value();
+        if (p->state() != QProcess::NotRunning && !p->waitForFinished(2000)) {
+            p->kill();
+        }
+    }
 
     QCoreApplication::exit(0);
 }
