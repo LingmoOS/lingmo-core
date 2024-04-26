@@ -17,7 +17,7 @@ jobs:
         run: |
           ls -la
           mkdir -p lingmo-core
-          cp -R $(ls | grep -v lingmo-core) lingmo-core/
+          cp -R $(ls | grep -xv lingmo-core) lingmo-core/
           tar -cJf lingmo-core.tar.xz lingmo-core
 
       - name: Create Release
