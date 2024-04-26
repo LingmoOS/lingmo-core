@@ -1,0 +1,31 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Build Tarball
+        run: |
+          ls -la
+          mkdir -p lingmo-core
+          cp -R $(ls | grep -v lingmo-core) lingmo-core/
+          tar -cJf lingmo-core.tar.xz lingmo-core
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+            files: lingmo-core.tar.xz
+            name: Release ${{ github.ref }}
+
+      - name: Cleanup
+        run: rm lingmo-core.tar.xz
