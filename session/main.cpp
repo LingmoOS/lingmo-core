@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
     // putenv((char *)"SESSION_MANAGER=");
 
     // force xcb QPA plugin as session manager server is very X11 specific.
-    qputenv("QT_QPA_PLATFORM", QByteArrayLiteral("xcb"));
+    qputenv("QT_QPA_PLATFORM", QByteArrayLiteral("wayland"));
 
     QQuickWindow::setDefaultAlphaBuffer(true);
     QCoreApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
