@@ -1,8 +1,15 @@
+lingmo-core (2.0.1) unstable; urgency=high
+
+  [ Elysia ]
+  * Added daemon to lingmo-session in order to start critical apps
+
+ -- Elysia <c.elysia@foxmail.com>  Tue, 4 Jun 2024 22:27:00 +0800
+
 lingmo-core (2.0.0~1) UNRELEASED; urgency=high
 
   * Fix logout stuck issue. (Elysia)  <c.elysia@foxmail.com>
 
- -- Elysia <c.elysia@foxmail.com>  Thur, 21 Mar 2024 13:45:00 +0800
+ -- Elysia <c.elysia@foxmail.com>  Thr, 21 Mar 2024 13:45:00 +0800
 
 lingmo-core (2.0.0) UNRELEASED; urgency=high
 

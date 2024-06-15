@@ -25,6 +25,9 @@
 #include <QProcess>
 #include <QEventLoop>
 #include <QMap>
+#include <memory>
+
+#include "daemon-helper.h"
 
 class Application;
 class ProcessManager : public QObject, public QAbstractNativeEventFilter
@@ -41,6 +44,10 @@ public:
     void startWindowManager();
     void startDesktopProcess();
     void startDaemonProcess();
+
+    /**
+     * @brief Start the user defined autostart process.
+     */
     void loadAutoStartProcess();
 
     bool nativeEventFilter(const QByteArray & eventType, void * message, long * result) override;
@@ -49,6 +56,12 @@ private:
     Application *m_app;
     QMap<QString, QProcess *> m_systemProcess;
     QMap<QString, QProcess *> m_autoStartProcess;
+
+    // Daemon helper for desktop components
+    std::shared_ptr<LINGMO_SESSION::Daemon> m_desktopAutoStartD;
+
+    // Daemon helper for other daemon components
+    std::shared_ptr<LINGMO_SESSION::Daemon> m_daemonAutoStartD;
 
     bool m_wmStarted;
     QEventLoop *m_waitLoop;

@@ -22,6 +22,8 @@
 #include <KWindowSystem>
 #include <KWindowSystem/NETWM>
 
+#include "daemon-helper.h"
+
 ProcessManager::ProcessManager(Application *app, QObject *parent)
     : QObject(parent)
     , m_app(app)
@@ -103,36 +105,8 @@ void ProcessManager::startDesktopProcess()
     list << qMakePair(QString("lingmo-powerman"), QStringList());
     list << qMakePair(QString("lingmo-clipboard"), QStringList());
     list << qMakePair(QString("lingmo-wallpaper-color-pick"), QStringList());
-    
-    // For LingmoOS.
-//    if (QFile("/usr/bin/lingmo-welcome").exists() &&
-//            !QFile("/run/live/medium/live/filesystem.squashfs").exists()) {
-//        QSettings settings("lingmoos", "login");
 
-//        if (!settings.value("Finished", false).toBool()) {
-//            list << qMakePair(QString("/usr/bin/lingmo-welcome"), QStringList());
-//        } else {
-//            list << qMakePair(QString("/usr/bin/lingmo-welcome"), QStringList() << "-d");
-//        }
-//    }
-
-    for (QPair<QString, QStringList> pair : list) {
-        QProcess *process = new QProcess;
-        process->setProcessChannelMode(QProcess::ForwardedChannels);
-        process->setProgram(pair.first);
-        process->setArguments(pair.second);
-        process->start();
-        process->waitForStarted();
-
-        qDebug() << "Load DE components: " << pair.first << pair.second;
-
-        // Add to map
-        if (process->exitCode() == 0) {
-            m_autoStartProcess.insert(pair.first, process);
-        } else {
-            process->deleteLater();
-        }
-    }
+    m_desktopAutoStartD = std::make_shared<LINGMO_SESSION::Daemon>(list);
 
     // Auto start
     QTimer::singleShot(100, this, &ProcessManager::loadAutoStartProcess);
@@ -148,21 +122,7 @@ void ProcessManager::startDaemonProcess()
 //    list << qMakePair(QString("lingmo-clipboard"), QStringList());
     list << qMakePair(QString("lingmo-chotkeys"), QStringList());
 
-    for (QPair<QString, QStringList> pair : list) {
-        QProcess *process = new QProcess;
-        process->setProcessChannelMode(QProcess::ForwardedChannels);
-        process->setProgram(pair.first);
-        process->setArguments(pair.second);
-        process->start();
-        process->waitForStarted();
-
-        // Add to map
-        if (process->exitCode() == 0) {
-            m_autoStartProcess.insert(pair.first, process);
-        } else {
-            process->deleteLater();
-        }
-    }
+    m_daemonAutoStartD = std::make_shared<LINGMO_SESSION::Daemon>(list);
 }
 
 void ProcessManager::loadAutoStartProcess()
