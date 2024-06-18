@@ -19,6 +19,7 @@
 #include <QScopedPointer>
 #include <QGuiApplication>
 #include <QVector>
+#include <QScreen>
 
 /** XEMBED messages */
 #define XEMBED_EMBEDDED_NOTIFY 0

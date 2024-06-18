@@ -18,7 +18,6 @@
 #include <QGuiApplication>
 #include <QScreen>
 #include <QTimer>
-#include <QX11Info>
 
 #include <QBitmap>
 
