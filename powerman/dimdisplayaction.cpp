@@ -24,6 +24,7 @@
 #include <QDBusPendingCall>
 #include <QProcess>
 #include <QDebug>
+#include <QGuiApplication>
 
 #include <X11/Xlib.h>
 #include <xcb/dpms.h>
