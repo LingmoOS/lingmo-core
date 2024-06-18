@@ -99,7 +99,7 @@ bool FdoSelectionManager::addDamageWatch(xcb_window_t client)
     return true;
 }
 
-bool FdoSelectionManager::nativeEventFilter(const QByteArray &eventType, void *message, long int *result) override
+bool FdoSelectionManager::nativeEventFilter(const QByteArray &eventType, void *message, long *result) 
 {
     Q_UNUSED(result)
 
