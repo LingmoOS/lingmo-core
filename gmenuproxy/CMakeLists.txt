@@ -38,12 +38,11 @@ add_executable(lingmo-gmenuproxy ${GMENU_DBUSMENU_PROXY_SRCS})
 set_package_properties(XCB PROPERTIES TYPE REQUIRED)
 
 target_link_libraries(lingmo-gmenuproxy
-    Qt5::Core
-    Qt5::X11Extras
-    Qt5::DBus
-    Qt5::Widgets
-    KF5::CoreAddons
-    KF5::WindowSystem
+    Qt6::Core
+    Qt6::DBus
+    Qt6::Widgets
+    KF6::CoreAddons
+    KF6::WindowSystem
     XCB::XCB
     ${AppMenuGtkModule}
 )

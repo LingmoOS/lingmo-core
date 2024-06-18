@@ -44,7 +44,6 @@ target_link_libraries(${TARGET}
         Qt6::Widgets
         Qt6::Quick
         Qt6::DBus
-        Qt6::X11Extras
 
         KF6::IdleTime
         ${XCB_LIBS}
