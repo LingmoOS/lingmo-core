@@ -16,6 +16,7 @@
 #include <xcb/xcb_event.h>
 
 #include <QScopedPointer>
+#include <QGuiApplication>
 #include <QVector>
 
 /** XEMBED messages */
