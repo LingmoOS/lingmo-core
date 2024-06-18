@@ -17,7 +17,6 @@
 #include <X11/Xlib-xcb.h>
 
 #include <QScopedPointer>
-#include <QApplication>
 #include <QNativeInterface>
 #include <QVector>
 
