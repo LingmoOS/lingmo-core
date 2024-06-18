@@ -34,11 +34,19 @@ DimDisplayAction::DimDisplayAction(QObject *parent)
               "/Brightness",
               "com.lingmo.Brightness", QDBusConnection::sessionBus())
 {
-    if (QX11Info::isPlatformX11()) {
-        // Disable a default timeout, if any
-        xcb_dpms_set_timeouts(QX11Info::connection(), 0, 0, 0);
+    auto isPlatformX11 = qGuiApp->nativeInterface<QNativeInterface::QX11Application>();
+    if (isPlatformX11) {
+        auto *x11App = qApp->nativeInterface<QNativeInterface::QX11Application>();
 
-        XSetScreenSaver(QX11Info::display(), 0, 0, 0, 0);
+        // 获取Display类型的显示指针
+        auto *displayID = x11App->display();
+
+        // 从Display转换为xcb_connection_t类型的连接
+        auto *connection = XGetXCBConnection(displayID);
+
+        xcb_dpms_set_timeouts(connection, 0, 0, 0);
+
+        XSetScreenSaver(displayID, 0, 0, 0, 0);
     }
 }
 

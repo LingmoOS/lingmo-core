@@ -18,7 +18,6 @@
 #include <QDBusInterface>
 #include <QDBusPendingCall>
 
-#include <QX11Info>
 #include <KWindowSystem>
 #include <KWindowSystem/NETWM>
 

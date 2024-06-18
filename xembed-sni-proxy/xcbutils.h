@@ -17,7 +17,6 @@
 
 #include <QScopedPointer>
 #include <QVector>
-#include <QX11Info>
 
 /** XEMBED messages */
 #define XEMBED_EMBEDDED_NOTIFY 0
