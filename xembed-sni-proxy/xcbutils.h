@@ -38,13 +38,7 @@ using ScopedCPointer = QScopedPointer<T, QScopedPointerPodDeleter>;
 class Atom
 {
 public:
-    auto *x11App = qApp->nativeInterface<QNativeInterface::QX11Application>();
-    // 获取Display类型的显示指针
-    auto *displayID = x11App->display();
-    // 从Display转换为xcb_connection_t类型的连接
-    auto *connection = XGetXCBConnection(displayID);
-
-    explicit Atom(const QByteArray &name, bool onlyIfExists = false, xcb_connection_t *c = connection)
+    explicit Atom(const QByteArray &name, bool onlyIfExists = false, xcb_connection_t *c = XGetXCBConnection(qApp->nativeInterface<QNativeInterface::QX11Application>()->display()))
         : m_connection(c)
         , m_retrieved(false)
         , m_cookie(xcb_intern_atom_unchecked(m_connection, onlyIfExists, name.length(), name.constData()))
