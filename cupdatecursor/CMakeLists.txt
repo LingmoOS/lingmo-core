@@ -7,7 +7,6 @@ add_executable(cupdatecursor
 target_link_libraries(cupdatecursor
     Qt6::Core
     Qt6::Gui
-    Qt6::X11Extras
     ${X11_LIBRARIES}
     X11::X11
     X11::Xi
