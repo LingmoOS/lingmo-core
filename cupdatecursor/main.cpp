@@ -9,7 +9,10 @@
 
 inline void applyTheme(const QString &theme, int size)
 {
-    Display *display = QX11Info::display();
+
+    auto *x11App = qApp->nativeInterface<QNativeInterface::QX11Application>();
+    auto *display = x11App->display();
+
 
     if (!theme.isEmpty())
         XcursorSetTheme(display, QFile::encodeName(theme));
