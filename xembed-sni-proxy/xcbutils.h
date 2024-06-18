@@ -17,7 +17,7 @@
 #include <X11/Xlib-xcb.h>
 
 #include <QScopedPointer>
-#include <QGuiApplication>
+#include <QNativeInterface>
 #include <QVector>
 
 /** XEMBED messages */
@@ -103,40 +103,31 @@ class Atoms
 public:
     Atoms()
     {
-        xcb_connection_t *connection = QX11Info::connection();
-
-        xembedAtom = getAtom(connection, "_XEMBED");
-        selectionAtom = getAtom(connection, "_NET_SYSTEM_TRAY_S" + std::to_string(defaultScreen()));
-        opcodeAtom = getAtom(connection, "_NET_SYSTEM_TRAY_OPCODE");
-        messageData = getAtom(connection, "_NET_SYSTEM_TRAY_MESSAGE_DATA");
-        visualAtom = getAtom(connection, "_NET_SYSTEM_TRAY_VISUAL");
+        xcb_connection_t *connection = QNativeInterface::QX11Application::connection();
+        
+        xembedAtom = internAtom(connection, "_XEMBED");
+        selectionAtom = internAtom(connection, "_NET_SYSTEM_TRAY_S" + std::to_string(QApplication::primaryScreen()->geometry().x()));
+        opcodeAtom = internAtom(connection, "_NET_SYSTEM_TRAY_OPCODE");
+        messageData = internAtom(connection, "_NET_SYSTEM_TRAY_MESSAGE_DATA");
+        visualAtom = internAtom(connection, "_NET_SYSTEM_TRAY_VISUAL");
     }
 
-    xcb_atom_t xembedAtom;
-    xcb_atom_t selectionAtom;
-    xcb_atom_t opcodeAtom;
-    xcb_atom_t messageData;
-    xcb_atom_t visualAtom;
-
-private:
-    int defaultScreen() const
+    Atom internAtom(xcb_connection_t *connection, const std::string &atomName)
     {
-        QScreen *screen = QGuiApplication::primaryScreen();
-        return screen ? screen->virtualSiblings().indexOf(screen) : 0;
-    }
-
-    xcb_atom_t getAtom(xcb_connection_t *connection, const std::string &atomName)
-    {
-        xcb_intern_atom_cookie_t cookie = xcb_intern_atom(connection, 0, atomName.size(), atomName.c_str());
+        xcb_intern_atom_cookie_t cookie = xcb_intern_atom(connection, 0, atomName.length(), atomName.c_str());
         xcb_intern_atom_reply_t *reply = xcb_intern_atom_reply(connection, cookie, nullptr);
-
-        xcb_atom_t atom = reply ? reply->atom : XCB_ATOM_NONE;
+        Atom atom = reply ? reply->atom : XCB_ATOM_NONE;
         free(reply);
-
         return atom;
     }
+
+    Atom xembedAtom;
+    Atom selectionAtom;
+    Atom opcodeAtom;
+    Atom messageData;
+    Atom visualAtom;
 };
 
-extern xcb_atom_t *atoms;
+extern Atoms *atoms;
 
-} // namespace Xcb
+}// namespace Xcb

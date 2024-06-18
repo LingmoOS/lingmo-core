@@ -1,5 +1,4 @@
 #include <QGuiApplication>
-#include <QX11Info>
 #include <QFile>
 #include <QDebug>
 #include <QSettings>
