@@ -103,7 +103,7 @@ class Atoms
 public:
     Atoms()
         : xembedAtom("_XEMBED")
-        , selectionAtom(xcb_atom_name_by_screen("_NET_SYSTEM_TRAY", QNativeInterface::QX11Application::screen()))
+        , selectionAtom(xcb_atom_name_by_screen("_NET_SYSTEM_TRAY", QNativeInterface::QX11Application::display()))
         , opcodeAtom("_NET_SYSTEM_TRAY_OPCODE")
         , messageData("_NET_SYSTEM_TRAY_MESSAGE_DATA")
         , visualAtom("_NET_SYSTEM_TRAY_VISUAL")
