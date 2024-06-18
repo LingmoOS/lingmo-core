@@ -14,6 +14,7 @@
 #include <xcb/xcb.h>
 #include <xcb/xcb_atom.h>
 #include <xcb/xcb_event.h>
+#include <X11/Xlib-xcb.h>
 
 #include <QScopedPointer>
 #include <QGuiApplication>
