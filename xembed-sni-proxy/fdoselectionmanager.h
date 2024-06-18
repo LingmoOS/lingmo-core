@@ -25,7 +25,7 @@ public:
     ~FdoSelectionManager() override;
 
 protected:
-    bool nativeEventFilter(const QByteArray &eventType, void *message, long *result);
+    bool nativeEventFilter(const QByteArray &eventType, void *message, long int *result) override;
 
 private Q_SLOTS:
     void onClaimedOwnership();
