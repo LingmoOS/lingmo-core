@@ -11,7 +11,6 @@
 
 #include <QCoreApplication>
 #include <QTimer>
-#include <QX11Info>
 
 #include <KSelectionOwner>
 
