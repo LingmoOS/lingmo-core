@@ -45,7 +45,7 @@ target_link_libraries(${TARGET}
         Qt6::Quick
         Qt6::DBus
 
-        KF6::IdleTime
+        KF6::KIdleTime
         ${XCB_LIBS}
         ${X11_LIBRARIES}
 )
