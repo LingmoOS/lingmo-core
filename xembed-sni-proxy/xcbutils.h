@@ -98,28 +98,45 @@ private:
     QByteArray m_name;
 };
 
-class Atoms {
+class Atoms
+{
 public:
     Atoms()
-        : xembedAtom("_XEMBED")
-        , selectionAtom("_NET_SYSTEM_TRAY_S" + QByteArray::number(screenIndex))
-        , opcodeAtom("_NET_SYSTEM_TRAY_OPCODE")
-        , messageData("_NET_SYSTEM_TRAY_MESSAGE_DATA")
-        , visualAtom("_NET_SYSTEM_TRAY_VISUAL")
     {
-        if (QGuiApplication::platformName() == QLatin1String("xcb")) {
-            void* display = QGuiApplication::platformNativeInterface()->nativeResourceForIntegration("display");
-            // ... 使用display和screenIndex ...
-        }
+        xcb_connection_t *connection = QX11Info::connection();
+
+        xembedAtom = getAtom(connection, "_XEMBED");
+        selectionAtom = getAtom(connection, "_NET_SYSTEM_TRAY_S" + std::to_string(defaultScreen()));
+        opcodeAtom = getAtom(connection, "_NET_SYSTEM_TRAY_OPCODE");
+        messageData = getAtom(connection, "_NET_SYSTEM_TRAY_MESSAGE_DATA");
+        visualAtom = getAtom(connection, "_NET_SYSTEM_TRAY_VISUAL");
     }
 
+    xcb_atom_t xembedAtom;
+    xcb_atom_t selectionAtom;
+    xcb_atom_t opcodeAtom;
+    xcb_atom_t messageData;
+    xcb_atom_t visualAtom;
+
 private:
-    QByteArray xembedAtom;
-    QByteArray selectionAtom;
-    QByteArray opcodeAtom;
-    QByteArray messageData;
-    QByteArray visualAtom;
-    int screenIndex = QGuiApplication::primaryScreen()->virtualSiblings().indexOf(QGuiApplication::primaryScreen());
+    int defaultScreen() const
+    {
+        QScreen *screen = QGuiApplication::primaryScreen();
+        return screen ? screen->virtualSiblings().indexOf(screen) : 0;
+    }
+
+    xcb_atom_t getAtom(xcb_connection_t *connection, const std::string &atomName)
+    {
+        xcb_intern_atom_cookie_t cookie = xcb_intern_atom(connection, 0, atomName.size(), atomName.c_str());
+        xcb_intern_atom_reply_t *reply = xcb_intern_atom_reply(connection, cookie, nullptr);
+
+        xcb_atom_t atom = reply ? reply->atom : XCB_ATOM_NONE;
+        free(reply);
+
+        return atom;
+    }
 };
 
-}// namespace Xcb
+extern xcb_atom_t *atoms;
+
+} // namespace Xcb
