@@ -41,7 +41,7 @@ target_link_libraries(lingmo-gmenuproxy
     Qt6::Core
     Qt6::DBus
     Qt6::Widgets
-    KF6::KCoreAddons
+    KF6::CoreAddons
     KF6::WindowSystem
     XCB::XCB
     ${AppMenuGtkModule}
