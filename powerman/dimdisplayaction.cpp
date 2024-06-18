@@ -22,7 +22,6 @@
 #include <QSettings>
 #include <QTimer>
 #include <QDBusPendingCall>
-#include <QX11Info>
 #include <QProcess>
 #include <QDebug>
 
