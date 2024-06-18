@@ -40,10 +40,10 @@ using ScopedCPointer = QScopedPointer<T, QScopedPointerPodDeleter>;
 class Atom
 {
 public:
-    explicit Atom(const QByteArray &name, bool onlyIfExists = false)
-        : m_connection(QGuiApplication::platformNativeInterface()->nativeResourceForIntegration("xcb_connection"))
+    explicit Atom(const QByteArray &name, bool onlyIfExists = false, xcb_connection_t *c = XGetXCBConnection(qApp->nativeInterface<QNativeInterface::QX11Application>()->display()))
+        : m_connection(c)
         , m_retrieved(false)
-        , m_cookie(xcb_intern_atom_unchecked(static_cast<xcb_connection_t *>(m_connection), onlyIfExists, name.length(), name.constData()))
+        , m_cookie(xcb_intern_atom_unchecked(m_connection, onlyIfExists, name.length(), name.constData()))
         , m_atom(XCB_ATOM_NONE)
         , m_name(name)
     {
