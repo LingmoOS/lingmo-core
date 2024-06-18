@@ -17,6 +17,7 @@
 
 #include <QScopedPointer>
 #include <QVector>
+#include <QNativeInterface>
 
 /** XEMBED messages */
 #define XEMBED_EMBEDDED_NOTIFY 0
@@ -38,7 +39,13 @@ using ScopedCPointer = QScopedPointer<T, QScopedPointerPodDeleter>;
 class Atom
 {
 public:
-    explicit Atom(const QByteArray &name, bool onlyIfExists = false, xcb_connection_t *c = QX11Info::connection())
+    auto *x11App = qApp->nativeInterface<QNativeInterface::QX11Application>();
+    // 获取Display类型的显示指针
+    auto *displayID = x11App->display();
+    // 从Display转换为xcb_connection_t类型的连接
+    auto *connection = XGetXCBConnection(displayID);
+
+    explicit Atom(const QByteArray &name, bool onlyIfExists = false, xcb_connection_t *c = connection)
         : m_connection(c)
         , m_retrieved(false)
         , m_cookie(xcb_intern_atom_unchecked(m_connection, onlyIfExists, name.length(), name.constData()))
@@ -101,7 +108,7 @@ class Atoms
 public:
     Atoms()
         : xembedAtom("_XEMBED")
-        , selectionAtom(xcb_atom_name_by_screen("_NET_SYSTEM_TRAY", QX11Info::appScreen()))
+        , selectionAtom(xcb_atom_name_by_screen("_NET_SYSTEM_TRAY", QNativeInterface::QX11Application::screen()))
         , opcodeAtom("_NET_SYSTEM_TRAY_OPCODE")
         , messageData("_NET_SYSTEM_TRAY_MESSAGE_DATA")
         , visualAtom("_NET_SYSTEM_TRAY_VISUAL")
