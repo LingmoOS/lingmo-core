@@ -98,23 +98,28 @@ private:
     QByteArray m_name;
 };
 
-class Atoms
-{
+class Atoms {
 public:
     Atoms()
         : xembedAtom("_XEMBED")
-        , selectionAtom(xcb_atom_name_by_screen("_NET_SYSTEM_TRAY", QX11Info::appScreen()))
+        , selectionAtom("_NET_SYSTEM_TRAY_S" + QByteArray::number(screenIndex))
         , opcodeAtom("_NET_SYSTEM_TRAY_OPCODE")
         , messageData("_NET_SYSTEM_TRAY_MESSAGE_DATA")
         , visualAtom("_NET_SYSTEM_TRAY_VISUAL")
     {
+        if (QGuiApplication::platformName() == QLatin1String("xcb")) {
+            void* display = QGuiApplication::platformNativeInterface()->nativeResourceForIntegration("display");
+            // ... 使用display和screenIndex ...
+        }
     }
 
-    Atom xembedAtom;
-    Atom selectionAtom;
-    Atom opcodeAtom;
-    Atom messageData;
-    Atom visualAtom;
+private:
+    QByteArray xembedAtom;
+    QByteArray selectionAtom;
+    QByteArray opcodeAtom;
+    QByteArray messageData;
+    QByteArray visualAtom;
+    int screenIndex = QGuiApplication::primaryScreen()->virtualSiblings().indexOf(QGuiApplication::primaryScreen());
 };
 
 }// namespace Xcb
