@@ -17,7 +17,7 @@ set(SRCS main.cpp
 # for Ubuntu
 # qt_add_dbus_adaptor(SRCS org.freedesktop.Notifications.xml notificationserver.h NotificationServer)
 
-qt5_add_dbus_adaptor(DBUS_SOURCES com.lingmo.Notification.xml application.h Application)
+qt_add_dbus_adaptor(DBUS_SOURCES com.lingmo.Notification.xml application.h Application)
 set_source_files_properties(${DBUS_SOURCES} PROPERTIES SKIP_AUTOGEN ON)
 
 find_package(KF6WindowSystem)
