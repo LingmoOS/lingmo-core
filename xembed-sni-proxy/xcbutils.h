@@ -40,10 +40,10 @@ using ScopedCPointer = QScopedPointer<T, QScopedPointerPodDeleter>;
 class Atom
 {
 public:
-    explicit Atom(const QByteArray &name, bool onlyIfExists = false, xcb_connection_t *c = XGetXCBConnection(qApp->nativeInterface<QNativeInterface::QX11Application>()->display()))
-        : m_connection(c)
+    explicit Atom(const QByteArray &name, bool onlyIfExists = false)
+        : m_connection(QGuiApplication::platformNativeInterface()->nativeResourceForIntegration("xcb_connection"))
         , m_retrieved(false)
-        , m_cookie(xcb_intern_atom_unchecked(m_connection, onlyIfExists, name.length(), name.constData()))
+        , m_cookie(xcb_intern_atom_unchecked(static_cast<xcb_connection_t *>(m_connection), onlyIfExists, name.length(), name.constData()))
         , m_atom(XCB_ATOM_NONE)
         , m_name(name)
     {
@@ -102,23 +102,12 @@ class Atoms
 {
 public:
     Atoms()
+        : xembedAtom("_XEMBED")
+        , selectionAtom(xcb_atom_name_by_screen("_NET_SYSTEM_TRAY", QGuiApplication::primaryScreen()->name().toInt()))
+        , opcodeAtom("_NET_SYSTEM_TRAY_OPCODE")
+        , messageData("_NET_SYSTEM_TRAY_MESSAGE_DATA")
+        , visualAtom("_NET_SYSTEM_TRAY_VISUAL")
     {
-        xcb_connection_t *connection = QNativeInterface::QX11Application::connection();
-        
-        xembedAtom = internAtom(connection, "_XEMBED");
-        selectionAtom = internAtom(connection, "_NET_SYSTEM_TRAY_S" + std::to_string(QApplication::primaryScreen()->geometry().x()));
-        opcodeAtom = internAtom(connection, "_NET_SYSTEM_TRAY_OPCODE");
-        messageData = internAtom(connection, "_NET_SYSTEM_TRAY_MESSAGE_DATA");
-        visualAtom = internAtom(connection, "_NET_SYSTEM_TRAY_VISUAL");
-    }
-
-    Atom internAtom(xcb_connection_t *connection, const std::string &atomName)
-    {
-        xcb_intern_atom_cookie_t cookie = xcb_intern_atom(connection, 0, atomName.length(), atomName.c_str());
-        xcb_intern_atom_reply_t *reply = xcb_intern_atom_reply(connection, cookie, nullptr);
-        Atom atom = reply ? reply->atom : XCB_ATOM_NONE;
-        free(reply);
-        return atom;
     }
 
     Atom xembedAtom;
