@@ -73,6 +73,7 @@ add_executable(lingmo-xembedsniproxy ${XEMBED_SNI_PROXY_SOURCES} ${DBUS_SOURCES}
 set_package_properties(XCB PROPERTIES TYPE REQUIRED)
 target_link_libraries(lingmo-xembedsniproxy
     Qt6::Core
+    Qt6::Gui
     Qt6::DBus
     KF6::WindowSystem
     ${XCB_LIBS}

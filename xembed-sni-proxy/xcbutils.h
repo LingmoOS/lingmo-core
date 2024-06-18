@@ -17,6 +17,7 @@
 #include <X11/Xlib-xcb.h>
 
 #include <QScopedPointer>
+#include <QNativeInterface>
 #include <QVector>
 
 /** XEMBED messages */
