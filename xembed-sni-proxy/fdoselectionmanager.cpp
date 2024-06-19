@@ -14,6 +14,7 @@
 
 #include <KSelectionOwner>
 #include <QGuiApplication>
+#include <QUrl>
 
 #include <xcb/composite.h>
 #include <xcb/damage.h>
