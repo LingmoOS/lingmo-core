@@ -6,6 +6,7 @@
 #include "application.h"
 
 #include <QCoreApplication>
+#include <QGuiApplication>
 #include <QStandardPaths>
 #include <QFileInfoList>
 #include <QFileInfo>
@@ -175,7 +176,12 @@ bool ProcessManager::nativeEventFilter(const QByteArray &eventType, void *messag
     // ref: lxqt session
     if (!m_wmStarted && m_waitLoop) {
         // all window managers must set their name according to the spec
-        if (!QString::fromUtf8(NETRootInfo(QNativeInterface::QX11Application::connection(), NET::SupportingWMCheck).wmName()).isEmpty()) {
+        
+        QNativeInterface::QX11Application *x11App = qApp->nativeInterface<QNativeInterface::QX11Application>();
+        Display *displayID = x11App->display();
+        xcb_connection_t *connection = XGetXCBConnection(displayID);
+
+        if (!QString::fromUtf8(NETRootInfo(connection, NET::SupportingWMCheck).wmName()).isEmpty()) {
             qDebug() << "Window manager started";
             m_wmStarted = true;
             if (m_waitLoop && m_waitLoop->isRunning())
