@@ -46,7 +46,10 @@ FdoSelectionManager::~FdoSelectionManager()
 void FdoSelectionManager::init()
 {
     // load damage extension
-    xcb_connection_t *c = QGuiApplication::QX11Application::connection();
+    QNativeInterface::QX11Application *x11App = qApp->nativeInterface<QNativeInterface::QX11Application>();
+    Display *displayID = x11App->display();
+    xcb_connection_t *c = XGetXCBConnection(displayID);
+
     xcb_prefetch_extension_data(c, &xcb_damage_id);
     const auto *reply = xcb_get_extension_data(c, &xcb_damage_id);
     if (reply && reply->present) {
@@ -214,7 +217,7 @@ void FdoSelectionManager::setSystemTrayVisual()
     QNativeInterface::QX11Application *x11App = qApp->nativeInterface<QNativeInterface::QX11Application>();
     Display *displayID = x11App->display();
     xcb_connection_t *c = XGetXCBConnection(displayID);
-    
+
     auto screen = xcb_setup_roots_iterator(xcb_get_setup(c)).data;
     auto trayVisual = screen->root_visual;
     xcb_depth_iterator_t depth_iterator = xcb_screen_allowed_depths_iterator(screen);
