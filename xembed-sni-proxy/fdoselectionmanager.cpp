@@ -11,12 +11,9 @@
 
 #include <QCoreApplication>
 #include <QTimer>
-#include <QObject>
-#include <QAbstractNativeEventFilter>
-#include <QHash>
-#include <QSystemTrayIcon>
 
 #include <KSelectionOwner>
+#include <QGuiApplication>
 
 #include <xcb/composite.h>
 #include <xcb/damage.h>
@@ -30,17 +27,14 @@
 #define SYSTEM_TRAY_BEGIN_MESSAGE 1
 #define SYSTEM_TRAY_CANCEL_MESSAGE 2
 
-FdoSelectionManager::FdoSelectionManager(QObject *parent)
-    : QObject(parent)
-    , m_trayIcon(new QSystemTrayIcon(this))
+FdoSelectionManager::FdoSelectionManager()
+    : QObject()
     , m_selectionOwner(new KSelectionOwner(Xcb::atoms->selectionAtom, -1, this))
 {
-    // 初始化系统托盘图标
-    m_trayIcon->setIcon(QIcon(":/icons/tray_icon.png"));
-    m_trayIcon->show();
+    qCDebug(SNIPROXY) << "starting";
 
-    // 其他初始化代码...
-    init();
+    // we may end up calling QCoreApplication::quit() in this method, at which point we need the event loop running
+    QTimer::singleShot(0, this, &FdoSelectionManager::init);
 }
 
 FdoSelectionManager::~FdoSelectionManager()
@@ -52,7 +46,7 @@ FdoSelectionManager::~FdoSelectionManager()
 void FdoSelectionManager::init()
 {
     // load damage extension
-    xcb_connection_t *c = QX11Info::connection();
+    xcb_connection_t *c = QGuiApplication::QX11Application::connection();
     xcb_prefetch_extension_data(c, &xcb_damage_id);
     const auto *reply = xcb_get_extension_data(c, &xcb_damage_id);
     if (reply && reply->present) {
@@ -106,10 +100,8 @@ bool FdoSelectionManager::addDamageWatch(xcb_window_t client)
     return true;
 }
 
-bool FdoSelectionManager::nativeEventFilter(const QByteArray &eventType, void *message, long int *result) 
+bool FdoSelectionManager::nativeEventFilter(const QByteArray &eventType, void *message, qintptr *)
 {
-    Q_UNUSED(result)
-
     if (eventType != "xcb_generic_event_t") {
         return false;
     }

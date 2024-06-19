@@ -19,7 +19,7 @@
 #include <QDBusPendingCall>
 
 #include <KWindowSystem>
-// #include <KWindowSystem/NETWM>
+#include <KWindowSystem/NETWM>
 
 #include "daemon-helper.h"
 

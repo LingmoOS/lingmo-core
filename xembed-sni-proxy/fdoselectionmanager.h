@@ -1,26 +1,34 @@
-#ifndef FDOSELECTIONMANAGER_H
-#define FDOSELECTIONMANAGER_H
+/*
+    Registers as a embed container
+    SPDX-FileCopyrightText: 2015 David Edmundson <davidedmundson@kde.org>
 
-#include <QObject>
+    SPDX-License-Identifier: LGPL-2.1-or-later
+*/
+
+#pragma once
+
 #include <QAbstractNativeEventFilter>
 #include <QHash>
-#include <QSystemTrayIcon>
+#include <QObject>
 
-class SNIProxy; // 假设这是处理系统托盘图标的类
-class KSelectionOwner; // 假设这是管理X11选择的类
+#include <xcb/xcb.h>
+
+class KSelectionOwner;
+class SNIProxy;
 
 class FdoSelectionManager : public QObject, public QAbstractNativeEventFilter
 {
     Q_OBJECT
 
 public:
-    explicit FdoSelectionManager(QObject *parent = nullptr);
+    FdoSelectionManager();
     ~FdoSelectionManager() override;
 
-    // 重写QAbstractNativeEventFilter的函数
-    bool nativeEventFilter(const QByteArray &eventType, void *message, long int *result) override;
+protected:
+    bool nativeEventFilter(const QByteArray &eventType, void *message, qintptr *) override
+    // bool nativeEventFilter(const QByteArray &eventType, void *message, long *result) override;
 
-private slots:
+private Q_SLOTS:
     void onClaimedOwnership();
     void onFailedToClaimOwnership();
     void onLostOwnership();
@@ -32,11 +40,9 @@ private:
     void undock(xcb_window_t client);
     void setSystemTrayVisual();
 
-    QSystemTrayIcon *m_trayIcon;
     uint8_t m_damageEventBase;
+
     QHash<xcb_window_t, u_int32_t> m_damageWatches;
     QHash<xcb_window_t, SNIProxy *> m_proxies;
     KSelectionOwner *m_selectionOwner;
 };
-
-#endif // FDOSELECTIONMANAGER_H
