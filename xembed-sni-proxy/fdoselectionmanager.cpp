@@ -11,6 +11,7 @@
 
 #include <QCoreApplication>
 #include <QGuiApplication>
+#include <QNativeInterface>
 #include <QTimer>
 
 #include <KSelectionOwner>
