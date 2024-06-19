@@ -30,6 +30,7 @@
 #include <xcb/xcb.h>
 #include <X11/Xlib-xcb.h>
 #include <xcb/dpms.h>
+#include <xcb/xcbint.h>
 
 DimDisplayAction::DimDisplayAction(QObject *parent)
     : Action(parent)
