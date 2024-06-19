@@ -65,7 +65,7 @@ bool NotificationWindow::eventFilter(QObject *object, QEvent *event)
             QQuickView::setVisible(false);
         }
     } else if (event->type() == QEvent::Show) {
-        KWindowSystem::setState(winId(), NET::SkipTaskbar | NET::SkipPager | NET::SkipSwitcher);
+        NETWinInfo::setState(winId(), NET::SkipTaskbar | NET::SkipPager | NET::SkipSwitcher);
         HistoryModel::self()->updateTime();
     } else if (event->type() == QEvent::Hide) {
         setMouseGrabEnabled(false);

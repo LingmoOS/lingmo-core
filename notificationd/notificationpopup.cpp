@@ -23,6 +23,7 @@
 
 #include <KWindowSystem>
 #include <KWindowEffects>
+#include <KX11Extras>
 #include <netwm.h>
 
 NotificationPopup::NotificationPopup(QQuickView *parent)
