@@ -38,7 +38,7 @@ NotificationPopup::NotificationPopup(QQuickView *parent)
 bool NotificationPopup::eventFilter(QObject *object, QEvent *event)
 {
     if (event->type() == QEvent::Show) {
-        NETWinInfo::setState(winId(), NET::SkipTaskbar | NET::SkipPager | NET::SkipSwitcher);
+        KX11Extras::setState(winId(), NET::SkipTaskbar | NET::SkipPager | NET::SkipSwitcher);
     }
 
     return QObject::eventFilter(object, event);
