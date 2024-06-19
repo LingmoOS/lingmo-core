@@ -41,7 +41,7 @@ DimDisplayAction::DimDisplayAction(QObject *parent)
     if (isPlatformX11) {
         // 从Display转换为xcb_connection_t类型的连接
         auto *native = dynamic_cast<QNativeInterface::QX11Application *>(qApp)
-        auto *connection = native->connection();
+        xcb_connection_t *connection = native->connection();
         auto *displayID = native->display();
 
         xcb_dpms_set_timeouts(connection, 0, 0, 0);
