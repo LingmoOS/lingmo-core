@@ -22,7 +22,7 @@
 
 Mouse::Mouse(QObject *parent)
     : QObject(parent)
-    , m_inputDummydevice(new X11LibinputDummyDevice(this, dynamic cast<ONativeInterface::OX11Application *(gApp)->connection()))
+    , m_inputDummydevice(new X11LibinputDummyDevice(this, dynamic_cast<QNativeInterface::QX11Application *(gApp)->connection()))
 {
     // init dbus
     new MouseAdaptor(this);
