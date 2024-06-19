@@ -109,63 +109,73 @@ bool FdoSelectionManager::addDamageWatch(xcb_window_t client)
     }
 }
 
-bool FdoSelectionManager::nativeEventFilter(const QByteArray &eventType, void *message, qintptr *)
+bool FdoSelectionManager::nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result)
 {
+    Q_UNUSED(result)
     if (eventType != "xcb_generic_event_t") {
         return false;
     }
 
     xcb_generic_event_t *ev = static_cast<xcb_generic_event_t *>(message);
-
     const auto responseType = XCB_EVENT_RESPONSE_TYPE(ev);
-    if (responseType == XCB_CLIENT_MESSAGE) {
-        const auto ce = reinterpret_cast<xcb_client_message_event_t *>(ev);
-        if (ce->type == Xcb::atoms->opcodeAtom) {
-            switch (ce->data.data32[1]) {
-            case SYSTEM_TRAY_REQUEST_DOCK:
-                dock(ce->data.data32[2]);
-                return true;
+
+    if (auto *native = dynamic_cast<QNativeInterface::QX11Application *>(qApp)) {
+        xcb_connection_t *c = native->connection(); // 使用新的接口获取X11连接
+
+        if (responseType == XCB_CLIENT_MESSAGE) {
+            const auto ce = reinterpret_cast<xcb_client_message_event_t *>(ev);
+            if (ce->type == Xcb::atoms->opcodeAtom) {
+                switch (ce->data.data32[1]) {
+                case SYSTEM_TRAY_REQUEST_DOCK:
+                    dock(ce->data.data32[2]);
+                    return true;
+                }
+            }
+        } else if (responseType == XCB_UNMAP_NOTIFY) {
+            const auto unmappedWId = reinterpret_cast<xcb_unmap_notify_event_t *>(ev)->window;
+            if (m_proxies.contains(unmappedWId)) {
+                undock(unmappedWId);
+            }
+        } else if (responseType == XCB_DESTROY_NOTIFY) {
+            const auto destroyedWId = reinterpret_cast<xcb_destroy_notify_event_t *>(ev)->window;
+            if (m_proxies.contains(destroyedWId)) {
+                undock(destroyedWId);
+            }
+        } else if (responseType == m_damageEventBase + XCB_DAMAGE_NOTIFY) {
+            const auto damagedWId = reinterpret_cast<xcb_damage_notify_event_t *>(ev)->drawable;
+            const auto sniProxy = m_proxies.value(damagedWId);
+            if (sniProxy) {
+                sniProxy->update();
+                
+                xcb_damage_subtract(c, m_damageWatches[damagedWId], XCB_NONE, XCB_NONE); // 修改为使用新的X11连接
+            }
+        } else if (responseType == XCB_CONFIGURE_REQUEST) {
+            const auto event = reinterpret_cast<xcb_configure_request_event_t *>(ev);
+            const auto sniProxy = m_proxies.value(event->window);
+            if (sniProxy) {
+                // The embedded window tries to move or resize. Ignore move, handle resize only.
+                if ((event->value_mask & XCB_CONFIG_WINDOW_WIDTH) || (event->value_mask & XCB_CONFIG_WINDOW_HEIGHT)) {
+                    sniProxy->resizeWindow(event->width, event->height);
+                }
+            }
+        } else if (responseType == XCB_VISIBILITY_NOTIFY) {
+            const auto event = reinterpret_cast<xcb_visibility_notify_event_t *>(ev);
+            // it's possible that something showed our container window, we have to hide it
+            // workaround for BUG 357443: when KWin is restarted, container window is shown on top
+            if (event->state == XCB_VISIBILITY_UNOBSCURED) {
+                for (auto sniProxy : m_proxies.values()) {
+                    sniProxy->hideContainerWindow(event->window);
+                }
             }
         }
-    } else if (responseType == XCB_UNMAP_NOTIFY) {
-        const auto unmappedWId = reinterpret_cast<xcb_unmap_notify_event_t *>(ev)->window;
-        if (m_proxies.contains(unmappedWId)) {
-            undock(unmappedWId);
-        }
-    } else if (responseType == XCB_DESTROY_NOTIFY) {
-        const auto destroyedWId = reinterpret_cast<xcb_destroy_notify_event_t *>(ev)->window;
-        if (m_proxies.contains(destroyedWId)) {
-            undock(destroyedWId);
-        }
-    } else if (responseType == m_damageEventBase + XCB_DAMAGE_NOTIFY) {
-        const auto damagedWId = reinterpret_cast<xcb_damage_notify_event_t *>(ev)->drawable;
-        const auto sniProxy = m_proxies.value(damagedWId);
-        if (sniProxy) {
-            sniProxy->update();
-            xcb_damage_subtract(QX11Info::connection(), m_damageWatches[damagedWId], XCB_NONE, XCB_NONE);
-        }
-    } else if (responseType == XCB_CONFIGURE_REQUEST) {
-        const auto event = reinterpret_cast<xcb_configure_request_event_t *>(ev);
-        const auto sniProxy = m_proxies.value(event->window);
-        if (sniProxy) {
-            // The embedded window tries to move or resize. Ignore move, handle resize only.
-            if ((event->value_mask & XCB_CONFIG_WINDOW_WIDTH) || (event->value_mask & XCB_CONFIG_WINDOW_HEIGHT)) {
-                sniProxy->resizeWindow(event->width, event->height);
-            }
-        }
-    } else if (responseType == XCB_VISIBILITY_NOTIFY) {
-        const auto event = reinterpret_cast<xcb_visibility_notify_event_t *>(ev);
-        // it's possible that something showed our container window, we have to hide it
-        // workaround for BUG 357443: when KWin is restarted, container window is shown on top
-        if (event->state == XCB_VISIBILITY_UNOBSCURED) {
-            for (auto sniProxy : m_proxies.values()) {
-                sniProxy->hideContainerWindow(event->window);
-            }
-        }
+    } else {
+        qCCritical(SNIPROXY) << "not running under an X11 environment. Quitting";
+        return false;
     }
 
     return false;
 }
+
 
 void FdoSelectionManager::setSystemTrayVisual()
 {
