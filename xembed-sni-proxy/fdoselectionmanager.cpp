@@ -136,7 +136,7 @@ bool FdoSelectionManager::nativeEventFilter(const QByteArray &eventType, void *m
         if (sniProxy) {
             sniProxy->update();
             
-            xcb_connection_t *connection = XGetXCBConnection(qApp->nativeInterface<QNativeInterface::QX11Application>()->display())
+            xcb_connection_t *connection = XGetXCBConnection(qApp->nativeInterface<QNativeInterface::QX11Application>()->display());
 
             xcb_damage_subtract(connection, m_damageWatches[damagedWId], XCB_NONE, XCB_NONE);
         }
