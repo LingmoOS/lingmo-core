@@ -1,7 +1,6 @@
 #include "hotkeys.h"
 
 #include <QApplication>
-#include <QCoreApplication>
 #include <QKeySequence>
 #include <QGuiApplication>
 #include <QTimer>
@@ -16,6 +15,15 @@
 #include <xcb/xcb_keysyms.h>
 
 #include <X11/XKBlib.h>
+
+#include <xcb/composite.h>
+#include <xcb/damage.h>
+#include <xcb/randr.h>
+#include <xcb/shm.h>
+#include <xcb/xcb.h>
+#include <xcb/xcb_atom.h>
+#include <xcb/xcb_event.h>
+#include <X11/Xlib-xcb.h>
 
 Hotkeys::Hotkeys(QObject *parent)
     : QObject(parent)
