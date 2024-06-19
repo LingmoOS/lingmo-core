@@ -47,7 +47,7 @@ FdoSelectionManager::~FdoSelectionManager()
 void FdoSelectionManager::init()
 {
     // load damage extension
-    xcb_connection_t *c = QGuiApplication::nativeInterface<QNativeInterface::QX11Application>()->connection();
+    xcb_connection_t *c = QNativeInterface::QX11Application::connection();
     xcb_prefetch_extension_data(c, &xcb_damage_id);
     const auto *reply = xcb_get_extension_data(c, &xcb_damage_id);
     if (reply && reply->present) {
@@ -72,7 +72,7 @@ bool FdoSelectionManager::addDamageWatch(xcb_window_t client)
 {
     qCDebug(SNIPROXY) << "adding damage watch for " << client;
 
-    xcb_connection_t *c = QGuiApplication::nativeInterface<QNativeInterface::QX11Application>()->connection();
+    xcb_connection_t *c = QNativeInterface::QX11Application::connection();
     const auto attribsCookie = xcb_get_window_attributes_unchecked(c, client);
 
     const auto damageId = xcb_generate_id(c);
@@ -138,7 +138,7 @@ bool FdoSelectionManager::nativeEventFilter(const QByteArray &eventType, void *m
         if (sniProxy) {
             sniProxy->update();
             
-            xcb_connection_t *c = QGuiApplication::nativeInterface<QNativeInterface::QX11Application>()->connection();
+            xcb_connection_t *c = QNativeInterface::QX11Application::connection();
             xcb_damage_subtract(c, m_damageWatches[damagedWId], XCB_NONE, XCB_NONE);
         }
     } else if (responseType == XCB_CONFIGURE_REQUEST) {
@@ -209,7 +209,7 @@ void FdoSelectionManager::onLostOwnership()
 
 void FdoSelectionManager::setSystemTrayVisual()
 {
-    xcb_connection_t *c = QGuiApplication::nativeInterface<QNativeInterface::QX11Application>()->connection();
+    xcb_connection_t *c = QNativeInterface::QX11Application::connection();
     auto screen = xcb_setup_roots_iterator(xcb_get_setup(c)).data;
     auto trayVisual = screen->root_visual;
     xcb_depth_iterator_t depth_iterator = xcb_screen_allowed_depths_iterator(screen);
