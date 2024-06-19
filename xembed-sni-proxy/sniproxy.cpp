@@ -20,12 +20,13 @@
 #include <QTimer>
 #include <QEvent>
 #include <QPermissions>
+#include <QDateTime>
 
 #include <QBitmap>
 
 #include <KWindowSystem>
 #include <KWindowInfo>
-#include <netwm.h>
+#include <NETWM>
 
 #include "statusnotifieritemadaptor.h"
 #include "statusnotifierwatcher_interface.h"
@@ -507,7 +508,8 @@ void SNIProxy::sendClick(uint8_t mouseButton, int x, int y)
     qCDebug(SNIPROXY) << "Received click" << mouseButton << "with passed x*y" << x << y;
     sendingClickEvent = true;
 
-    auto c = qApp->nativeInterface<QNativeInterface::QX11Application>()->connection();
+    auto *x11App = qApp->nativeInterface<QNativeInterface::QX11Application>();
+    auto c = x11App->connection();
 
     auto cookieSize = xcb_get_geometry(c, m_windowId);
     QScopedPointer<xcb_get_geometry_reply_t, QScopedPointerPodDeleter> clientGeom(xcb_get_geometry_reply(c, cookieSize, nullptr));
@@ -544,15 +546,17 @@ void SNIProxy::sendClick(uint8_t mouseButton, int x, int y)
     // pull window up
     stackContainerWindow(XCB_STACK_MODE_ABOVE);
 
+    
     // mouse down
     if (m_injectMode == Direct) {
         xcb_button_press_event_t *event = new xcb_button_press_event_t;
         memset(event, 0x00, sizeof(xcb_button_press_event_t));
+
         event->response_type = XCB_BUTTON_PRESS;
         event->event = m_windowId;
-        event->time = QX11Info::getTimestamp();
+        event->time = QDateTime::currentDateTime().toSecsSinceEpoch();
         event->same_screen = 1;
-        event->root = QX11Info::appRootWindow();
+        event->root = DefaultRootWindow(x11App->display());
         event->root_x = x;
         event->root_y = y;
         event->event_x = static_cast<int16_t>(clickPoint.x());
@@ -564,7 +568,7 @@ void SNIProxy::sendClick(uint8_t mouseButton, int x, int y)
         xcb_send_event(c, false, m_windowId, XCB_EVENT_MASK_BUTTON_PRESS, (char *)event);
         delete event;
     } else {
-        sendXTestPressed(QX11Info::display(), mouseButton);
+        sendXTestPressed(x11App->display(), mouseButton);
     }
 
     // mouse up
@@ -573,9 +577,9 @@ void SNIProxy::sendClick(uint8_t mouseButton, int x, int y)
         memset(event, 0x00, sizeof(xcb_button_release_event_t));
         event->response_type = XCB_BUTTON_RELEASE;
         event->event = m_windowId;
-        event->time = QX11Info::getTimestamp();
+        event->time = QDateTime::currentDateTime().toSecsSinceEpoch();
         event->same_screen = 1;
-        event->root = QX11Info::appRootWindow();
+        event->root = DefaultRootWindow(x11App->display());
         event->root_x = x;
         event->root_y = y;
         event->event_x = static_cast<int16_t>(clickPoint.x());
@@ -587,7 +591,7 @@ void SNIProxy::sendClick(uint8_t mouseButton, int x, int y)
         xcb_send_event(c, false, m_windowId, XCB_EVENT_MASK_BUTTON_RELEASE, (char *)event);
         delete event;
     } else {
-        sendXTestReleased(QX11Info::display(), mouseButton);
+        sendXTestReleased(x11App->display(), mouseButton);
     }
 
 #ifndef VISUAL_DEBUG
