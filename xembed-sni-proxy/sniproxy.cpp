@@ -18,6 +18,7 @@
 #include <QGuiApplication>
 #include <QScreen>
 #include <QTimer>
+#include <QEvent>
 
 #include <QBitmap>
 
