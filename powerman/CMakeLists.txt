@@ -9,26 +9,12 @@ find_package(X11)
 find_package(XCB
     REQUIRED COMPONENTS
         XCB
-        XFIXES
-        DAMAGE
-        COMPOSITE
-        RANDR
-        SHM
-        UTIL
-        IMAGE
         DPMS
 )
 
 set(XCB_LIBS
     XCB::XCB
     XCB::DPMS
-    XCB::XFIXES
-    XCB::DAMAGE
-    XCB::COMPOSITE
-    XCB::RANDR
-    XCB::SHM
-    XCB::UTIL
-    XCB::IMAGE
 )
 
 set(SOURCES

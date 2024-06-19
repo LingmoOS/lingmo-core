@@ -23,6 +23,7 @@
 // #include <KSharedConfig>
 #include <KWindowSystem>
 #include <KX11Extras>
+#include <KWindowInfo>
 
 #include <xcb/xcb.h>
 
