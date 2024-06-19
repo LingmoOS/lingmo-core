@@ -47,7 +47,7 @@ FdoSelectionManager::~FdoSelectionManager()
 void FdoSelectionManager::init()
 {
     // load damage extension
-    auto *nativeApp = dynamic_cast<QNativeInterface::QX11Application *>(QGuiApplication::nativeInterface());
+    auto *nativeApp = QGuiApplication::nativeInterface<QNativeInterface::QX11Application>()
     xcb_connection_t *c = nativeApp->connection();
     xcb_prefetch_extension_data(c, &xcb_damage_id);
     const auto *reply = xcb_get_extension_data(c, &xcb_damage_id);
@@ -59,7 +59,7 @@ void FdoSelectionManager::init()
         qCCritical(SNIPROXY) << "could not load damage extension. Quitting";
         qApp->exit(-1);
     }
-
+    
 
     qApp->installNativeEventFilter(this);
 
@@ -73,7 +73,7 @@ bool FdoSelectionManager::addDamageWatch(xcb_window_t client)
 {
     qCDebug(SNIPROXY) << "adding damage watch for " << client;
 
-    auto *nativeApp = dynamic_cast<QNativeInterface::QX11Application *>(QGuiApplication::nativeInterface());
+    auto *nativeApp = QGuiApplication::nativeInterface<QNativeInterface::QX11Application>()
     xcb_connection_t *c = nativeApp->connection();
     const auto attribsCookie = xcb_get_window_attributes_unchecked(c, client);
 
@@ -140,7 +140,7 @@ bool FdoSelectionManager::nativeEventFilter(const QByteArray &eventType, void *m
         if (sniProxy) {
             sniProxy->update();
             
-            auto *nativeApp = dynamic_cast<QNativeInterface::QX11Application *>(QGuiApplication::nativeInterface());
+            auto *nativeApp = QGuiApplication::nativeInterface<QNativeInterface::QX11Application>()
             xcb_connection_t *c = nativeApp->connection();
             xcb_damage_subtract(c, m_damageWatches[damagedWId], XCB_NONE, XCB_NONE);
         }
@@ -212,7 +212,7 @@ void FdoSelectionManager::onLostOwnership()
 
 void FdoSelectionManager::setSystemTrayVisual()
 {
-    auto *nativeApp = dynamic_cast<QNativeInterface::QX11Application *>(QGuiApplication::nativeInterface());
+    auto *nativeApp = QGuiApplication::nativeInterface<QNativeInterface::QX11Application>()
     xcb_connection_t *c = nativeApp->connection();
     auto screen = xcb_setup_roots_iterator(xcb_get_setup(c)).data;
     auto trayVisual = screen->root_visual;
