@@ -47,8 +47,8 @@ FdoSelectionManager::~FdoSelectionManager()
 void FdoSelectionManager::init()
 {
     // load damage extension
-    QNativeInterface::QX11Application *x11App = app.nativeInterface<QNativeInterface::QX11Application>();
-    xcb_connection_t *c = x11App->connection();
+    auto *native = QGuiApplication::nativeInterface<QNativeInterface::QX11Application>()
+    xcb_connection_t *c = native->connection();
 
     xcb_prefetch_extension_data(c, &xcb_damage_id);
     const auto *reply = xcb_get_extension_data(c, &xcb_damage_id);
@@ -73,8 +73,8 @@ bool FdoSelectionManager::addDamageWatch(xcb_window_t client)
 {
     qCDebug(SNIPROXY) << "adding damage watch for " << client;
 
-    QNativeInterface::QX11Application *x11App = app.nativeInterface<QNativeInterface::QX11Application>();
-    xcb_connection_t *c = x11App->connection();
+    auto *native = QGuiApplication::nativeInterface<QNativeInterface::QX11Application>()
+    xcb_connection_t *c = native->connection();
 
     const auto attribsCookie = xcb_get_window_attributes_unchecked(c, client);
 
@@ -210,8 +210,8 @@ void FdoSelectionManager::onLostOwnership()
 
 void FdoSelectionManager::setSystemTrayVisual()
 {
-    QNativeInterface::QX11Application *x11App = app.nativeInterface<QNativeInterface::QX11Application>();
-    xcb_connection_t *c = x11App->connection();
+    auto *native = QGuiApplication::nativeInterface<QNativeInterface::QX11Application>()
+    xcb_connection_t *c = native->connection();
     
     auto screen = xcb_setup_roots_iterator(xcb_get_setup(c)).data;
     auto trayVisual = screen->root_visual;
