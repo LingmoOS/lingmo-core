@@ -104,10 +104,9 @@ void Menu::stop(const QList<uint> &ids)
             qDebug() << "Failed to stop subscription to" << ids << "on" << m_serviceName << "at" << m_objectPath << reply.error();
         } else {
             // remove all subscriptions that we unsubscribed from
-            // TODO is there a nicer algorithm for that?
-            // TODO remove all m_menus also?
             m_subscriptions.erase(
-                std::remove_if(m_subscriptions.begin(), m_subscriptions.end(), std::bind(&QList<uint>::contains, m_subscriptions, std::placeholders::_1)),
+                std::remove_if(m_subscriptions.begin(), m_subscriptions.end(),
+                            [this](uint id) { return m_subscriptions.contains(id); }),
                 m_subscriptions.end());
 
             if (m_subscriptions.isEmpty()) {
@@ -116,6 +115,7 @@ void Menu::stop(const QList<uint> &ids)
         }
         watcher->deleteLater();
     });
+
 }
 
 bool Menu::hasMenu() const
