@@ -11,10 +11,12 @@
 
 #include <QCoreApplication>
 #include <QGuiApplication>
+#include <QNativeInterface>
 #include <QTimer>
 
 #include <KSelectionOwner>
 
+#include <xcb/xcb.h>
 #include <xcb/composite.h>
 #include <xcb/damage.h>
 #include <xcb/xcb_atom.h>
