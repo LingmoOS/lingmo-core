@@ -18,6 +18,7 @@
 #include <QJsonValue>
 #include <QUrl>
 #include <QDir>
+#include <QNativeInterface>
 
 #include <xcb/xcb.h>
 #include <xcb/composite.h>
