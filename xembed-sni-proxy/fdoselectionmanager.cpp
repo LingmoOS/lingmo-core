@@ -9,6 +9,7 @@
 
 #include "debug.h"
 
+#include <QGuiApplication>
 #include <QCoreApplication>
 #include <QTimer>
 
