@@ -251,7 +251,7 @@ void Window::menuChanged(const QVector<uint> &menuIds)
 void Window::onMenuSubscribed(uint id)
 {
     // When it was a delayed GetLayout request, send the reply now
-    const auto pendingReplies = m_pendingGetLayouts.values(id);
+    const auto pendingReplies = m_pendingGetLayouts.values(static_cast<int>(id));
     if (!pendingReplies.isEmpty()) {
         for (const auto &pendingReply : pendingReplies) {
             if (pendingReply.type() != QDBusMessage::InvalidMessage) {
@@ -424,7 +424,7 @@ uint Window::GetLayout(int parentId, int recursionDepth, const QStringList &prop
 
     if (!m_currentMenu->hasSubscription(subscription)) {
         // let's serve multiple similar requests in one go once we've processed them
-        m_pendingGetLayouts.insertMulti(subscription, message());
+        m_pendingGetLayouts.insert(subscription, message());
         setDelayedReply(true);
 
         m_currentMenu->start(subscription);
