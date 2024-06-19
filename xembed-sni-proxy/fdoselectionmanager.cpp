@@ -10,12 +10,10 @@
 #include "debug.h"
 
 #include <QCoreApplication>
-#include <QGuiApplication>
 #include <QTimer>
 
 #include <KSelectionOwner>
 
-#include <xcb/xcb.h>
 #include <xcb/composite.h>
 #include <xcb/damage.h>
 #include <xcb/xcb_atom.h>
@@ -47,18 +45,20 @@ FdoSelectionManager::~FdoSelectionManager()
 void FdoSelectionManager::init()
 {
     // load damage extension
-    QGuiApplication app(argc, argv);
-    auto *native = app.nativeInterface<QNativeInterface::QX11Application>();
-    xcb_connection_t *c = native->connection();
-
-    xcb_prefetch_extension_data(c, &xcb_damage_id);
-    const auto *reply = xcb_get_extension_data(c, &xcb_damage_id);
-    if (reply && reply->present) {
-        m_damageEventBase = reply->first_event;
-        xcb_damage_query_version_unchecked(c, XCB_DAMAGE_MAJOR_VERSION, XCB_DAMAGE_MINOR_VERSION);
+    if (auto *native = dynamic_cast<QNativeInterface::QX11Application *>(qApp)) {
+        xcb_connection_t *c = native->connection(); // 使用新的接口
+        xcb_prefetch_extension_data(c, &xcb_damage_id);
+        const auto *reply = xcb_get_extension_data(c, &xcb_damage_id);
+        if (reply && reply->present) {
+            m_damageEventBase = reply->first_event;
+            xcb_damage_query_version_unchecked(c, XCB_DAMAGE_MAJOR_VERSION, XCB_DAMAGE_MINOR_VERSION);
+        } else {
+            // no XDamage means
+            qCCritical(SNIPROXY) << "could not load damage extension. Quitting";
+            qApp->exit(-1);
+        }
     } else {
-        // no XDamage means
-        qCCritical(SNIPROXY) << "could not load damage extension. Quitting";
+        qCCritical(SNIPROXY) << "not running under an X11 environment. Quitting";
         qApp->exit(-1);
     }
 
@@ -74,37 +74,39 @@ bool FdoSelectionManager::addDamageWatch(xcb_window_t client)
 {
     qCDebug(SNIPROXY) << "adding damage watch for " << client;
 
-    QGuiApplication app(argc, argv);
-    auto *native = app.nativeInterface<QNativeInterface::QX11Application>();
-    xcb_connection_t *c = native->connection();
+    if (auto *native = dynamic_cast<QNativeInterface::QX11Application *>(qApp)) {
+        xcb_connection_t *c = native->connection();
+        const auto attribsCookie = xcb_get_window_attributes_unchecked(c, client);
 
-    const auto attribsCookie = xcb_get_window_attributes_unchecked(c, client);
+        const auto damageId = xcb_generate_id(c);
+        m_damageWatches[client] = damageId;
+        xcb_damage_create(c, damageId, client, XCB_DAMAGE_REPORT_LEVEL_NON_EMPTY);
 
-    const auto damageId = xcb_generate_id(c);
-    m_damageWatches[client] = damageId;
-    xcb_damage_create(c, damageId, client, XCB_DAMAGE_REPORT_LEVEL_NON_EMPTY);
+        xcb_generic_error_t *error = nullptr;
+        QScopedPointer<xcb_get_window_attributes_reply_t, QScopedPointerPodDeleter> attr(xcb_get_window_attributes_reply(c, attribsCookie, &error));
+        QScopedPointer<xcb_generic_error_t, QScopedPointerPodDeleter> getAttrError(error);
+        uint32_t events = XCB_EVENT_MASK_STRUCTURE_NOTIFY;
+        if (!attr.isNull()) {
+            events = events | attr->your_event_mask;
+        }
+        // if window is already gone, there is no need to handle it.
+        if (getAttrError && getAttrError->error_code == XCB_WINDOW) {
+            return false;
+        }
+        // the event mask will not be removed again. We cannot track whether another component also needs STRUCTURE_NOTIFY (e.g. KWindowSystem).
+        // if we would remove the event mask again, other areas will break.
+        const auto changeAttrCookie = xcb_change_window_attributes_checked(c, client, XCB_CW_EVENT_MASK, &events);
+        QScopedPointer<xcb_generic_error_t, QScopedPointerPodDeleter> changeAttrError(xcb_request_check(c, changeAttrCookie));
+        // if window is gone by this point, it will be caught by eventFilter, so no need to check later errors.
+        if (changeAttrError && changeAttrError->error_code == XCB_WINDOW) {
+            return false;
+        }
 
-    xcb_generic_error_t *error = nullptr;
-    QScopedPointer<xcb_get_window_attributes_reply_t, QScopedPointerPodDeleter> attr(xcb_get_window_attributes_reply(c, attribsCookie, &error));
-    QScopedPointer<xcb_generic_error_t, QScopedPointerPodDeleter> getAttrError(error);
-    uint32_t events = XCB_EVENT_MASK_STRUCTURE_NOTIFY;
-    if (!attr.isNull()) {
-        events = events | attr->your_event_mask;
-    }
-    // if window is already gone, there is no need to handle it.
-    if (getAttrError && getAttrError->error_code == XCB_WINDOW) {
+        return true;
+    } else {
+        qCCritical(SNIPROXY) << "not running under an X11 environment. Quitting";
         return false;
     }
-    // the event mask will not be removed again. We cannot track whether another component also needs STRUCTURE_NOTIFY (e.g. KWindowSystem).
-    // if we would remove the event mask again, other areas will break.
-    const auto changeAttrCookie = xcb_change_window_attributes_checked(c, client, XCB_CW_EVENT_MASK, &events);
-    QScopedPointer<xcb_generic_error_t, QScopedPointerPodDeleter> changeAttrError(xcb_request_check(c, changeAttrCookie));
-    // if window is gone by this point, it will be caught by eventFilter, so no need to check later errors.
-    if (changeAttrError && changeAttrError->error_code == XCB_WINDOW) {
-        return false;
-    }
-
-    return true;
 }
 
 bool FdoSelectionManager::nativeEventFilter(const QByteArray &eventType, void *message, long int *result)
@@ -212,34 +214,36 @@ void FdoSelectionManager::onLostOwnership()
 
 void FdoSelectionManager::setSystemTrayVisual()
 {
-    QGuiApplication app(argc, argv);
-    auto *native = app.nativeInterface<QNativeInterface::QX11Application>();
-    xcb_connection_t *c = native->connection();
-    
-    auto screen = xcb_setup_roots_iterator(xcb_get_setup(c)).data;
-    auto trayVisual = screen->root_visual;
-    xcb_depth_iterator_t depth_iterator = xcb_screen_allowed_depths_iterator(screen);
-    xcb_depth_t *depth = nullptr;
+    if (auto *native = dynamic_cast<QNativeInterface::QX11Application *>(qApp)) {
+        xcb_connection_t *c = native->connection();
+        auto screen = xcb_setup_roots_iterator(xcb_get_setup(c)).data;
+        auto trayVisual = screen->root_visual;
+        xcb_depth_iterator_t depth_iterator = xcb_screen_allowed_depths_iterator(screen);
+        xcb_depth_t *depth = nullptr;
 
-    while (depth_iterator.rem) {
-        if (depth_iterator.data->depth == 32) {
-            depth = depth_iterator.data;
-            break;
-        }
-        xcb_depth_next(&depth_iterator);
-    }
-
-    if (depth) {
-        xcb_visualtype_iterator_t visualtype_iterator = xcb_depth_visuals_iterator(depth);
-        while (visualtype_iterator.rem) {
-            xcb_visualtype_t *visualtype = visualtype_iterator.data;
-            if (visualtype->_class == XCB_VISUAL_CLASS_TRUE_COLOR) {
-                trayVisual = visualtype->visual_id;
+        while (depth_iterator.rem) {
+            if (depth_iterator.data->depth == 32) {
+                depth = depth_iterator.data;
                 break;
             }
-            xcb_visualtype_next(&visualtype_iterator);
+            xcb_depth_next(&depth_iterator);
         }
-    }
 
-    xcb_change_property(c, XCB_PROP_MODE_REPLACE, m_selectionOwner->ownerWindow(), Xcb::atoms->visualAtom, XCB_ATOM_VISUALID, 32, 1, &trayVisual);
+        if (depth) {
+            xcb_visualtype_iterator_t visualtype_iterator = xcb_depth_visuals_iterator(depth);
+            while (visualtype_iterator.rem) {
+                xcb_visualtype_t *visualtype = visualtype_iterator.data;
+                if (visualtype->_class == XCB_VISUAL_CLASS_TRUE_COLOR) {
+                    trayVisual = visualtype->visual_id;
+                    break;
+                }
+                xcb_visualtype_next(&visualtype_iterator);
+            }
+        }
+
+        xcb_change_property(c, XCB_PROP_MODE_REPLACE, m_selectionOwner->ownerWindow(), Xcb::atoms->visualAtom, XCB_ATOM_VISUALID, 32, 1, &trayVisual);
+    } else {
+        qCCritical(SNIPROXY) << "not running under an X11 environment. Quitting";
+        return;
+    }
 }
