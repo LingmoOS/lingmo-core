@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.14)
 project(lingmo-xembedsniproxy)
 
 add_definitions(-DQT_NO_CAST_TO_ASCII
@@ -8,39 +9,11 @@ add_definitions(-DQT_NO_CAST_TO_ASCII
 find_package(ECM REQUIRED NO_MODULE)
 list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 
-find_package(X11)
-set_package_properties(X11 PROPERTIES DESCRIPTION "X11 libraries"
-                        URL "http://www.x.org"
-                        TYPE OPTIONAL
-                        PURPOSE "Required for building the X11 based workspace")
+find_package(X11 REQUIRED)
+find_package(XCB REQUIRED COMPONENTS XCB RANDR XFIXES DAMAGE COMPOSITE SHM UTIL IMAGE)
 
-if(X11_FOUND)
-  find_package(XCB MODULE REQUIRED COMPONENTS XCB RANDR)
-  set_package_properties(XCB PROPERTIES TYPE REQUIRED)
-  if(NOT X11_SM_FOUND)
-    message(FATAL_ERROR "\nThe X11 Session Management (SM) development package could not be found.\nPlease install libSM.\n")
-  endif(NOT X11_SM_FOUND)
-
-  find_package(Qt6 ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS)
-endif()
-
-if(X11_FOUND AND XCB_XCB_FOUND)
-  set(HAVE_X11 1)
-endif()
-
-find_package(XCB
-    REQUIRED COMPONENTS
-        XCB
-        XFIXES
-        DAMAGE
-        COMPOSITE
-        RANDR
-        SHM
-        UTIL
-        IMAGE
-)
-
-find_package(KF6WindowSystem)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui DBus Widgets)
+find_package(KF6WindowSystem REQUIRED)
 
 set(XCB_LIBS
     XCB::XCB
@@ -62,22 +35,23 @@ set(XEMBED_SNI_PROXY_SOURCES
     xtestsender.cpp
 )
 
-qt_add_dbus_adaptor(DBUS_SOURCES org.kde.StatusNotifierItem.xml
-                     sniproxy.h SNIProxy)
+qt_add_dbus_adaptor(DBUS_SOURCES org.kde.StatusNotifierItem.xml sniproxy.h SNIProxy)
 set(statusnotifierwatcher_xml org.kde.StatusNotifierWatcher.xml)
 qt_add_dbus_interface(DBUS_SOURCES ${statusnotifierwatcher_xml} statusnotifierwatcher_interface)
 
 set_source_files_properties(${DBUS_SOURCES} PROPERTIES SKIP_AUTOGEN ON)
 
 add_executable(lingmo-xembedsniproxy ${XEMBED_SNI_PROXY_SOURCES} ${DBUS_SOURCES})
-set_package_properties(XCB PROPERTIES TYPE REQUIRED)
 target_link_libraries(lingmo-xembedsniproxy
     Qt6::Core
     Qt6::Gui
     Qt6::DBus
+    Qt6::Widgets
     KF6::WindowSystem
     ${XCB_LIBS}
-    ${X11_XTest_LIB}
+    ${X11_X11_LIB}
+    ${X11_Xext_LIB}
+    ${X11_Xrandr_LIB}
 )
 
 install(TARGETS lingmo-xembedsniproxy DESTINATION ${CMAKE_INSTALL_BINDIR})
