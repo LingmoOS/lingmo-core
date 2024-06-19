@@ -19,6 +19,7 @@
 #include <QScreen>
 #include <QTimer>
 #include <QEvent>
+#include <QPermissions>
 
 #include <QBitmap>
 
