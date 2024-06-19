@@ -31,7 +31,7 @@ class SNIProxy : public QObject
     Q_PROPERTY(QString Category READ Category)
     Q_PROPERTY(QString Id READ Id)
     Q_PROPERTY(QString Title READ Title)
-    Q_PROPERTY(QString Status READ Status)
+    Q_PROPERTY(QString getStatus READ getStatus)
     Q_PROPERTY(int WindowId READ WindowId)
     Q_PROPERTY(bool ItemIsMenu READ ItemIsMenu)
     Q_PROPERTY(KDbusImageVector IconPixmap READ IconPixmap)
