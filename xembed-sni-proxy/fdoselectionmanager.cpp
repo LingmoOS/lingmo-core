@@ -11,7 +11,6 @@
 
 #include <QCoreApplication>
 #include <QGuiApplication>
-#include <QNativeInterface>
 #include <QTimer>
 
 #include <KSelectionOwner>
@@ -60,7 +59,7 @@ void FdoSelectionManager::init()
         qCCritical(SNIPROXY) << "could not load damage extension. Quitting";
         qApp->exit(-1);
     }
-    
+
 
     qApp->installNativeEventFilter(this);
 
