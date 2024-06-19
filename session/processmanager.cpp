@@ -22,6 +22,8 @@
 #include <KWindowSystem>
 // #include <KWindowSystem/NETWM>
 
+#include <X11/X.h>
+
 #include "daemon-helper.h"
 
 ProcessManager::ProcessManager(Application *app, QObject *parent)
