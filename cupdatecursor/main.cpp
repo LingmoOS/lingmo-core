@@ -43,7 +43,8 @@ int main(int argc, char *argv[])
     if (argc != 3)
         return 1;
 
-    if (!QX11Info::isPlatformX11())
+    auto isPlatformX11 = qGuiApp->nativeInterface<QNativeInterface::QX11Application>();
+    if (!isPlatformX11)
         return 2;
 
     QString theme = QFile::decodeName(argv[1]);

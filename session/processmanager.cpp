@@ -175,7 +175,7 @@ bool ProcessManager::nativeEventFilter(const QByteArray &eventType, void *messag
     // ref: lxqt session
     if (!m_wmStarted && m_waitLoop) {
         // all window managers must set their name according to the spec
-        if (!QString::fromUtf8(NETRootInfo(QX11Info::connection(), NET::SupportingWMCheck).wmName()).isEmpty()) {
+        if (!QString::fromUtf8(NETRootInfo(QNativeInterface::QX11Application::connection(), NET::SupportingWMCheck).wmName()).isEmpty()) {
             qDebug() << "Window manager started";
             m_wmStarted = true;
             if (m_waitLoop && m_waitLoop->isRunning())
