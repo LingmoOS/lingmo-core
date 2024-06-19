@@ -60,6 +60,7 @@ void FdoSelectionManager::init()
         qCCritical(SNIPROXY) << "could not load damage extension. Quitting";
         qApp->exit(-1);
     }
+    
 
     qApp->installNativeEventFilter(this);
 
