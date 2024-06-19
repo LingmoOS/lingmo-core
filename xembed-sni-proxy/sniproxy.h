@@ -15,6 +15,7 @@
 #include <QPixmap>
 #include <QPoint>
 #include <QEvent>
+#include <QUrl>
 
 #include <xcb/xcb.h>
 #include <xcb/xcb_image.h>
