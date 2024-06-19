@@ -107,7 +107,8 @@ void Menu::stop(const QList<uint> &ids)
             // TODO is there a nicer algorithm for that?
             // TODO remove all m_menus also?
             m_subscriptions.erase(
-                std::remove_if(m_subscriptions.begin(), m_subscriptions.end(), std::bind(&QList<uint>::contains, m_subscriptions, std::placeholders::_1)),
+                std::remove_if(m_subscriptions.begin(), m_subscriptions.end(),
+                    this{ return m_subscriptions.contains(id); }),
                 m_subscriptions.end());
 
             if (m_subscriptions.isEmpty()) {
