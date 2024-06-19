@@ -23,6 +23,7 @@
 
 #include <KWindowSystem>
 #include <KWindowEffects>
+#include <netwm.h>
 
 NotificationPopup::NotificationPopup(QQuickView *parent)
     : QQuickView(parent)
@@ -36,7 +37,7 @@ NotificationPopup::NotificationPopup(QQuickView *parent)
 bool NotificationPopup::eventFilter(QObject *object, QEvent *event)
 {
     if (event->type() == QEvent::Show) {
-        KWindowSystem::setState(winId(), NET::SkipTaskbar | NET::SkipPager | NET::SkipSwitcher);
+        NETWinInfo::setState(winId(), NET::SkipTaskbar | NET::SkipPager | NET::SkipSwitcher);
     }
 
     return QObject::eventFilter(object, event);
