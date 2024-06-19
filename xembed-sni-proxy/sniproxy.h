@@ -16,6 +16,7 @@
 #include <QPoint>
 #include <QEvent>
 #include <QUrl>
+#include <QDir>
 
 #include <xcb/xcb.h>
 #include <xcb/xcb_image.h>
