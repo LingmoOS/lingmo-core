@@ -3,7 +3,6 @@
 #include <QDebug>
 #include <QSettings>
 #include <QStandardPaths>
-#include <QUrl>
 
 #include <X11/X.h>
 #include <X11/Xcursor/Xcursor.h>
