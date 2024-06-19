@@ -14,6 +14,7 @@
 
 #include <KSelectionOwner>
 #include <QGuiApplication>
+#include <QJsonValue>
 #include <QUrl>
 #include <QDir>
 
