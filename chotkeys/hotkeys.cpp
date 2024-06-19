@@ -60,7 +60,7 @@ bool Hotkeys::nativeEventFilter(const QByteArray &eventType, void *message, long
 
 //        // Keyboard needs to be ungrabed after XGrabKey() activates the grab,
 //        // otherwise it becomes frozen.
-//        xcb_connection_t *c = QX11Info::connection();
+//        xcb_connection_t *c = dynamic_cast<QNativeInterface::OX11Application *(qApp)->connection();
 //        xcb_void_cookie_t cookie = xcb_ungrab_keyboard_checked(c, XCB_TIME_CURRENT_TIME);
 //        xcb_flush(c);
 
@@ -147,17 +147,18 @@ void Hotkeys::registerKey(quint32 keycode)
 
 void Hotkeys::registerKey(quint32 key, quint32 mods)
 {
-    xcb_grab_key(QX11Info::connection(),
+    auto *native = dynamic_cast<QNativeInterface::QX11Application *>(qApp);
+    xcb_grab_key(dynamic_cast<native->connection(),
                  1,
-                 QX11Info::appRootWindow(),
+                 DefaultRootWindow(native->display()),
                  mods,
                  key,
                  XCB_GRAB_MODE_ASYNC,
                  XCB_GRAB_MODE_ASYNC);
 
-    xcb_grab_key(QX11Info::connection(),
+    xcb_grab_key(dynamic_cast<native->connection(),
                  1,
-                 QX11Info::appRootWindow(),
+                 DefaultRootWindow(native->display()),
                  mods | XCB_MOD_MASK_2,
                  key,
                  XCB_GRAB_MODE_ASYNC,
@@ -166,7 +167,8 @@ void Hotkeys::registerKey(quint32 key, quint32 mods)
 
 void Hotkeys::unregisterKey(quint32 key, quint32 mods)
 {
-    xcb_ungrab_key(QX11Info::connection(), key, QX11Info::appRootWindow(), mods);
+    auto *native = dynamic_cast<QNativeInterface::QX11Application *>(qApp);
+    xcb_ungrab_key(native->connection(), key, DefaultRootWindow(native->display()), mods);
 }
 
 quint32 Hotkeys::nativeKeycode(Qt::Key k)
