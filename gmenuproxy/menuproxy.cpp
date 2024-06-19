@@ -109,9 +109,9 @@ bool MenuProxy::init()
     }
 
     enableGtkSettings(true);
-
-    connect(KWindowSystem::self(), &KX11Extras::windowAdded, this, &MenuProxy::onWindowAdded);
-    connect(KWindowSystem::self(), &KX11Extras::windowRemoved, this, &MenuProxy::onWindowRemoved);
+    
+    connect(KWindowSystem::self(), &KWindowSystem::windowAdded, this, &MenuProxy::onWindowAdded);
+    connect(KWindowSystem::self(), &KWindowSystem::windowRemoved, this, &MenuProxy::onWindowRemoved);
 
     const auto windows = KWindowSystem::windows();
     for (WId id : windows) {
