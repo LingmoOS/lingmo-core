@@ -20,6 +20,7 @@
 #include <QDBusPendingCall>
 
 #include <KWindowSystem>
+#include <netwm.h>
 // #include <KWindowSystem/NETWM>
 
 #include <X11/Xlib-xcb.h>
