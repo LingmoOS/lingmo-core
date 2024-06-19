@@ -1,5 +1,6 @@
 #include "datehelper.h"
 #include <QDateTime>
+#include <QLocale>
 
 DateHelper::DateHelper(QObject *parent) : QObject(parent)
 {
