@@ -1,6 +1,7 @@
 #include "hotkeys.h"
 
 #include <QApplication>
+#include <QCoreApplication>
 #include <QKeySequence>
 #include <QGuiApplication>
 #include <QTimer>
