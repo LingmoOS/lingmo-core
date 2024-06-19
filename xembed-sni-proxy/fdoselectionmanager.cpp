@@ -19,6 +19,7 @@
 #include <xcb/damage.h>
 #include <xcb/xcb_atom.h>
 #include <xcb/xcb_event.h>
+#include <X11/Xlib-xcb.h>
 
 #include "sniproxy.h"
 #include "xcbutils.h"
