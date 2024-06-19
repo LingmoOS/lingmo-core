@@ -8,7 +8,6 @@
 #define PROPERTYINFO_H
 
 #include <QSharedPointer>
-#include <QX11Info>
 #include <X11/Xdefs.h>
 
 void XDeleter(void *p);

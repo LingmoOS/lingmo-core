@@ -9,7 +9,6 @@
 
 #include <QSocketNotifier>
 #include <QVector>
-#include <QX11Info>
 
 #include <xcb/record.h>
 #include <xcb/xcb.h>

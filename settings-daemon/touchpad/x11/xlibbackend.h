@@ -11,7 +11,7 @@
 #include <QMap>
 #include <QScopedPointer>
 #include <QSet>
-#include <QSharedPointer>
+#include <QSharedPointer>   
 #include <QStringList>
 
 #include "libinputtouchpad.h"

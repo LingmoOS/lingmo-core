@@ -5,7 +5,6 @@
 	#include <QGuiApplication>
 #else
 	#include <QDebug>
-	#include <QX11Info>
 #endif
 
 #include <QThreadStorage>
