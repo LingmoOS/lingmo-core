@@ -15,7 +15,6 @@
 #include "xcbutils.h"
 
 #include <QDBusMetaType>
-#include <QUrl>
 
 #include <KWindowSystem>
 

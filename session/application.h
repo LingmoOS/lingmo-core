@@ -21,7 +21,6 @@
 #define APPLICATION_H
 
 #include <QApplication>
-#include <QUrl>
 
 #include "processmanager.h"
 #include "networkproxymanager.h"
