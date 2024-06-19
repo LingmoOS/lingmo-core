@@ -10,6 +10,7 @@
 #include "debug.h"
 
 #include <QCoreApplication>
+#include <QGuiApplication>
 #include <QTimer>
 
 #include <KSelectionOwner>
