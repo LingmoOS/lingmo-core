@@ -17,6 +17,7 @@
 #include <QUrl>
 #include <QDir>
 
+#include <xcb/xcb.h>
 #include <xcb/composite.h>
 #include <xcb/damage.h>
 #include <xcb/xcb_atom.h>

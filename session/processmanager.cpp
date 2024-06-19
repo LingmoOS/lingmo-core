@@ -24,6 +24,7 @@
 // #include <KWindowSystem/NETWM>
 
 #include <X11/Xlib-xcb.h>
+#include <xcb/xcb.h>
 
 #include "daemon-helper.h"
 
