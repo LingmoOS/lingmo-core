@@ -30,7 +30,6 @@
 #include <xcb/xcb.h>
 #include <X11/Xlib-xcb.h>
 #include <xcb/dpms.h>
-#include <xcb/xcbint.h>
 
 DimDisplayAction::DimDisplayAction(QObject *parent)
     : Action(parent)
@@ -40,14 +39,11 @@ DimDisplayAction::DimDisplayAction(QObject *parent)
 {
     auto isPlatformX11 = qGuiApp->nativeInterface<QNativeInterface::QX11Application>();
     if (isPlatformX11) {
-        // 从Display转换为xcb_connection_t类型的连接
-        auto *native = dynamic_cast<QNativeInterface::QX11Application *>(qApp)
-        xcb_connection_t *connection = native->connection();
-        auto *displayID = native->display();
+        auto *native = dynamic_cast<QNativeInterface::QX11Application *>(qApp);
 
-        xcb_dpms_set_timeouts(connection, 0, 0, 0);
+        xcb_dpms_set_timeouts(native->connection(), 0, 0, 0);
 
-        XSetScreenSaver(displayID, 0, 0, 0, 0);
+        XSetScreenSaver(native->display(), 0, 0, 0, 0);
     }
 }
 
