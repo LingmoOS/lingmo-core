@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QKeySequence>
 #include <QGuiApplication>
+#include <QNativeInterface>
 #include <QTimer>
 #include <QDebug>
 
