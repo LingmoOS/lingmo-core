@@ -9,7 +9,6 @@
 
 #include "debug.h"
 
-#include <QGuiApplication>
 #include <QCoreApplication>
 #include <QTimer>
 
@@ -110,10 +109,8 @@ bool FdoSelectionManager::addDamageWatch(xcb_window_t client)
     }
 }
 
-bool FdoSelectionManager::nativeEventFilter(const QByteArray &eventType, void *message, long int *result)
+bool FdoSelectionManager::nativeEventFilter(const QByteArray &eventType, void *message, qintptr *)
 {
-    Q_UNUSED(result)
-
     if (eventType != "xcb_generic_event_t") {
         return false;
     }
@@ -168,49 +165,6 @@ bool FdoSelectionManager::nativeEventFilter(const QByteArray &eventType, void *m
     }
 
     return false;
-}
-
-void FdoSelectionManager::dock(xcb_window_t winId)
-{
-    qCDebug(SNIPROXY) << "trying to dock window " << winId;
-
-    if (m_proxies.contains(winId)) {
-        return;
-    }
-
-    if (addDamageWatch(winId)) {
-        m_proxies[winId] = new SNIProxy(winId, this);
-    }
-}
-
-void FdoSelectionManager::undock(xcb_window_t winId)
-{
-    qCDebug(SNIPROXY) << "trying to undock window " << winId;
-
-    if (!m_proxies.contains(winId)) {
-        return;
-    }
-    m_proxies[winId]->deleteLater();
-    m_proxies.remove(winId);
-}
-
-void FdoSelectionManager::onClaimedOwnership()
-{
-    qCDebug(SNIPROXY) << "Manager selection claimed";
-
-    setSystemTrayVisual();
-}
-
-void FdoSelectionManager::onFailedToClaimOwnership()
-{
-    qCWarning(SNIPROXY) << "failed to claim ownership of Systray Manager";
-    qApp->exit(-1);
-}
-
-void FdoSelectionManager::onLostOwnership()
-{
-    qCWarning(SNIPROXY) << "lost ownership of Systray Manager";
-    qApp->exit(-1);
 }
 
 void FdoSelectionManager::setSystemTrayVisual()
