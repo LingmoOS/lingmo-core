@@ -167,7 +167,7 @@ void ProcessManager::loadAutoStartProcess()
     }
 }
 
-bool ProcessManager::nativeEventFilter(const QByteArray &eventType, void *message, long *result)
+bool ProcessManager::nativeEventFilter(const QByteArray &eventType, void *message, qintptr *)
 {
     if (eventType != "xcb_generic_event_t") // We only want to handle XCB events
         return false;
