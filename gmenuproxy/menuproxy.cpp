@@ -109,9 +109,10 @@ bool MenuProxy::init()
     }
 
     enableGtkSettings(true);
-    
-    connect(KWindowSystem::self(), &KWindowSystem::windowAdded, this, &MenuProxy::onWindowAdded);
-    connect(KWindowSystem::self(), &KWindowSystem::windowRemoved, this, &MenuProxy::onWindowRemoved);
+
+    // 使用KX11Extras的windowAdded信号
+    connect(KX11Extras::self(), &KX11Extras::windowAdded, this, &MenuProxy::onWindowAdded);
+    connect(KX11Extras::self(), &KX11Extras::windowRemoved, this, &MenuProxy::onWindowRemoved);
 
     const auto windows = KWindowSystem::windows();
     for (WId id : windows) {
