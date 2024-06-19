@@ -158,7 +158,7 @@ void Hotkeys::registerKey(quint32 keycode)
 void Hotkeys::registerKey(quint32 key, quint32 mods)
 {
     auto *native = dynamic_cast<QNativeInterface::QX11Application *>(qApp);
-    xcb_grab_key(dynamic_cast<native->connection(),
+    xcb_grab_key(native->connection(),
                  1,
                  DefaultRootWindow(native->display()),
                  mods,
@@ -166,7 +166,7 @@ void Hotkeys::registerKey(quint32 key, quint32 mods)
                  XCB_GRAB_MODE_ASYNC,
                  XCB_GRAB_MODE_ASYNC);
 
-    xcb_grab_key(dynamic_cast<native->connection(),
+    xcb_grab_key(native->connection(),
                  1,
                  DefaultRootWindow(native->display()),
                  mods | XCB_MOD_MASK_2,
