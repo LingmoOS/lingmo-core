@@ -20,6 +20,7 @@
 #include <QGuiApplication>
 #include <QVector>
 #include <QScreen>
+#include <QUrl>
 
 /** XEMBED messages */
 #define XEMBED_EMBEDDED_NOTIFY 0
