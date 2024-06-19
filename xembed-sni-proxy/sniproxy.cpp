@@ -453,7 +453,7 @@ bool SNIProxy::ItemIsMenu() const
     return false;
 }
 
-QString SNIProxy::Status() const
+QString SNIProxy::getStatus() const
 {
     return QStringLiteral("Active");
 }

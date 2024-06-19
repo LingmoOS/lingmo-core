@@ -62,9 +62,9 @@ public:
 
     /**
      * @return The status of this item
-     * @see Status
+     * @see getStatus
      */
-    QString Status() const;
+    QString getStatus() const;
 
     /**
      * @return The id of the main window of the application that controls the item
