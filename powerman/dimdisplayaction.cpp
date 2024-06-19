@@ -39,13 +39,10 @@ DimDisplayAction::DimDisplayAction(QObject *parent)
 {
     auto isPlatformX11 = qGuiApp->nativeInterface<QNativeInterface::QX11Application>();
     if (isPlatformX11) {
-        auto *x11App = qApp->nativeInterface<QNativeInterface::QX11Application>();
-
-        // 获取Display类型的显示指针
-        auto *displayID = x11App->display();
-
         // 从Display转换为xcb_connection_t类型的连接
-        auto *connection = XGetXCBConnection(qApp->nativeInterface<QNativeInterface::QX11Application>()->display());
+        auto *native = dynamic_cast<QNativeInterface::QX11Application *>(qApp)
+        auto *connection = native->connection();
+        auto *displayID = native->display();
 
         xcb_dpms_set_timeouts(connection, 0, 0, 0);
 
