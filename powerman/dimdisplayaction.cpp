@@ -45,7 +45,7 @@ DimDisplayAction::DimDisplayAction(QObject *parent)
         auto *displayID = x11App->display();
 
         // 从Display转换为xcb_connection_t类型的连接
-        auto *connection = XGetXCBConnection(displayID);
+        auto *connection = XGetXCBConnection(qApp->nativeInterface<QNativeInterface::QX11Application>()->display());
 
         xcb_dpms_set_timeouts(connection, 0, 0, 0);
 

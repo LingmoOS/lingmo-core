@@ -180,9 +180,7 @@ bool ProcessManager::nativeEventFilter(const QByteArray &eventType, void *messag
     if (!m_wmStarted && m_waitLoop) {
         // all window managers must set their name according to the spec
         
-        QNativeInterface::QX11Application *x11App = qApp->nativeInterface<QNativeInterface::QX11Application>();
-        Display *displayID = x11App->display();
-        xcb_connection_t *connection = XGetXCBConnection(displayID);
+        xcb_connection_t *connection = XGetXCBConnection(qApp->nativeInterface<QNativeInterface::QX11Application>()->display());
 
         if (!QString::fromUtf8(NETRootInfo(connection, NET::SupportingWMCheck).wmName()).isEmpty()) {
             qDebug() << "Window manager started";
