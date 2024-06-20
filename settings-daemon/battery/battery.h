@@ -8,7 +8,7 @@
 
 class Battery : public QObject
 {
-    // Q_OBJECT
+    Q_OBJECT
     Q_PROPERTY(int isPresent READ isPresent)
     Q_PROPERTY(int type READ type)
     Q_PROPERTY(int chargePercent READ chargePercent NOTIFY chargePercentChanged)
