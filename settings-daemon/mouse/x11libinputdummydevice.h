@@ -11,6 +11,7 @@
 #include <QString>
 #include <QUrl>
 #include <QDir>
+#include <QJsonValue>
 
 #include <X11/Xdefs.h>
 #include <X11/Xlib.h>
