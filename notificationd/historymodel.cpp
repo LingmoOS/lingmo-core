@@ -23,6 +23,7 @@
 #include <QSettings>
 #include <QDataStream>
 #include <QMetaEnum>
+#include <QIODeviceBase>
 
 static HistoryModel *s_historyModel = nullptr;
 
@@ -136,7 +137,7 @@ void HistoryModel::save()
     settings.clear();
 
     QByteArray datas;
-    QDataStream out(&datas, QIODevice::WriteOnly);
+    QDataStream out(&datas, QIODeviceBase::WriteOnly);
 
     out << m_notifications;
 
@@ -147,7 +148,7 @@ void HistoryModel::initDatas()
 {
     QSettings settings(QSettings::UserScope, "lingmoos", "notifications");
     QByteArray listByteArray = settings.value("datas").toByteArray();
-    QDataStream in(&listByteArray, QIODevice::ReadOnly);
+    QDataStream in(&listByteArray, QIODeviceBase::ReadOnly);
     in >> m_notifications;
 }
 
