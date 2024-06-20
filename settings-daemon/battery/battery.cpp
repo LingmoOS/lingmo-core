@@ -3,6 +3,7 @@
 #include "primarybatteryadaptor.h"
 
 #include <QDateTime>
+#include <QObject>
 #include <QDebug>
 
 enum TimeConstants {
