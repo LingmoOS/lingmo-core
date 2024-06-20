@@ -6,7 +6,7 @@
 
 class UPowerDevice : public QObject
 {
-    Q_OBJECT
+    // Q_OBJECT
 
 public:
     enum Type { Unknown = 0, GenericInterface = 1, Processor = 2,
