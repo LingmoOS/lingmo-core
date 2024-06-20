@@ -9,6 +9,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QUrl>
 
 #include <X11/Xdefs.h>
 #include <X11/Xlib.h>
