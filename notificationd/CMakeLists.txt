@@ -34,6 +34,7 @@ qt_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${ts_files_replaced})
 target_link_libraries(lingmo-notificationd
     Qt6::Core
     Qt6::DBus
+    Qt6::Gui
     Qt6::Quick
     Qt6::Widgets
     KF6::WindowSystem
