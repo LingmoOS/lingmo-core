@@ -36,7 +36,7 @@ Hotkeys::~Hotkeys()
     qApp->removeNativeEventFilter(this);
 }
 
-bool Hotkeys::nativeEventFilter(const QByteArray &eventType, void *message, long *result)
+bool Hotkeys::nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result)
 {
     Q_UNUSED(result);
 
@@ -255,7 +255,7 @@ quint32 Hotkeys::nativeKeycode(Qt::Key k)
             key = 0;
         }
     }
-    return XKeysymToKeycode(QX11Info::display(), key);
+    return XKeysymToKeycode(dynamic_cast<QNativeInterface::QX11Application *>(qApp)->display(), key);
 }
 
 quint32 Hotkeys::nativeModifiers(Qt::KeyboardModifiers m)
