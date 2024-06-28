@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.16)
 project(lingmo-settings-daemon)
 set(TARGET lingmo-settings-daemon)
 
@@ -7,6 +8,7 @@ list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 find_package(X11 REQUIRED)
 find_package(X11_XCB REQUIRED)
 find_package(XCB REQUIRED)
+find_package(Qt6 REQUIRED COMPONENTS DBus LinguistTools)
 
 pkg_check_modules(XORGLIBINPUT xorg-libinput IMPORTED_TARGET)
 pkg_check_modules(XORGSERVER xorg-server IMPORTED_TARGET)

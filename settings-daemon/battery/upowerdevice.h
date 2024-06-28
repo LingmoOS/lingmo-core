@@ -3,32 +3,19 @@
 
 #include <QObject>
 #include <QDBusInterface>
-#include <QVariantMap>
-#include <QDBusPendingReply>  // 新增：确保包含QDBusPendingReply头文件
-#include <QMetaType>          // 新增：确保包含QMetaType头文件
 
 class UPowerDevice : public QObject
 {
     Q_OBJECT
 
 public:
-    enum Type {
-        Unknown = 0,
-        GenericInterface = 1,
-        Processor = 2,
-        Block = 3,
-        StorageAccess = 4,
-        StorageDrive = 5,
-        OpticalDrive = 6,
-        StorageVolume = 7,
-        OpticalDisc = 8,
-        Camera = 9,
-        PortableMediaPlayer = 10,
-        Battery = 12,
-        NetworkShare = 14,
-        Last = 0xffff
-    };
-    Q_ENUM(Type)  // 确保Type枚举在元对象系统中可用
+    enum Type { Unknown = 0, GenericInterface = 1, Processor = 2,
+                Block = 3, StorageAccess = 4, StorageDrive = 5,
+                OpticalDrive = 6, StorageVolume = 7, OpticalDisc = 8,
+                Camera = 9, PortableMediaPlayer = 10,
+                Battery = 12, NetworkShare = 14, Last = 0xffff
+              };
+    Q_ENUM(Type)
 
     explicit UPowerDevice(const QString &udi, QObject *parent = nullptr);
 
@@ -56,8 +43,8 @@ private:
     void checkCache(const QString &key) const;
 
 private:
-    QDBusInterface m_device;
-    QVariantMap m_cache;
+    mutable QDBusInterface m_device;
+    mutable QVariantMap m_cache;
 
     QString m_udi;
 };
