@@ -14,9 +14,10 @@
 #include <QJsonValue>
 #include <QPermissions>
 
+
 #include <X11/Xdefs.h>
 #include <X11/Xlib.h>
-#include <xcb/xcb.h>
+#include <X11/Xatom.h>
 
 struct LibinputSettings;
 
