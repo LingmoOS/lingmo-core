@@ -12,8 +12,6 @@
 #include <X11/extensions/XInput.h>
 #include <X11/extensions/XInput2.h>
 
-#undef Bool
-
 static Atom s_touchpadAtom;
 
 template<typename Callback>
