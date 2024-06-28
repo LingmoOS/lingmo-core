@@ -21,6 +21,8 @@
 #define MOUSE_H
 
 #include <QObject>
+#include <QGuiApplication>
+#include <QDBusConnection>
 #include "x11libinputdummydevice.h"
 
 class Mouse : public QObject
