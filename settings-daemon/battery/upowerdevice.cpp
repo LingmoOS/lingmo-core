@@ -1,5 +1,5 @@
 #include "upowerdevice.h"
-#include "power.h"
+#include "power.h"  // 假设这是包含了 UP_DBUS_SERVICE 和 UP_DBUS_INTERFACE_DEVICE 的头文件
 
 #include <QDebug>
 #include <QStringList>
@@ -15,18 +15,18 @@ UPowerDevice::UPowerDevice(const QString &udi, QObject *parent)
 {
     if (m_device.isValid()) {
         if (m_device.metaObject()->indexOfSignal("Changed()") != -1) {
-            connect(&m_device, SIGNAL(Changed()), this, SLOT(slotChanged()));
+            connect(&m_device, &QDBusInterface::signal, this, &UPowerDevice::slotChanged);
         } else {
             // for UPower >= 0.99.0, missing Changed() signal
             QDBusConnection::systemBus().connect(UP_DBUS_SERVICE, m_udi, "org.freedesktop.DBus.Properties",
                                                  "PropertiesChanged", this,
-                                                 SLOT(onPropertiesChanged(QString, QVariantMap, QStringList)));
+                                                 &UPowerDevice::onPropertiesChanged);
         }
 
         // TODO port this to Solid::Power, we can't link against kdelibs4support for this signal
         // older upower versions not affected
         QDBusConnection::systemBus().connect("org.freedesktop.login1", "/org/freedesktop/login1", "org.freedesktop.login1.Manager", "PrepareForSleep",
-                                             this, SLOT(login1Resuming(bool)));
+                                             this, &UPowerDevice::login1Resuming);
     }
 }
 
@@ -138,7 +138,7 @@ QMap<QString, QVariant> UPowerDevice::allProperties() const
     QDBusMessage call = QDBusMessage::createMethodCall(m_device.service(), m_device.path(),
                         "org.freedesktop.DBus.Properties", "GetAll");
     call << m_device.interface();
-    QDBusPendingReply< QVariantMap > reply = QDBusConnection::systemBus().asyncCall(call);
+    QDBusReply<QVariantMap> reply = QDBusConnection::systemBus().asyncCall(call);
     reply.waitForFinished();
 
     if (reply.isValid()) {
@@ -186,7 +186,7 @@ void UPowerDevice::checkCache(const QString &key) const
         return;
     }
 
-    QVariant reply = m_device.property(key.toUtf8());  // 修改：将QString转换为QByteArray
+    QVariant reply = m_device.property(key.toUtf8());  // QString 转换为 QByteArray
 
     if (reply.isValid()) {
         m_cache[key] = reply;
