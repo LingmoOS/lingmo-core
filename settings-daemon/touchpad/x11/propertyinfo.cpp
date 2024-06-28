@@ -6,7 +6,6 @@
 
 #include "propertyinfo.h"
 
-#include <QObject>
 #include <QVariant>
 #include <QDebug>
 
