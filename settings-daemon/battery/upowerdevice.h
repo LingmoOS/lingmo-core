@@ -5,6 +5,7 @@
 #include <QDBusInterface>
 #include <QVariantMap>          // 新增：Qt6需要显式包含QVariantMap头文件
 #include <QDBusPendingReply>    // 新增：Qt6需要显式包含QDBusPendingReply头文件
+#include <QMetaType>            // 新增：确保QMetaType头文件被包含
 
 class UPowerDevice : public QObject
 {
