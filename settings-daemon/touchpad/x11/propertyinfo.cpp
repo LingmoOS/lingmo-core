@@ -8,6 +8,7 @@
 
 #include <QVariant>
 #include <QDebug>
+#include <QTextStream>
 
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
