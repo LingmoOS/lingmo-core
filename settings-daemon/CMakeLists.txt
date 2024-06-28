@@ -26,8 +26,6 @@ file (GLOB_RECURSE SRCS
   "language/*.h"
   "dock/*.cpp"
   "dock/*.h"
-  "mouse/*.h"
-  "mouse/*.cpp"
 )
 
 set(SOURCES ${SRCS})
@@ -50,9 +48,9 @@ qt_add_dbus_adaptor(DBUS_SOURCES
 qt_add_dbus_adaptor(DBUS_SOURCES
                      dock/com.lingmo.Dock.xml
                      dock/dock.h Dock)
-qt_add_dbus_adaptor(DBUS_SOURCES
-                     mouse/com.lingmo.Mouse.xml
-                     mouse/mousemanager.h Mouse)
+# qt_add_dbus_adaptor(DBUS_SOURCES
+#                      mouse/com.lingmo.Mouse.xml
+#                      mouse/mousemanager.h Mouse)
 # qt_add_dbus_adaptor(DBUS_SOURCES
 #                      touchpad/com.lingmo.Touchpad.xml
 #                      touchpad/touchpadmanager.h TouchpadManager)
