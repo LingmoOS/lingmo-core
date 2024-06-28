@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QDBusInterface>
 
+#undef Bool
+
 class UPowerDevice : public QObject
 {
     Q_OBJECT
