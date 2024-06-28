@@ -13,11 +13,10 @@
 #include <QDir>
 #include <QJsonValue>
 #include <QPermissions>
-
+#include <QMetaType>
 
 #include <X11/Xdefs.h>
 #include <X11/Xlib.h>
-#include <X11/Xatom.h>
 
 struct LibinputSettings;
 
