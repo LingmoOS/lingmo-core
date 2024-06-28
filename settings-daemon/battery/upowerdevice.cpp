@@ -1,6 +1,7 @@
 #include "upowerdevice.h"
 #include "power.h"
 
+#include <QMetaType>
 #include <QDebug>
 #include <QStringList>
 #include <QDBusReply>
