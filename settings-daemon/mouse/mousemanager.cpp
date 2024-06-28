@@ -20,8 +20,6 @@
 #include "mousemanager.h"
 #include "mouseadaptor.h"
 #include <QGuiApplication>
-#include <QObject>
-#include <QEvent>
 
 Mouse::Mouse(QObject *parent)
     : QObject(parent)
