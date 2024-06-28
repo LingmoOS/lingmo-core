@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.16)
 project(lingmo-settings-daemon)
 set(TARGET lingmo-settings-daemon)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 find_package(ECM REQUIRED NO_MODULE)
 list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 
