@@ -14,7 +14,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/)
 
 set(QT Core Gui Widgets Quick QuickControls2 DBus Xml LinguistTools)
 find_package(Qt6 COMPONENTS ${QT} REQUIRED)
-# find_package(LingmoUI REQUIRED)
+
 find_package(PkgConfig REQUIRED)
 
 include(GNUInstallDirs)
