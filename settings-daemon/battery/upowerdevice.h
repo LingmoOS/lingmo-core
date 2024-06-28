@@ -3,6 +3,8 @@
 
 #include <QObject>
 #include <QDBusInterface>
+#include <QVariantMap>          // 新增：Qt6需要显式包含QVariantMap头文件
+#include <QDBusPendingReply>    // 新增：Qt6需要显式包含QDBusPendingReply头文件
 
 class UPowerDevice : public QObject
 {
@@ -15,9 +17,9 @@ public:
                 Camera = 9, PortableMediaPlayer = 10,
                 Battery = 12, NetworkShare = 14, Last = 0xffff
               };
-    Q_ENUM(Type)
+    Q_ENUM(Type)  // 新增：使Type枚举类型在Qt的元对象系统中可用
 
-    explicit UPowerDevice(const QString &udi, QObject *parent = nullptr);
+    explicit UPowerDevice(const QString &udi, QObject *parent = nullptr);  // 修改：使用nullptr初始化指针
 
     bool queryDeviceInterface(Type type) const;
     QString description() const;

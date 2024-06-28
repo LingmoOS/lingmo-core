@@ -1,7 +1,6 @@
 #include "upowerdevice.h"
 #include "power.h"
 
-#include <QMetaType>
 #include <QDebug>
 #include <QStringList>
 #include <QDBusReply>
@@ -187,7 +186,7 @@ void UPowerDevice::checkCache(const QString &key) const
         return;
     }
 
-    QVariant reply = m_device.property(key.toUtf8());
+    QVariant reply = m_device.property(key.toUtf8());  // 修改：将QString转换为QByteArray
 
     if (reply.isValid()) {
         m_cache[key] = reply;
