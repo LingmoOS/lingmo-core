@@ -14,6 +14,7 @@
 #include <QJsonValue>
 #include <QPermissions>
 #include <QMetaType>
+#include <QVariant>
 
 #include <X11/Xdefs.h>
 #include <X11/Xlib.h>

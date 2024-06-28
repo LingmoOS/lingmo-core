@@ -9,7 +9,6 @@
 
 #include <QSharedPointer>
 #include <X11/Xdefs.h>
-#include <X11/Xlib.h>
 
 void XDeleter(void *p);
 
