@@ -9,6 +9,7 @@
 #include <cmath>
 
 #include "synapticstouchpad.h"
+#include "xlibbackend.h"
 
 #include <limits.h>
 #include <stddef.h>
