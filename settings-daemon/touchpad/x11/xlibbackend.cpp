@@ -356,7 +356,7 @@ void XlibBackend::propertyChanged(xcb_atom_t prop)
 QStringList XlibBackend::listMouses(const QStringList &blacklist)
 {
     int nDevices = 0;
-    QScopedPointer<XDeviceInfo, DeviceListDeleter> info(XListInputDevices(m_display, &nDevices));
+    QScopedPointer<XDeviceInfo, DeviceListDeleter> info(XListInputDevices(m_display.data(), &nDevices));
     QStringList list;
     for (XDeviceInfo *i = info.data(); i != info.data() + nDevices; i++) {
         if (m_device && i->id == static_cast<XID>(m_device->deviceId())) {
@@ -374,7 +374,7 @@ QStringList XlibBackend::listMouses(const QStringList &blacklist)
         if (blacklist.contains(name, Qt::CaseInsensitive)) {
             continue;
         }
-        PropertyInfo enabled(m_display, i->id, m_enabledAtom.atom(), 0);
+        PropertyInfo enabled(m_display.data(), i->id, m_enabledAtom.atom(), 0);
         if (enabled.value(0) == false) {
             continue;
         }
@@ -404,7 +404,7 @@ QVector<QObject *> XlibBackend::getDevices() const
 void XlibBackend::watchForEvents(bool keyboard)
 {
     if (!m_notifications) {
-        m_notifications.reset(new XlibNotifications(m_display, m_device ? m_device->deviceId() : XIAllDevices));
+        m_notifications.reset(new XlibNotifications(m_display.get(), m_device ? m_device->deviceId() : XIAllDevices));
         connect(m_notifications.data(), SIGNAL(devicePlugged(int)), SLOT(devicePlugged(int)));
         connect(m_notifications.data(), SIGNAL(touchpadDetached()), SLOT(touchpadDetached()));
         connect(m_notifications.data(), SIGNAL(propertyChanged(xcb_atom_t)), SLOT(propertyChanged(xcb_atom_t)));
@@ -419,7 +419,7 @@ void XlibBackend::watchForEvents(bool keyboard)
         return;
     }
 
-     m_keyboard.reset(new XRecordKeyboardMonitor(m_display));
+     m_keyboard.reset(new XRecordKeyboardMonitor(m_display.get()));
      connect(m_keyboard.data(), SIGNAL(keyboardActivityStarted()), SIGNAL(keyboardActivityStarted()));
      connect(m_keyboard.data(), SIGNAL(keyboardActivityFinished()), SIGNAL(keyboardActivityFinished()));
 }
