@@ -404,7 +404,7 @@ QVector<QObject *> XlibBackend::getDevices() const
 void XlibBackend::watchForEvents(bool keyboard)
 {
     if (!m_notifications) {
-        m_notifications.reset(new XlibNotifications(m_display.get(), m_device ? m_device->deviceId() : XIAllDevices));
+        m_notifications.reset(new XlibNotifications(m_display.data(), m_device ? m_device->deviceId() : XIAllDevices));
         connect(m_notifications.data(), SIGNAL(devicePlugged(int)), SLOT(devicePlugged(int)));
         connect(m_notifications.data(), SIGNAL(touchpadDetached()), SLOT(touchpadDetached()));
         connect(m_notifications.data(), SIGNAL(propertyChanged(xcb_atom_t)), SLOT(propertyChanged(xcb_atom_t)));
@@ -419,7 +419,7 @@ void XlibBackend::watchForEvents(bool keyboard)
         return;
     }
 
-     m_keyboard.reset(new XRecordKeyboardMonitor(m_display.get()));
+     m_keyboard.reset(new XRecordKeyboardMonitor(m_display.data()));
      connect(m_keyboard.data(), SIGNAL(keyboardActivityStarted()), SIGNAL(keyboardActivityStarted()));
      connect(m_keyboard.data(), SIGNAL(keyboardActivityFinished()), SIGNAL(keyboardActivityFinished()));
 }
