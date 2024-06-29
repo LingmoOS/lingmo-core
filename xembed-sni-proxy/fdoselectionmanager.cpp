@@ -45,7 +45,7 @@ FdoSelectionManager::~FdoSelectionManager()
 
 void FdoSelectionManager::init()
 {
-    syslog(LOG_INFO, "FdoSelectionManager::init()");
+    syslog(LOG_WARNING, "FdoSelectionManager::init() start");
     // load damage extension
     if (auto *native = dynamic_cast<QNativeInterface::QX11Application *>(qApp)) {
         xcb_connection_t *c = native->connection(); // 使用新的接口
@@ -70,7 +70,7 @@ void FdoSelectionManager::init()
     connect(m_selectionOwner, &KSelectionOwner::failedToClaimOwnership, this, &FdoSelectionManager::onFailedToClaimOwnership);
     connect(m_selectionOwner, &KSelectionOwner::lostOwnership, this, &FdoSelectionManager::onLostOwnership);
     m_selectionOwner->claim(false);
-    syslog(LOG_INFO, "FdoSelectionManager::init() end");
+    syslog(LOG_WARNING, "FdoSelectionManager::init() end");
 }
 
 bool FdoSelectionManager::addDamageWatch(xcb_window_t client)
