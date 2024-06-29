@@ -4,10 +4,10 @@
     SPDX-License-Identifier: GPL-2.0-or-later
 */
 
-#include "propertyinfo.h"
-
 #include <QVariant>
 #include <QDebug>
+
+#include "propertyinfo.h"
 
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>

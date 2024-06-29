@@ -4,10 +4,10 @@
     SPDX-License-Identifier: GPL-2.0-or-later
 */
 
+#include "libinputtouchpad.h"
+
 #include <QSet>
 #include <QDebug>
-
-#include "libinputtouchpad.h"
 
 #include <limits.h>
 #include <stddef.h>
