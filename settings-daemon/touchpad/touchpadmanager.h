@@ -2,7 +2,6 @@
 #define TOUCHPADMANAGER_H
 
 #include <QObject>
-#include <QDBusConnection>
 #include "x11/xlibbackend.h"
 
 class TouchpadManager : public QObject

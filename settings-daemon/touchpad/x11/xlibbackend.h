@@ -13,12 +13,14 @@
 #include <QSet>
 #include <QSharedPointer>   
 #include <QStringList>
+#include <QObject>
 
 #include "libinputtouchpad.h"
 #include "synapticstouchpad.h"
 #include "xlibtouchpad.h"
 
 #include <xcb/xcb.h>
+#include <X11/Xlib.h>
 
 #include "propertyinfo.h"
 #include "xcbatom.h"
