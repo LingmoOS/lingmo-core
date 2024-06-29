@@ -27,7 +27,7 @@ file (GLOB_RECURSE SRCS
   "dock/*.cpp"
   "dock/*.h"
   "mouse/*.h"
-#   "mouse/*.cpp"
+  "mouse/*.cpp"
 #   "touchpad/*.h"
 #   "touchpad/*.cpp"
 #   "touchpad/x11/*.h"
