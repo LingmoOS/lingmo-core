@@ -26,7 +26,7 @@
 #include "battery/upowermanager.h"
 #include "language/language.h"
 #include "mouse/mousemanager.h"
-#include "touchpad/touchpadmanager.h"
+// #include "touchpad/touchpadmanager.h"
 #include "defaultapplications.h"
 
 #include <QTimer>
