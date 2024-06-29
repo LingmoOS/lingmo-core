@@ -26,7 +26,7 @@
 #include "battery/upowermanager.h"
 #include "language/language.h"
 #include "mouse/mousemanager.h"
-// #include "touchpad/touchpadmanager.h"
+#include "touchpad/touchpadmanager.h"
 #include "defaultapplications.h"
 
 #include <QTimer>
@@ -49,7 +49,7 @@ private:
     UPowerManager *m_upowerManager;
     Language *m_language;
     Mouse *m_mouse;
-    // TouchpadManager *m_touchpad;
+    TouchpadManager *m_touchpad;
     DefaultApplications *m_defaultApps;
 //
    QTimer *m_kwinTimer;

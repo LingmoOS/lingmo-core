@@ -1,7 +1,8 @@
 #include "touchpadmanager.h"
-// #include "touchpadadaptor.h"
+#include "touchpadadaptor.h"
 
 #include <QDebug>
+#include <QDBusConnection>
 
 TouchpadManager::TouchpadManager(QObject *parent)
     : QObject(parent)

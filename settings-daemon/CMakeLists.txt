@@ -28,6 +28,10 @@ file (GLOB_RECURSE SRCS
   "dock/*.h"
   "mouse/*.h"
   "mouse/*.cpp"
+  "touchpad/*.h"
+  "touchpad/*.cpp"
+  "touchpad/x11/*.h"
+  "touchpad/x11/*.cpp"
 )
 
 set(SOURCES ${SRCS})
@@ -53,9 +57,9 @@ qt_add_dbus_adaptor(DBUS_SOURCES
 qt_add_dbus_adaptor(DBUS_SOURCES
                      mouse/com.lingmo.Mouse.xml
                      mouse/mousemanager.h Mouse)
-# qt_add_dbus_adaptor(DBUS_SOURCES
-#                      touchpad/com.lingmo.Touchpad.xml
-#                      touchpad/touchpadmanager.h TouchpadManager)
+qt_add_dbus_adaptor(DBUS_SOURCES
+                     touchpad/com.lingmo.Touchpad.xml
+                     touchpad/touchpadmanager.h TouchpadManager)
 set_source_files_properties(${DBUS_SOURCES} PROPERTIES SKIP_AUTOGEN ON)
 
 add_executable(${TARGET} ${SOURCES} ${DBUS_SOURCES} ${HEADERS} ${FORMS} ${RESOURCES})
