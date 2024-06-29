@@ -178,19 +178,21 @@ bool ProcessManager::nativeEventFilter(const QByteArray &eventType, void *messag
 
     // ref: lxqt session
     if (!m_wmStarted && m_waitLoop) {
-        // all window managers must set their name according to the spec
-        
-        xcb_connection_t *connection = dynamic_cast<QNativeInterface::QX11Application *>(qApp)->connection();
-
-        if (!QString::fromUtf8(NETRootInfo(connection, NET::SupportingWMCheck).wmName()).isEmpty()) {
-            qDebug() << "Window manager started";
-            m_wmStarted = true;
-            if (m_waitLoop && m_waitLoop->isRunning())
-                m_waitLoop->exit();
-
-            qApp->removeNativeEventFilter(this);
+        if (auto *native = dynamic_cast<QNativeInterface::QX11Application *>(qApp)) { // Ensure qApp is a QX11Application instance
+            xcb_connection_t *connection = native->connection();
+            if (connection) { // Ensure connection is valid
+                QString wmName = QString::fromUtf8(NETRootInfo(connection, NET::SupportingWMCheck).wmName());
+                if (!wmName.isEmpty()) {
+                    qDebug() << "Window manager started";
+                    m_wmStarted = true;
+                    if (m_waitLoop && m_waitLoop->isRunning())
+                        m_waitLoop->exit();
+                    qApp->removeNativeEventFilter(this);
+                }
+            }
         }
     }
 
     return false;
 }
+
