@@ -9,15 +9,14 @@
 #include <QSet>
 #include <QDebug>
 
+#include <X11/Xlib.h>
+#include <X11/extensions/XInput2.h>
+
 #include <limits.h>
 #include <stddef.h>
 
 #include <libinput-properties.h>
 #include <xserver-properties.h>
-
-#include <X11/Xatom.h>
-#include <X11/Xlib.h>
-#include <X11/extensions/XInput2.h>
 
 const Parameter libinputProperties[] = {
 

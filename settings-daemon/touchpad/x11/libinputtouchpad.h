@@ -7,10 +7,11 @@
 #ifndef LIBINPUTTOUCHPAD_H
 #define LIBINPUTTOUCHPAD_H
 
+#include <QSettings>
+#include <X11/Xlib.h>
+
 #include "../libinputcommon.h"
 #include "xlibtouchpad.h"
-
-#include <QSettings>
 
 class LibinputTouchpad : public LibinputCommon, public XlibTouchpad
 {
