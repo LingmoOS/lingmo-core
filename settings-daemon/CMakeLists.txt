@@ -12,30 +12,63 @@ pkg_check_modules(XORGLIBINPUT xorg-libinput IMPORTED_TARGET)
 pkg_check_modules(XORGSERVER xorg-server IMPORTED_TARGET)
 pkg_check_modules(SYNAPTICS xorg-synaptics IMPORTED_TARGET GLOBAL)
 
-file (GLOB SRCS
-    "*.cpp"
-    "*.h"
-    "theme/*.h"
-    "theme/*.cpp"
-    "brightness/*.h"
-    "brightness/*.cpp"
-    "brightness/*.c"
-    "battery/*.cpp"
-    "battery/*.h"
-    "language/*.cpp"
-    "language/*.h"
-    "dock/*.cpp"
-    "dock/*.h"
-    "mouse/*.h"
-    "mouse/*.cpp"
-    "touchpad/*.h"
-    "touchpad/*.cpp"
-    "touchpad/x11/*.h"
-    "touchpad/x11/*.cpp"
+# 只查找当前目录的文件，不递归
+file(GLOB SRCS
+  "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
 )
 
-list(FILTER SRCS EXCLUDE REGEX ".*CompilerIdCXX.*")
-set(SOURCES ${SRCS})
+# 分别添加各个子目录的文件
+file(GLOB THEME_SRCS
+  "${CMAKE_CURRENT_SOURCE_DIR}/theme/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/theme/*.h"
+)
+
+file(GLOB BRIGHTNESS_SRCS
+  "${CMAKE_CURRENT_SOURCE_DIR}/brightness/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/brightness/*.h"
+  "${CMAKE_CURRENT_SOURCE_DIR}/brightness/*.c"
+)
+
+file(GLOB BATTERY_SRCS
+  "${CMAKE_CURRENT_SOURCE_DIR}/battery/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/battery/*.h"
+)
+
+file(GLOB LANGUAGE_SRCS
+  "${CMAKE_CURRENT_SOURCE_DIR}/language/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/language/*.h"
+)
+
+file(GLOB DOCK_SRCS
+  "${CMAKE_CURRENT_SOURCE_DIR}/dock/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/dock/*.h"
+)
+
+file(GLOB MOUSE_SRCS
+  "${CMAKE_CURRENT_SOURCE_DIR}/mouse/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/mouse/*.h"
+)
+
+file(GLOB TOUCHPAD_SRCS
+  "${CMAKE_CURRENT_SOURCE_DIR}/touchpad/*.h"
+  "${CMAKE_CURRENT_SOURCE_DIR}/touchpad/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/touchpad/x11/*.h"
+  "${CMAKE_CURRENT_SOURCE_DIR}/touchpad/x11/*.cpp"
+)
+
+# 合并所有源文件
+set(SOURCES
+    ${SRCS}
+    ${THEME_SRCS}
+    ${BRIGHTNESS_SRCS}
+    ${BATTERY_SRCS}
+    ${LANGUAGE_SRCS}
+    ${DOCK_SRCS}
+    ${MOUSE_SRCS}
+    # ${TOUCHPAD_SRCS}
+)
+
 set(HEADERS "")
 set(FORMS "")
 set(RESOURCES "")
@@ -58,9 +91,10 @@ qt_add_dbus_adaptor(DBUS_SOURCES
 qt_add_dbus_adaptor(DBUS_SOURCES
                      mouse/com.lingmo.Mouse.xml
                      mouse/mousemanager.h Mouse)
-qt_add_dbus_adaptor(DBUS_SOURCES
-                     touchpad/com.lingmo.Touchpad.xml
-                     touchpad/touchpadmanager.h TouchpadManager)
+# qt_add_dbus_adaptor(DBUS_SOURCES
+#                      touchpad/com.lingmo.Touchpad.xml
+#                      touchpad/touchpadmanager.h TouchpadManager)
+
 set_source_files_properties(${DBUS_SOURCES} PROPERTIES SKIP_AUTOGEN ON)
 
 add_executable(${TARGET} ${SOURCES} ${DBUS_SOURCES} ${HEADERS} ${FORMS} ${RESOURCES})
