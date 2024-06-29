@@ -21,6 +21,7 @@
 
 #include "sniproxy.h"
 #include "xcbutils.h"
+#include <syslog.h>
 
 #define SYSTEM_TRAY_REQUEST_DOCK 0
 #define SYSTEM_TRAY_BEGIN_MESSAGE 1
@@ -44,6 +45,7 @@ FdoSelectionManager::~FdoSelectionManager()
 
 void FdoSelectionManager::init()
 {
+    syslog(LOG_INFO, "FdoSelectionManager::init()");
     // load damage extension
     if (auto *native = dynamic_cast<QNativeInterface::QX11Application *>(qApp)) {
         xcb_connection_t *c = native->connection(); // 使用新的接口
@@ -68,6 +70,7 @@ void FdoSelectionManager::init()
     connect(m_selectionOwner, &KSelectionOwner::failedToClaimOwnership, this, &FdoSelectionManager::onFailedToClaimOwnership);
     connect(m_selectionOwner, &KSelectionOwner::lostOwnership, this, &FdoSelectionManager::onLostOwnership);
     m_selectionOwner->claim(false);
+    syslog(LOG_INFO, "FdoSelectionManager::init() end");
 }
 
 bool FdoSelectionManager::addDamageWatch(xcb_window_t client)
