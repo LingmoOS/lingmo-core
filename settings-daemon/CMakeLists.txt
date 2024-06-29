@@ -13,23 +13,24 @@ pkg_check_modules(XORGSERVER xorg-server IMPORTED_TARGET)
 pkg_check_modules(SYNAPTICS xorg-synaptics IMPORTED_TARGET GLOBAL)
 
 file (GLOB_RECURSE SRCS
-  "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/theme/*.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/theme/*.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/brightness/*.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/brightness/*.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/brightness/*.c"
-  "${CMAKE_CURRENT_SOURCE_DIR}/battery/*.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/battery/*.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/language/*.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/language/*.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/dock/*.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/dock/*.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mouse/*.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mouse/*.cpp"
+  "*.cpp"
+  "*.h"
+  "theme/*.h"
+  "theme/*.cpp"
+  "brightness/*.h"
+  "brightness/*.cpp"
+  "brightness/*.c"
+  "battery/*.cpp"
+  "battery/*.h"
+  "language/*.cpp"
+  "language/*.h"
+  "dock/*.cpp"
+  "dock/*.h"
+  "mouse/*.h"
+  "mouse/*.cpp"
 )
 
+list(FILTER SRCS EXCLUDE REGEX ".*CompilerIdCXX.*")
 set(SOURCES ${SRCS})
 set(HEADERS "")
 set(FORMS "")
@@ -56,7 +57,6 @@ qt_add_dbus_adaptor(DBUS_SOURCES
 # qt_add_dbus_adaptor(DBUS_SOURCES
 #                      touchpad/com.lingmo.Touchpad.xml
 #                      touchpad/touchpadmanager.h TouchpadManager)
-
 set_source_files_properties(${DBUS_SOURCES} PROPERTIES SKIP_AUTOGEN ON)
 
 add_executable(${TARGET} ${SOURCES} ${DBUS_SOURCES} ${HEADERS} ${FORMS} ${RESOURCES})
