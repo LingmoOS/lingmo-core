@@ -56,7 +56,8 @@ void xembed_message_send(xcb_window_t towin, long message, long d1, long d2, lon
     ev.data.data32[3] = d2;
     ev.data.data32[4] = d3;
     ev.type = Xcb::atoms->xembedAtom;
-    xcb_send_event(qApp->nativeInterface<QNativeInterface::QX11Application>()->connection(), false, towin, XCB_EVENT_MASK_NO_EVENT, (char *)&ev);
+    if(auto native = qApp->nativeInterface<QNativeInterface::QX11Application>())
+        xcb_send_event(native->connection(), false, towin, XCB_EVENT_MASK_NO_EVENT, (char *)&ev);
 }
 
 SNIProxy::SNIProxy(xcb_window_t wid, QObject *parent)
