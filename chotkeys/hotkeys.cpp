@@ -70,7 +70,7 @@ bool Hotkeys::nativeEventFilter(const QByteArray &eventType, void *message, qint
 
 //        // Keyboard needs to be ungrabed after XGrabKey() activates the grab,
 //        // otherwise it becomes frozen.
-//        xcb_connection_t *c = dynamic_cast<QNativeInterface::OX11Application *(qApp)->connection();
+//        xcb_connection_t *c = dynamic_cast<QNativeInterface::QX11Application *>(qApp)->connection();
 //        xcb_void_cookie_t cookie = xcb_ungrab_keyboard_checked(c, XCB_TIME_CURRENT_TIME);
 //        xcb_flush(c);
 
