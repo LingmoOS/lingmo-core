@@ -49,7 +49,7 @@ private:
     UPowerManager *m_upowerManager;
     Language *m_language;
     Mouse *m_mouse;
-    TouchpadManager *m_touchpad;
+    // TouchpadManager *m_touchpad;
     DefaultApplications *m_defaultApps;
 //
    QTimer *m_kwinTimer;
