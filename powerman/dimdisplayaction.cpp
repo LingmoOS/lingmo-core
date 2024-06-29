@@ -37,12 +37,8 @@ DimDisplayAction::DimDisplayAction(QObject *parent)
               "/Brightness",
               "com.lingmo.Brightness", QDBusConnection::sessionBus())
 {
-    auto isPlatformX11 = qGuiApp->nativeInterface<QNativeInterface::QX11Application>();
-    if (isPlatformX11) {
-        auto *native = dynamic_cast<QNativeInterface::QX11Application *>(qApp);
-
+    if (auto *native = dynamic_cast<QNativeInterface::QX11Application *>(qApp)) {
         xcb_dpms_set_timeouts(native->connection(), 0, 0, 0);
-
         XSetScreenSaver(native->display(), 0, 0, 0, 0);
     }
 }

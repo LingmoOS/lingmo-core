@@ -57,7 +57,7 @@ public:
 
     ~Atom()
     {
-        if (!m_retrieved && m_cookie.sequence) {
+        if (!m_retrieved && m_cookie.sequence && auto *native = dynamic_cast<QNativeInterface::QX11Application *>(qApp)) {
             xcb_discard_reply(m_connection, m_cookie.sequence);
         }
     }
