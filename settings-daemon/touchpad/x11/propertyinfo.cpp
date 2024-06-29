@@ -6,7 +6,6 @@
 
 #include "propertyinfo.h"
 
-#include <QTextStream>
 #include <QVariant>
 #include <QDebug>
 

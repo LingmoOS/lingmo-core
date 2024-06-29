@@ -17,6 +17,8 @@
 
 #include <X11/extensions/XInput2.h>
 
+#define __stdcall
+
 const Parameter libinputProperties[] = {
 
     /* libinput disable supports property */
