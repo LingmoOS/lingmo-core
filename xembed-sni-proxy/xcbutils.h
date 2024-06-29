@@ -41,13 +41,16 @@ using ScopedCPointer = QScopedPointer<T, QScopedPointerPodDeleter>;
 class Atom
 {
 public:
-    explicit Atom(const QByteArray &name, bool onlyIfExists = false, xcb_connection_t *c = dynamic_cast<QNativeInterface::QX11Application *>(qApp)->connection())
-        : m_connection(c)
+    explicit Atom(const QByteArray &name, bool onlyIfExists = false)
+        : m_connection(nullptr)
         , m_retrieved(false)
-        , m_cookie(xcb_intern_atom_unchecked(m_connection, onlyIfExists, name.length(), name.constData()))
         , m_atom(XCB_ATOM_NONE)
         , m_name(name)
     {
+        if (auto *native = dynamic_cast<QNativeInterface::QX11Application *>(qApp)) {
+            m_connection = native->connection();
+            m_cookie = xcb_intern_atom_unchecked(m_connection, onlyIfExists, name.length(), name.constData());
+        }
     }
     Atom() = delete;
     Atom(const Atom &) = delete;
