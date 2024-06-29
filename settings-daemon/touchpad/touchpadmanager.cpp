@@ -3,6 +3,13 @@
 
 #include <QDebug>
 #include <QDBusConnection>
+#include <QDBusConnectionInterface>
+#include <QDBusMessage>
+#include <QDBusReply>
+#include <QDBusVariant>
+#include <QDBusArgument>
+#include <QDBusMetaType>
+#include <QDBusError>
 
 TouchpadManager::TouchpadManager(QObject *parent)
     : QObject(parent)
