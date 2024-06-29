@@ -15,6 +15,7 @@
 #include <libinput-properties.h>
 #include <xserver-properties.h>
 
+#include <X11/extensions/XInput.h>
 #include <X11/extensions/XInput2.h>
 
 const Parameter libinputProperties[] = {
