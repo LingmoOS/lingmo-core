@@ -4,10 +4,10 @@
     SPDX-License-Identifier: GPL-2.0-or-later
 */
 
-#include "libinputtouchpad.h"
-
 #include <QSet>
 #include <QDebug>
+
+#include "libinputtouchpad.h"
 
 #include <limits.h>
 #include <stddef.h>
@@ -16,8 +16,6 @@
 #include <xserver-properties.h>
 
 #include <X11/extensions/XInput2.h>
-
-#define __stdcall
 
 const Parameter libinputProperties[] = {
 
