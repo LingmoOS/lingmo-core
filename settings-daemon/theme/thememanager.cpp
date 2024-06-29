@@ -27,6 +27,7 @@
 #include <QFile>
 #include <QDebug>
 #include <QProcess>
+#include <QSettings>
 
 static const QByteArray s_systemFontName = QByteArrayLiteral("Font");
 static const QByteArray s_systemFixedFontName = QByteArrayLiteral("FixedFont");
@@ -309,9 +310,9 @@ void ThemeManager::setWallpaper(const QString &path)
         m_wallpaperPath = path;
         m_settings->setValue("Wallpaper", path);
 
-        //启动莫奈取色
+        // 启动莫奈取色
         QProcess *proc = new QProcess(this);
-        connect(proc, static_cast<void (QProcess::*)(int)>(&QProcess::finished), proc, &QProcess::deleteLater);
+        connect(proc, &QProcess::finished, proc, &QProcess::deleteLater);
         proc->startDetached("/usr/bin/lingmo-wallpaper-color-pick");
 
         emit wallpaperChanged(path);
