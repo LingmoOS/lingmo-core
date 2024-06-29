@@ -1,5 +1,5 @@
 #include "touchpadmanager.h"
-#include "touchpadadaptor.h"
+// #include "touchpadadaptor.h"
 
 #include <QDebug>
 
