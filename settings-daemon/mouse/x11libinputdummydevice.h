@@ -18,6 +18,8 @@
 #include <X11/Xdefs.h>
 #include <X11/Xlib.h>
 
+#undef Bool
+
 struct LibinputSettings;
 
 class X11LibinputDummyDevice : public QObject
