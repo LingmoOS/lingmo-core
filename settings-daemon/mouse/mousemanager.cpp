@@ -23,17 +23,25 @@
 
 Mouse::Mouse(QObject *parent)
     : QObject(parent)
-    , m_inputDummydevice(new X11LibinputDummyDevice(this, dynamic_cast<QNativeInterface::QX11Application *>(qApp)->display()))
+    , m_inputDummydevice(nullptr) // 初始化为 nullptr
 {
+    if (auto *native = dynamic_cast<QNativeInterface::QX11Application *>(qApp)) {
+        m_inputDummydevice = new X11LibinputDummyDevice(this, native->display());
+    }
+
     // init dbus
     new MouseAdaptor(this);
     QDBusConnection::sessionBus().registerObject(QStringLiteral("/Mouse"), this);
 
-    connect(m_inputDummydevice, &X11LibinputDummyDevice::leftHandedChanged, this, &Mouse::leftHandedChanged);
-    connect(m_inputDummydevice, &X11LibinputDummyDevice::pointerAccelerationProfileChanged, this, &Mouse::accelerationChanged);
-    connect(m_inputDummydevice, &X11LibinputDummyDevice::naturalScrollChanged, this, &Mouse::naturalScrollChanged);
-    connect(m_inputDummydevice, &X11LibinputDummyDevice::pointerAccelerationChanged, this, &Mouse::pointerAccelerationChanged);
+    // 确保 m_inputDummydevice 不是 nullptr 再进行连接
+    if (m_inputDummydevice) {
+        connect(m_inputDummydevice, &X11LibinputDummyDevice::leftHandedChanged, this, &Mouse::leftHandedChanged);
+        connect(m_inputDummydevice, &X11LibinputDummyDevice::pointerAccelerationProfileChanged, this, &Mouse::accelerationChanged);
+        connect(m_inputDummydevice, &X11LibinputDummyDevice::naturalScrollChanged, this, &Mouse::naturalScrollChanged);
+        connect(m_inputDummydevice, &X11LibinputDummyDevice::pointerAccelerationChanged, this, &Mouse::pointerAccelerationChanged);
+    }
 }
+
 
 Mouse::~Mouse()
 {
