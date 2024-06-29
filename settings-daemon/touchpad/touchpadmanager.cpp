@@ -2,6 +2,7 @@
 #include "touchpadadaptor.h"
 
 #include <QDebug>
+#include <QVariant>
 
 TouchpadManager::TouchpadManager(QObject *parent)
     : QObject(parent)
