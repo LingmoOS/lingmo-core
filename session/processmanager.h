@@ -47,6 +47,7 @@ public:
 
     /**
      * @brief Start the user defined autostart process.
+     *        Typically, they are in <home>/.config/autostart/xxx.desktop
      */
     void loadAutoStartProcess();
 

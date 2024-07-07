@@ -76,7 +76,7 @@ void ProcessManager::logout()
 
 void ProcessManager::startWindowManager()
 {
-    QProcess *wmProcess = new QProcess;
+    auto *wmProcess = new QProcess;
 
     wmProcess->start(m_app->wayland() ? "kwin_wayland" : "kwin_x11", QStringList());
 

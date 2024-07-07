@@ -54,11 +54,15 @@ public slots:
         m_power.suspend();
     }
 
-    void startDesktopProcess() {
+    [[maybe_unused]] void startDesktopProcess() {
+        // Start Lingmo Desktop Environment
         m_processManager->startDesktopProcess();
+
+        // Start User defined programs
+        m_processManager->loadAutoStartProcess();
     }
 
-    void updateNetworkProxy() {
+    [[maybe_unused]] void updateNetworkProxy() {
         m_networkProxyManager->update();
     }
 

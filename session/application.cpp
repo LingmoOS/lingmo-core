@@ -130,6 +130,8 @@ Application::Application(int &argc, char **argv)
     m_networkProxyManager->update();
 
     QTimer::singleShot(50, this, &Application::updateUserDirs);
+
+    // Launch Lingmo and user defined processes !
     QTimer::singleShot(100, m_processManager, &ProcessManager::start);
 }
 
