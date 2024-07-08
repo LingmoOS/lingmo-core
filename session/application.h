@@ -21,6 +21,8 @@
 #define APPLICATION_H
 
 #include <QApplication>
+#include <chrono>
+#include <thread>
 
 #include "processmanager.h"
 #include "networkproxymanager.h"
@@ -57,9 +59,6 @@ public slots:
     [[maybe_unused]] void startDesktopProcess() {
         // Start Lingmo Desktop Environment
         m_processManager->startDesktopProcess();
-
-        // Start User defined programs
-        m_processManager->loadAutoStartProcess();
     }
 
     [[maybe_unused]] void updateNetworkProxy() {

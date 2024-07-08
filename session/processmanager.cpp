@@ -127,7 +127,8 @@ void ProcessManager::startDaemonProcess()
 
 void ProcessManager::loadAutoStartProcess()
 {
-    QStringList execList;
+    QList<QPair<QString, QStringList>> list;
+
     const QStringList dirs = QStandardPaths::locateAll(QStandardPaths::GenericConfigLocation,
                                                        QStringLiteral("autostart"),
                                                        QStandardPaths::LocateDirectory);
@@ -139,8 +140,17 @@ void ProcessManager::loadAutoStartProcess()
             desktop.setIniCodec("UTF-8");
             desktop.beginGroup("Desktop Entry");
 
-            if (desktop.contains("OnlyShowIn"))
-                continue;
+            // Ignore files the require a specific desktop environment
+            if (desktop.contains("NotShowIn")) {
+                const QStringList notShowIn = desktop.value("NotShowIn").toStringList();
+                if (notShowIn.contains("Lingmo"))
+                    continue;
+            }
+            if (desktop.contains("OnlyShowIn")) {
+                const QStringList onlyShowIn = desktop.value("OnlyShowIn").toStringList();
+                if (!onlyShowIn.contains("Lingmo"))
+                    continue;
+            }
 
             const QString execValue = desktop.value("Exec").toString();
 
@@ -148,24 +158,22 @@ void ProcessManager::loadAutoStartProcess()
             if (execValue.contains("gmenudbusmenuproxy"))
                 continue;
 
-            if (!execValue.isEmpty()) {
-                execList << execValue;
+            // 使用 QProcess::splitCommand 来解析命令和参数
+            QStringList args = QProcess::splitCommand(execValue);
+
+            // 检查是否至少有一个元素（即程序路径）
+            if (!args.isEmpty()) {
+                auto program = args.first();
+                args.removeFirst(); // 移除程序路径，剩下的都是参数
+
+                list << qMakePair(program,  args);
+            } else {
+                qWarning() << "Invalid 'Exec' found in file!";
             }
         }
     }
 
-    for (const QString &exec : execList) {
-        QProcess *process = new QProcess;
-        process->setProgram(exec);
-        process->start();
-        process->waitForStarted();
-
-        if (process->exitCode() == 0) {
-            m_autoStartProcess.insert(exec, process);
-        } else {
-            process->deleteLater();
-        }
-    }
+    m_userAutoStartD = std::make_shared<LINGMO_SESSION::Daemon>(list, false);
 }
 
 bool ProcessManager::nativeEventFilter(const QByteArray &eventType, void *message, long *result)

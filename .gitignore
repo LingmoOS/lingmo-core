@@ -57,3 +57,6 @@ debian/.debhelper
 debian/files
 debian/lingmo-core*
 obj-x86_64*
+
+.cache/
+.idea/

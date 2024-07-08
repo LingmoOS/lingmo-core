@@ -20,6 +20,7 @@
 #ifndef PROCESSMANAGER_H
 #define PROCESSMANAGER_H
 
+#include <QApplication>
 #include <QAbstractNativeEventFilter>
 #include <QObject>
 #include <QProcess>
@@ -63,6 +64,9 @@ private:
 
     // Daemon helper for other daemon components
     std::shared_ptr<LINGMO_SESSION::Daemon> m_daemonAutoStartD;
+
+    // Daemon helper for User Auto Start Process
+    std::shared_ptr<LINGMO_SESSION::Daemon> m_userAutoStartD;
 
     bool m_wmStarted;
     QEventLoop *m_waitLoop;

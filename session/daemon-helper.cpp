@@ -22,7 +22,7 @@ Daemon::Daemon(const QList<QPair<QString, QStringList>> &processList, bool _enab
 
 void Daemon::onProcessError(QProcess::ProcessError error) {
   auto process = qobject_cast<QProcess *>(sender());
-  m_processStore.append(process);
+
   if (!process)
     return;
 
@@ -42,7 +42,6 @@ void Daemon::onProcessError(QProcess::ProcessError error) {
 
 void Daemon::startProcess(const QPair<QString, QStringList> &processInfo) {
   auto process = new QProcess(this);
-  m_processStore.append(process);
 
   if (this->m_enableAutoRestart)
     connect(process, &QProcess::errorOccurred,
@@ -53,12 +52,6 @@ void Daemon::startProcess(const QPair<QString, QStringList> &processInfo) {
     qDebug() << "Process started:" << processInfo.first << "PID:" << process->processId();
   } else {
     qDebug() << "Failed to start process:" << processInfo.first << process->errorString();
-  }
-}
-
-Daemon::~Daemon() {
-  for(auto & p : m_processStore) {
-    delete p;
   }
 }
 } // namespace LINGMO_SESSION

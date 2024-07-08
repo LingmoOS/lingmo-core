@@ -22,11 +22,6 @@ namespace LINGMO_SESSION {
      */
     explicit Daemon(const QList<QPair<QString, QStringList>>& processList, bool _enableAutoStart = true, QObject* parent = nullptr);
 
-    /**
-     * Deconstruct daemon helper
-     */
-    ~Daemon() override;
-
   public slots:
 
     /**
@@ -49,11 +44,6 @@ namespace LINGMO_SESSION {
      * @brief Whether to enable auto reload when process exited.
      */
     bool m_enableAutoRestart;
-
-    /**
-     * @brief Store used QProcess ptr.
-     */
-    QList<QProcess*> m_processStore;
   };
 }
 #endif
