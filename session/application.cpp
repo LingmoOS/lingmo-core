@@ -28,6 +28,7 @@
 #include <QProcess>
 #include <QDebug>
 #include <QDir>
+#include <QFileInfoList>
 
 #include <QDBusConnectionInterface>
 #include <QDBusServiceWatcher>
@@ -122,6 +123,8 @@ Application::Application(int &argc, char **argv)
     // variables (e.g. LANG and LC_*)
     // ref plasma
     importSystemdEnvrionment();
+    
+    processAutostartFiles();
 
     qunsetenv("XCURSOR_THEME");
     qunsetenv("XCURSOR_SIZE");
@@ -333,6 +336,20 @@ bool Application::syncDBusEnvironment()
 
     return exitCode == 0;
 }
+
+void Application::processAutostartFiles()
+{
+    QString autostartDir = QDir::homePath() + "/.config/autostart";
+    QDir dir(autostartDir);
+    if (!dir.exists()) {
+        return;
+    }
+    QFileInfoList fileList = dir.entryInfoList(QStringList() << "*.desktop", QDir::Files);
+    foreach (const QFileInfo &fileInfo, fileList) {
+        QProcess::startDetached("xdg-open", QStringList() << fileInfo.absoluteFilePath());
+    }
+}
+
 
 // Import systemd user environment.
 // Systemd read ~/.config/environment.d which applies to all systemd user unit.
