@@ -20,7 +20,7 @@ namespace LINGMO_SESSION {
      * @param processList Process list to start
      * @param parent
      */
-    Daemon(const QList<QPair<QString, QStringList>>& processList, QObject* parent = nullptr);
+    explicit Daemon(const QList<QPair<QString, QStringList>>& processList, bool _enableAutoStart = true, QObject* parent = nullptr);
 
   public slots:
 
@@ -39,6 +39,11 @@ namespace LINGMO_SESSION {
     void startProcess(const QPair<QString, QStringList>& processInfo);
 
     QList<QPair<QString, QStringList>> m_processList;
+
+    /**
+     * @brief Whether to enable auto reload when process exited.
+     */
+    bool m_enableAutoRestart;
   };
 }
 #endif

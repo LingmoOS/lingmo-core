@@ -21,6 +21,8 @@
 #define APPLICATION_H
 
 #include <QApplication>
+#include <chrono>
+#include <thread>
 
 #include "processmanager.h"
 #include "networkproxymanager.h"
@@ -54,11 +56,12 @@ public slots:
         m_power.suspend();
     }
 
-    void startDesktopProcess() {
+    [[maybe_unused]] void startDesktopProcess() {
+        // Start Lingmo Desktop Environment
         m_processManager->startDesktopProcess();
     }
 
-    void updateNetworkProxy() {
+    [[maybe_unused]] void updateNetworkProxy() {
         m_networkProxyManager->update();
     }
 
