@@ -10,7 +10,7 @@
 #include <QDebug>
 #include <QPair>
 #include <QString>
-#include <QStringList>
+#include <QPointer>
 
 namespace LINGMO_SESSION {
 Daemon::Daemon(const QList<QPair<QString, QStringList>> &processList, bool _enableAutoStart, QObject *parent)
@@ -21,7 +21,7 @@ Daemon::Daemon(const QList<QPair<QString, QStringList>> &processList, bool _enab
 }
 
 void Daemon::onProcessError(QProcess::ProcessError error) {
-  auto process = qobject_cast<QProcess *>(sender());
+  const QPointer process  = qobject_cast<QProcess *>(sender());
 
   if (!process)
     return;
@@ -41,7 +41,7 @@ void Daemon::onProcessError(QProcess::ProcessError error) {
 }
 
 void Daemon::startProcess(const QPair<QString, QStringList> &processInfo) {
-  auto process = new QProcess(this);
+  const QPointer process = new QProcess(this);
 
   if (this->m_enableAutoRestart)
     connect(process, &QProcess::errorOccurred,
