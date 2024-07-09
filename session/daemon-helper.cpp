@@ -21,7 +21,7 @@ Daemon::Daemon(const QList<QPair<QString, QStringList>> &processList, bool _enab
 }
 
 void Daemon::onProcessError(QProcess::ProcessError error) {
-  const QPointer process  = qobject_cast<QProcess *>(sender());
+  const QPointer process = qobject_cast<QProcess *>(sender());
 
   if (!process)
     return;
