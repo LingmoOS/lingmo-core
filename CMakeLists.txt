@@ -34,6 +34,8 @@ add_subdirectory(sddm-helper)
 add_subdirectory(clipboard)
 add_subdirectory(chotkeys)
 
+add_subdirectory(startlingmo)
+
 install(FILES lingmo DESTINATION /etc/ COMPONENT Runtime)
 install(FILES Desktop/Lingmo DESTINATION /etc/Desktop/ COMPONENT Runtime)
 install(FILES wallpaper-color-pick/lingmo-wallpaper-color-pick DESTINATION "/usr/bin/")
