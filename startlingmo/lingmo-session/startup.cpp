@@ -8,6 +8,7 @@
 
 #include "debug.h"
 #include "startupadaptor.h"
+#include "sessiontrack.h"
 
 #include <KJob>
 
@@ -16,7 +17,7 @@ void Startup::updateLaunchEnv(const QString &key, const QString &value) {
 }
 
 void Startup::init(QObject *parent) {
-    Startup::getInstance()->setParent(parent);
+  Startup::getInstance()->setParent(parent);
 }
 
 Startup::Startup() : QObject(nullptr) {
@@ -38,6 +39,32 @@ Startup::Startup() : QObject(nullptr) {
                                    QStringLiteral("org.kde.KWinWrapper"));
     kwinWaylandJob.exec();
   }
+
+  const QVector<KJob *> sequence = {
+
+  };
+  KJob *last = nullptr;
+  for (KJob *job : sequence) {
+    if (!job) {
+      continue;
+    }
+    if (last) {
+      connect(last, &KJob::finished, job, &KJob::start);
+    }
+    last = job;
+  }
+
+  connect(sequence.last(), &KJob::finished, this, &Startup::finishStartup);
+  sequence.first()->start();
+}
+
+void Startup::finishStartup() {
+  qCDebug(LINGMO_SESSION) << "Finished";
+  // upAndRunning(QStringLiteral("ready"));
+
+  // playStartupSound();
+  new SessionTrack(m_processes);
+  deleteLater();
 }
 
 bool Startup::startDetached(QProcess *process) {
@@ -89,4 +116,31 @@ void StartServiceJob::start() {
   if (m_serviceId.isEmpty()) {
     emitResult();
   }
+}
+
+StartProcessJob::StartProcessJob(const QString &process,
+                                 const QStringList &args,
+                                 const QProcessEnvironment &additionalEnv)
+    : KJob(), m_process(new QProcess(this)) {
+  m_process->setProgram(process);
+  m_process->setArguments(args);
+  m_process->setProcessChannelMode(QProcess::ForwardedChannels);
+  auto env = QProcessEnvironment::systemEnvironment();
+  env.insert(additionalEnv);
+  m_process->setProcessEnvironment(env);
+
+  connect(m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(finished(int, QProcess::ExitStatus)));
+}
+
+void StartProcessJob::start() {
+  qCDebug(LINGMO_SESSION) << "Starting " << m_process->program()
+                          << m_process->arguments();
+
+  m_process->start();
+}
+
+void StartProcessJob::finised(int exitCode, QProcess::ExitStatus) {
+  qCInfo(LINGMO_SESSION) << "process job " << m_process->program()
+                         << "finished with exit code " << exitCode;
+  emitResult();
 }

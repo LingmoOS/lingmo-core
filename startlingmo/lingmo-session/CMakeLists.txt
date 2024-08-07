@@ -1,6 +1,12 @@
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED 17)
+
 set(lingmo_session_SRCS
     main.cpp
     startup.cpp
+    sessiontrack.cpp
+    signalhandler.cpp
 )
 
 ecm_qt_declare_logging_category(lingmo_session_SRCS  HEADER debug.h IDENTIFIER LINGMO_SESSION CATEGORY_NAME org.lingmo.session)
