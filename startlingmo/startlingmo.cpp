@@ -435,6 +435,12 @@ bool startLingmoSession(bool wayland) {
 
   std::unique_ptr<QProcess, KillBeforeDeleter> startLingmoSession;
 
+  QStringList lingmoSessionOptions;
+
+  if (wayland) {
+    lingmoSessionOptions << QStringLiteral("--wayland");
+  }
+
   {
     startLingmoSession.reset(new QProcess);
     qCDebug(LINGMO_STARTUP) << "Using classic boot";
@@ -443,7 +449,7 @@ bool startLingmoSession(bool wayland) {
 
     startLingmoSession->start(
         QStringLiteral(CMAKE_INSTALL_FULL_BINDIR "/lingmo_session"),
-        QStringList{});
+        lingmoSessionOptions);
   }
 
   if (rc) {

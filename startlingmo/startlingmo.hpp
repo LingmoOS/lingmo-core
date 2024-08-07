@@ -56,4 +56,5 @@ struct KillBeforeDeleter {
   }
 };
 
+bool isSessionVariable(const QByteArray &name);
 #endif // STARTLINGMO_HPP

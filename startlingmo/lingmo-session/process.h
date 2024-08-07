@@ -17,17 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "application.h"
-#include <QQuickWindow>
+#ifndef PROCESS_H
+#define PROCESS_H
 
-int main(int argc, char *argv[])
+#include <QProcess>
+
+class Process : public QProcess
 {
+    Q_OBJECT
 
-    QQuickWindow::setDefaultAlphaBuffer(true);
-    QCoreApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
+public:
+    Process(QObject *parent = nullptr);
+    ~Process();
+};
 
-    Application a(argc, argv);
-    a.setQuitOnLastWindowClosed(false);
-
-    return a.exec();
-}
+#endif
