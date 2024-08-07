@@ -85,23 +85,13 @@ Application::Application(int &argc, char **argv)
     : QApplication(argc, argv)
     , m_processManager(new ProcessManager(this))
     , m_networkProxyManager(new NetworkProxyManager)
-    , m_wayland(false)
+    , m_wayland(true) // 强制使用Wayland
 {
     new SessionAdaptor(this);
 
-    // connect to D-Bus and register as an object:
+    // 连接到DBus并注册为对象
     QDBusConnection::sessionBus().registerService(QStringLiteral("com.lingmo.Session"));
     QDBusConnection::sessionBus().registerObject(QStringLiteral("/Session"), this);
-
-    QCommandLineParser parser;
-    parser.setApplicationDescription(QStringLiteral("Lingmo Session"));
-    parser.addHelpOption();
-
-    QCommandLineOption waylandOption(QStringList() << "w" << "wayland" << "Wayland Mode");
-    parser.addOption(waylandOption);
-    parser.process(*this);
-
-    m_wayland = parser.isSet(waylandOption);
 
     createConfigDirectory();
     initKWinConfig();
@@ -112,15 +102,10 @@ Application::Application(int &argc, char **argv)
     initEnvironments();
 
     if (!syncDBusEnvironment()) {
-        // Startup error
         qDebug() << "Could not sync environment to dbus.";
         qApp->exit(1);
     }
 
-    // We import systemd environment after we sync the dbus environment here.
-    // Otherwise it may leads to some unwanted order of applying environment
-    // variables (e.g. LANG and LC_*)
-    // ref plasma
     importSystemdEnvrionment();
 
     qunsetenv("XCURSOR_THEME");
@@ -179,21 +164,21 @@ void Application::initEnvironments()
     qputenv("XDG_SESSION_DESKTOP", "Lingmo");
 
     // Qt
+    qputenv("QT_QPA_PLATFORM", "wayland");
     qputenv("QT_QPA_PLATFORMTHEME", "lingmo");
     qputenv("QT_PLATFORM_PLUGIN", "lingmo");
-    
-    // ref: https://stackoverflow.com/questions/34399993/qml-performance-issue-when-updating-an-item-in-presence-of-many-non-overlapping
     qputenv("QT_QPA_UPDATE_IDLE_TIME", "10");
-
     qputenv("QT_AUTO_SCREEN_SCALE_FACTOR", "0");
 
-    // IM Config
-    // qputenv("GTK_IM_MODULE", "fcitx5");
-    // qputenv("QT4_IM_MODULE", "fcitx5");
-    // qputenv("QT_IM_MODULE", "fcitx5");
-    // qputenv("CLUTTER_IM_MODULE", "fcitx5");
-    // qputenv("XMODIFIERS", "@im=fcitx");
+    // Wayland
+    qputenv("XDG_SESSION_TYPE", "wayland");
+    qputenv("XDG_CURRENT_DESKTOP", "Lingmo:GNOME");
+    qputenv("GDK_BACKEND", "wayland");
+    qputenv("CLUTTER_BACKEND", "wayland");
+    qputenv("SDL_VIDEODRIVER", "wayland");
+    qputenv("QT_WAYLAND_DISABLE_WINDOWDECORATION", "1");
 }
+
 
 void Application::initLanguage()
 {
