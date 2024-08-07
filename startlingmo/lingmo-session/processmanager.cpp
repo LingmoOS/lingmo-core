@@ -120,12 +120,13 @@ void ProcessManager::startDesktopProcess() {
 
 void ProcessManager::startDaemonProcess() {
   QList<QPair<QString, QStringList>> list;
-  list << qMakePair(QString("lingmo-settings-daemon"), QStringList());
-  list << qMakePair(QString("lingmo-xembedsniproxy"), QStringList());
-  list << qMakePair(QString("lingmo-gmenuproxy"), QStringList());
-  list << qMakePair(QString("lingmo-permission-surveillance"), QStringList());
-  //    list << qMakePair(QString("lingmo-clipboard"), QStringList());
-  list << qMakePair(QString("lingmo-chotkeys"), QStringList());
+  // list << qMakePair(QString("lingmo-settings-daemon"), QStringList());
+  // list << qMakePair(QString("lingmo-xembedsniproxy"), QStringList());
+  // list << qMakePair(QString("lingmo-gmenuproxy"), QStringList());
+  // list << qMakePair(QString("lingmo-permission-surveillance"), QStringList());
+  // //    list << qMakePair(QString("lingmo-clipboard"), QStringList());
+  // list << qMakePair(QString("lingmo-chotkeys"), QStringList());
+  list << qMakePair(QString("foot"), QStringList());
 
   m_daemonAutoStartD = std::make_shared<LINGMO_SESSION::Daemon>(list);
 }
