@@ -430,10 +430,26 @@ bool startLingmoSession(bool wayland) {
   resetSystemdFailedUnits();
   reloadSystemd();
 
-  std::unique_ptr<QProcess, KillBeforeDeleter> startPlasmaSession;
+  bool rc = true;
+  QEventLoop e;
+
+  std::unique_ptr<QProcess, KillBeforeDeleter> startLingmoSession;
 
   {
-    startPlasmaSession.reset(new QProcess);
+    startLingmoSession.reset(new QProcess);
     qCDebug(LINGMO_STARTUP) << "Using classic boot";
+
+    startLingmoSession->setProcessChannelMode(QProcess::ForwardedChannels);
+
+    startLingmoSession->start(
+        QStringLiteral(CMAKE_INSTALL_FULL_BINDIR "/lingmo_session"),
+        QStringList{});
   }
+
+  if (rc) {
+    QObject::connect(QCoreApplication::instance(),
+                     &QCoreApplication::aboutToQuit, &e, &QEventLoop::quit);
+    e.exec();
+  }
+  return rc;
 }

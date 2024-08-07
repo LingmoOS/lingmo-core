@@ -86,5 +86,7 @@ int main(int argc, char **argv) {
   // variables (e.g. LANG and LC_*)
   importSystemdEnvrionment();
 
+  startLingmoSession(true);
+
   return 0;
 }

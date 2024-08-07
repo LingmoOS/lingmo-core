@@ -11,16 +11,13 @@
 #include "sessiontrack.h"
 
 #include <KJob>
+#include <qprocess.h>
 
 void Startup::updateLaunchEnv(const QString &key, const QString &value) {
   qputenv(key.toLatin1(), value.toLatin1());
 }
 
-void Startup::init(QObject *parent) {
-  Startup::getInstance()->setParent(parent);
-}
-
-Startup::Startup() : QObject(nullptr) {
+Startup::Startup(QObject *parent) : QObject(parent) {
 
   new StartupAdaptor(this);
   QDBusConnection::sessionBus().registerObject(
@@ -40,8 +37,10 @@ Startup::Startup() : QObject(nullptr) {
     kwinWaylandJob.exec();
   }
 
+  QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+  env.insert("MOZ_ENABLE_WAYLAND", "1");
   const QVector<KJob *> sequence = {
-
+    new StartProcessJob(QStringLiteral("foot"), {}, env)
   };
   KJob *last = nullptr;
   for (KJob *job : sequence) {
@@ -107,7 +106,7 @@ void StartServiceJob::start() {
   }
   qCDebug(LINGMO_SESSION) << "Starting " << m_process->program()
                           << m_process->arguments();
-  if (!Startup::getInstance()->startDetached(m_process)) {
+  if (!startup_ptr->startDetached(m_process)) {
     qCWarning(LINGMO_SESSION) << "error starting process"
                               << m_process->program() << m_process->arguments();
     emitResult();
@@ -139,7 +138,7 @@ void StartProcessJob::start() {
   m_process->start();
 }
 
-void StartProcessJob::finised(int exitCode, QProcess::ExitStatus) {
+void StartProcessJob::finished(int exitCode, QProcess::ExitStatus e) {
   qCInfo(LINGMO_SESSION) << "process job " << m_process->program()
                          << "finished with exit code " << exitCode;
   emitResult();

@@ -11,14 +11,13 @@
 
 #include <KJob>
 
-#include "singleton.h"
+#include <memory>
 
 class Startup : public QObject {
   Q_OBJECT
-  Startup();
 
 public:
-  SINGLETON(Startup);
+  Startup(QObject *parent);
   void init(QObject *parent);
 
   bool startDetached(QProcess *process);
@@ -62,10 +61,12 @@ public:
   void start() override;
 
 public Q_SLOTS:
-  void finised(int exitCode, QProcess::ExitStatus);
+  void finished(int, QProcess::ExitStatus);
 
 private:
   QProcess *m_process;
 };
+
+extern std::shared_ptr<Startup> startup_ptr;
 
 #endif // STARTUP_HPP

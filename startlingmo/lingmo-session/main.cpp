@@ -6,11 +6,14 @@
 #include "startup.hpp"
 
 #include <QCoreApplication>
+#include <memory>
+
+std::shared_ptr<Startup> startup_ptr;
 
 int main(int argc, char **argv) {
   QCoreApplication app(argc, argv);
 
-  Startup::getInstance()->init(&app);
-  
+  startup_ptr = std::make_shared<Startup>(&app);
+
   app.exec();
 }
