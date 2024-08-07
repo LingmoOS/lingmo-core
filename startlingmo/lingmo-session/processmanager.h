@@ -84,7 +84,8 @@ public:
       const QString &process, const QStringList &args,
       const QProcessEnvironment &additionalEnv = QProcessEnvironment());
   void start() override;
-
+  
+public Q_SLOTS:
   void finished(int exitCode, QProcess::ExitStatus e);
 
 private:

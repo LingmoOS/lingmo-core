@@ -44,6 +44,8 @@ void Daemon::onProcessError(QProcess::ProcessError error) {
 }
 
 void Daemon::startProcess(const QPair<QString, QStringList> &processInfo) {
+  qputenv("QT_QPA_PLATFORM", QByteArrayLiteral("xcb"));
+
   const QPointer process = new QProcess(this);
 
   if (this->m_enableAutoRestart)

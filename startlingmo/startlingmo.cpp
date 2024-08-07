@@ -98,7 +98,6 @@ void setupCursor(bool wayland) {
     qreal scaleFactor = settings.value("PixelRatio", 1.0).toReal();
     QString cursorTheme = settings.value("CursorTheme", "default").toString();
     int cursorSize = settings.value("CursorSize", 24).toInt() * scaleFactor;
-
     runSync("cupdatecursor", {cursorTheme, QString::number(cursorSize)});
   }
 }

@@ -21,71 +21,72 @@
 #define APPLICATION_H
 
 #include <QApplication>
+#include <QObject>
 #include <chrono>
+#include <qcommandlineparser.h>
+#include <qobject.h>
 #include <thread>
 
-#include "processmanager.h"
 #include "networkproxymanager.h"
 #include "powermanager/power.h"
+#include "processmanager.h"
 
-class Application : public QApplication
-{
-    Q_OBJECT
+class Application : public QObject {
+  Q_OBJECT
 
 public:
-    explicit Application(int &argc, char **argv);
+  explicit Application(const QCommandLineParser &parser,
+                       QObject *parent = nullptr);
 
-    bool wayland() const;
+  bool wayland() const;
 
 public slots:
-    void logout() {
-        m_processManager->logout();
-    }
+  void logout() { m_processManager->logout(); }
 
-    void reboot() {
-        m_power.reboot();
-        QCoreApplication::exit(0);
-    }
+  void reboot() {
+    m_power.reboot();
+    QCoreApplication::exit(0);
+  }
 
-    void powerOff() {
-        m_power.shutdown();
-        QCoreApplication::exit(0);
-    }
+  void powerOff() {
+    m_power.shutdown();
+    QCoreApplication::exit(0);
+  }
 
-    void suspend() {
-        m_power.suspend();
-    }
+  void suspend() { m_power.suspend(); }
 
-    [[maybe_unused]] void startDesktopProcess() {
-        // Start Lingmo Desktop Environment
-        m_processManager->startDesktopProcess();
-    }
+  [[maybe_unused]] void startDesktopProcess() {
+    // Start Lingmo Desktop Environment
+    m_processManager->startDesktopProcess();
+  }
 
-    [[maybe_unused]] void updateNetworkProxy() {
-        m_networkProxyManager->update();
-    }
+  [[maybe_unused]] void updateNetworkProxy() {
+    m_networkProxyManager->update();
+  }
 
-    void launch(const QString &exec, const QStringList &args);
-    void launch(const QString &exec, const QString &workingDir, const QStringList &args);
+  void launch(const QString &exec, const QStringList &args);
+  void launch(const QString &exec, const QString &workingDir,
+              const QStringList &args);
 
 private:
-    void initEnvironments();
-    void initLanguage();
-    void initScreenScaleFactors();
-    void initXResource();
-    void initKWinConfig();
-    bool syncDBusEnvironment();
-    void importSystemdEnvrionment();
-    void createConfigDirectory();
-    void updateUserDirs();
-    int runSync(const QString &program, const QStringList &args, const QStringList &env = {});
+  void initEnvironments();
+  void initLanguage();
+  void initScreenScaleFactors();
+  void initXResource();
+  void initKWinConfig();
+  bool syncDBusEnvironment();
+  void importSystemdEnvrionment();
+  void createConfigDirectory();
+  void updateUserDirs();
+  int runSync(const QString &program, const QStringList &args,
+              const QStringList &env = {});
 
 private:
-    ProcessManager *m_processManager;
-    NetworkProxyManager *m_networkProxyManager;
-    Power m_power;
+  ProcessManager *m_processManager;
+  NetworkProxyManager *m_networkProxyManager;
+  Power m_power;
 
-    bool m_wayland;
+  bool m_wayland;
 };
 
 #endif // APPLICATION_H

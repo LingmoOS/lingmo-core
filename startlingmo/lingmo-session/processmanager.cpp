@@ -26,6 +26,13 @@
 
 #include "daemon-helper.h"
 
+void Delay_MSec(unsigned int msec) {
+  QEventLoop loop; // 定义一个新的事件循环
+  QTimer::singleShot(
+      msec, &loop, SLOT(quit())); // 创建单次定时器，槽函数为事件循环的退出函数
+  loop.exec(); // 事件循环开始执行，程序会卡在这里，直到定时时间到，本循环被退出
+}
+
 ProcessManager::ProcessManager(Application *app, QObject *parent)
     : QObject(parent), m_app(app), m_wmStarted(false), m_waitLoop(nullptr) {
   qApp->installNativeEventFilter(this);
@@ -74,19 +81,18 @@ void ProcessManager::startWindowManager() {
       qEnvironmentVariable("XDG_SESSION_TYPE") == QLatin1String("wayland");
 
   if (detcted_wayland || m_app->wayland()) {
+    // StartServiceJob kwinWaylandJob(QStringLiteral("kwin_wayland_wrapper"),
+    //                                {QStringLiteral("--xwayland")},
+    //                                QStringLiteral("org.kde.KWinWrapper"));
+    StartProcessJob kwinWaylandJob(QStringLiteral("kwin_wayland_wrapper"),
+                                   {QStringLiteral("--xwayland")});
+    kwinWaylandJob.start();
+
+    Delay_MSec(10000);
   } else {
     auto *wmProcess = new QProcess;
 
     wmProcess->start("kwin_x11", QStringList());
-  }
-
-  if (!m_app->wayland()) {
-    QEventLoop waitLoop;
-    m_waitLoop = &waitLoop;
-    // add a timeout to avoid infinite blocking if a WM fail to execute.
-    QTimer::singleShot(30 * 1000, &waitLoop, SLOT(quit()));
-    waitLoop.exec();
-    m_waitLoop = nullptr;
   }
 }
 
