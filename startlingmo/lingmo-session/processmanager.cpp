@@ -81,14 +81,14 @@ void ProcessManager::startWindowManager() {
       qEnvironmentVariable("XDG_SESSION_TYPE") == QLatin1String("wayland");
 
   if (detcted_wayland || m_app->wayland()) {
-    // StartServiceJob kwinWaylandJob(QStringLiteral("kwin_wayland_wrapper"),
-    //                                {QStringLiteral("--xwayland")},
-    //                                QStringLiteral("org.kde.KWinWrapper"));
-    StartProcessJob kwinWaylandJob(QStringLiteral("kwin_wayland_wrapper"),
-                                   {QStringLiteral("--xwayland")});
-    kwinWaylandJob.start();
+    StartServiceJob kwinWaylandJob(QStringLiteral("kwin_wayland_wrapper"),
+                                   {QStringLiteral("--xwayland")},
+                                   QStringLiteral("org.kde.KWinWrapper"));
+    // StartProcessJob kwinWaylandJob(QStringLiteral("kwin_wayland_wrapper"),
+    //                                {QStringLiteral("--xwayland")});
+    kwinWaylandJob.exec();
 
-    Delay_MSec(10000);
+    // Delay_MSec(10000);
   } else {
     auto *wmProcess = new QProcess;
 

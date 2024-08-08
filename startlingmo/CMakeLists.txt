@@ -49,6 +49,7 @@ find_kwin_bin_path()
 configure_file(config-startlingmo.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-startlingmo.h)
 
 add_subdirectory(lingmo-session) 
+add_subdirectory(wayland_wrapper)
 
 install(TARGETS startlingmo-wayland ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
 install(PROGRAMS lingmo-sourceenv.sh DESTINATION ${KDE_INSTALL_LIBEXECDIR})

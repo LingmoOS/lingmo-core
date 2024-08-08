@@ -27,6 +27,7 @@
 int main(int argc, char *argv[])
 {
     qputenv("QT_QPA_PLATFORM", QByteArrayLiteral("wayland"));
+    qputenv("XDG_SESSION_TYPE", QByteArrayLiteral("wayland"));
     QQuickWindow::setDefaultAlphaBuffer(true);
     QCoreApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
 

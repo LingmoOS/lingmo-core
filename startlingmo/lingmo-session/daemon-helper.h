@@ -179,7 +179,7 @@ Q_SIGNALS:
    */
   void result(Job *job);
 
-protected:
+protected :
   /**
    * Utility function to emit the result signal, and end this job.
    * It first notifies the observers to hide the progress for this job using
@@ -190,7 +190,7 @@ protected:
    * @see result()
    * @see finished()
    */
-  void emitResult();
+  Q_SLOT void emitResult();
 
   std::unique_ptr<JobPrivate> const d_ptr;
 
