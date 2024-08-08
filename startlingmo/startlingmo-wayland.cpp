@@ -7,6 +7,7 @@
 #include <QDBusArgument>
 #include <QDBusConnection>
 #include <QDBusMessage>
+#include <qglobal.h>
 
 #include "startlingmo.hpp"
 
@@ -77,6 +78,7 @@ int main(int argc, char **argv) {
   initScreenScaleFactors();
 
   qputenv("XDG_SESSION_TYPE", "wayland");
+  qputenv("QT_QPA_PLATFORM", "wayland");
 
   auto oldSystemdEnvironment = getSystemdEnvironment();
   if (!syncDBusEnvironment()) {

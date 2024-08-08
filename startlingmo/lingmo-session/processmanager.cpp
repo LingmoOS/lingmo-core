@@ -23,8 +23,10 @@
 #include <KWindowSystem/NETWM>
 #include <KWindowSystem>
 #include <QX11Info>
+#include <qprocess.h>
 
 #include "daemon-helper.h"
+#include "debug.h"
 
 ProcessManager *s_self;
 
@@ -101,34 +103,20 @@ void ProcessManager::startDesktopProcess() {
   // In the way, there will be no problem that desktop and launcher can't get
   // wallpaper.
 
-  QList<QPair<QString, QStringList>> list;
-  // Desktop components
-  list << qMakePair(QString("lingmo-notificationd"), QStringList());
-  list << qMakePair(QString("lingmo-statusbar"), QStringList());
-  list << qMakePair(QString("lingmo-dock"), QStringList());
-  list << qMakePair(QString("lingmo-filemanager"), QStringList("--desktop"));
-  list << qMakePair(QString("lingmo-launcher"), QStringList());
-  list << qMakePair(QString("lingmo-powerman"), QStringList());
-  list << qMakePair(QString("lingmo-clipboard"), QStringList());
-  list << qMakePair(QString("lingmo-wallpaper-color-pick"), QStringList());
-
-  m_desktopAutoStartD = std::make_shared<LINGMO_SESSION::Daemon>(list);
-
-  // Auto start
-  QTimer::singleShot(100, this, &ProcessManager::loadAutoStartProcess);
-}
-
-void ProcessManager::startDaemonProcess() {
-  QList<QPair<QString, QStringList>> list;
-  // list << qMakePair(QString("lingmo-settings-daemon"), QStringList());
-  // list << qMakePair(QString("lingmo-xembedsniproxy"), QStringList());
-  // list << qMakePair(QString("lingmo-gmenuproxy"), QStringList());
-  // list << qMakePair(QString("lingmo-permission-surveillance"),
-  // QStringList());
-  // //    list << qMakePair(QString("lingmo-clipboard"), QStringList());
-  // list << qMakePair(QString("lingmo-chotkeys"), QStringList());
+  auto xcb_extra = QProcessEnvironment();
+  xcb_extra.insert("QT_QPA_PLATFORM", "xcb");
   const QVector<Job *> sequence = {
-      new StartProcessJob(QStringLiteral("foot"), {}),
+      new LaunchProcess(QStringLiteral("lingmo-notificationd"), {}, xcb_extra),
+      new LaunchProcess(QStringLiteral("lingmo-statusbar"), {}, xcb_extra),
+      new LaunchProcess(QStringLiteral("lingmo-dock"), {}, xcb_extra),
+      new LaunchProcess(QStringLiteral("lingmo-filemanager"),
+                        QStringList("--desktop"), xcb_extra),
+
+      new LaunchProcess(QStringLiteral("lingmo-launcher"), {}, xcb_extra),
+      new LaunchProcess(QStringLiteral("lingmo-powerman"), {}, xcb_extra),
+      new LaunchProcess(QStringLiteral("lingmo-clipboard"), {}, xcb_extra),
+      new LaunchProcess(QStringLiteral("lingmo-wallpaper-color-pick"), {},
+                        xcb_extra),
   };
   Job *last = nullptr;
   for (Job *job : sequence) {
@@ -143,7 +131,32 @@ void ProcessManager::startDaemonProcess() {
 
   // connect(sequence.last(), &Job::finished, this, &Startup::finishStartup);
   sequence.first()->start();
-  // m_daemonAutoStartD = std::make_shared<LINGMO_SESSION::Daemon>(list);
+}
+
+void ProcessManager::startDaemonProcess() {
+  auto xcb_extra = QProcessEnvironment();
+  xcb_extra.insert("QT_QPA_PLATFORM", "xcb");
+  const QVector<Job *> sequence = {
+      new LaunchProcess(QStringLiteral("lingmo-settings-daemon"), {},
+                        xcb_extra),
+      new LaunchProcess(QStringLiteral("lingmo-xembedsniproxy"), {}, xcb_extra),
+      new LaunchProcess(QStringLiteral("lingmo-gmenuproxy"), {}, xcb_extra),
+      new LaunchProcess(QStringLiteral("lingmo-permission-surveillance"), {},
+                        xcb_extra),
+  };
+  Job *last = nullptr;
+  for (Job *job : sequence) {
+    if (!job) {
+      continue;
+    }
+    if (last) {
+      connect(last, &Job::finished, job, &Job::start);
+    }
+    last = job;
+  }
+
+  connect(sequence.last(), &Job::finished, this, &ProcessManager::startDesktopProcess);
+  sequence.first()->start();
 }
 
 void ProcessManager::loadAutoStartProcess() {
@@ -190,7 +203,7 @@ void ProcessManager::loadAutoStartProcess() {
 
         list << qMakePair(program, args);
       } else {
-        qWarning() << "Invalid 'Exec' found in file!";
+        qCWarning(LINGMO_SESSION_D) << "Invalid 'Exec' found in file!";
       }
     }
   }
@@ -248,14 +261,15 @@ StartProcessJob::StartProcessJob(const QString &process,
 }
 
 void StartProcessJob::start() {
-  qDebug() << "Starting " << m_process->program() << m_process->arguments();
+  qCDebug(LINGMO_SESSION_D)
+      << "Starting " << m_process->program() << m_process->arguments();
 
   m_process->start();
 }
 
 void StartProcessJob::finished(int exitCode, QProcess::ExitStatus e) {
-  qDebug() << "process job " << m_process->program()
-           << "finished with exit code " << exitCode;
+  qCDebug(LINGMO_SESSION_D) << "process job " << m_process->program()
+                            << "finished with exit code " << exitCode;
   emitResult();
 }
 
@@ -283,18 +297,39 @@ void StartServiceJob::start() {
   if (!m_serviceId.isEmpty() &&
       QDBusConnection::sessionBus().interface()->isServiceRegistered(
           m_serviceId)) {
-    qDebug() << m_process << "already running";
+    qCDebug(LINGMO_SESSION_D) << m_process << "already running";
     emitResult();
     return;
   }
   qDebug() << "Starting " << m_process->program() << m_process->arguments();
   if (!ProcessManager::self()->startDetached(m_process)) {
-    qWarning() << "error starting process" << m_process->program()
-               << m_process->arguments();
+    qCWarning(LINGMO_SESSION_D)
+        << "error starting process" << m_process->program()
+        << m_process->arguments();
     emitResult();
   }
 
   if (m_serviceId.isEmpty()) {
     emitResult();
   }
+}
+
+LaunchProcess::LaunchProcess(const QString &process, const QStringList &args,
+                             const QProcessEnvironment &additionalEnv)
+    : Job(), m_process(new QProcess(this)) {
+  m_process->setProgram(process);
+  m_process->setArguments(args);
+  m_process->setProcessChannelMode(QProcess::ForwardedChannels);
+  auto env = QProcessEnvironment::systemEnvironment();
+  env.insert(additionalEnv);
+  m_process->setProcessEnvironment(env);
+}
+
+void LaunchProcess::start() {
+  qCDebug(LINGMO_SESSION_D)
+      << "Starting " << m_process->program() << m_process->arguments();
+
+  m_process->startDetached();
+
+  emitResult();
 }

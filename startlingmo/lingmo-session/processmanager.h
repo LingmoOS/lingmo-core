@@ -90,6 +90,21 @@ using namespace LINGMO_SESSION;
 /**
  * Launches a process, and waits for the process to start
  */
+class LaunchProcess : public Job {
+  Q_OBJECT
+public:
+  LaunchProcess(
+      const QString &process, const QStringList &args,
+      const QProcessEnvironment &additionalEnv = QProcessEnvironment());
+  void start() override;
+
+private:
+  QProcess *m_process;
+};
+
+/**
+ * Launches a process, and waits for the process to finish
+ */
 class StartProcessJob : public Job {
   Q_OBJECT
 public:

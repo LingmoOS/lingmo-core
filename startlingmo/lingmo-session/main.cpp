@@ -18,30 +18,28 @@
  */
 
 #include "application.h"
+#include <QCommandLineOption>
 #include <QCoreApplication>
 #include <QQuickWindow>
-#include <QCommandLineOption>
 #include <qcommandlineparser.h>
 
+int main(int argc, char *argv[]) {
+  QQuickWindow::setDefaultAlphaBuffer(true);
+  QCoreApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
 
-int main(int argc, char *argv[])
-{
-    qputenv("QT_QPA_PLATFORM", QByteArrayLiteral("wayland"));
-    qputenv("XDG_SESSION_TYPE", QByteArrayLiteral("wayland"));
-    QQuickWindow::setDefaultAlphaBuffer(true);
-    QCoreApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
+  QCoreApplication app(argc, argv);
 
-    QCoreApplication app(argc, argv);
+  QCommandLineParser parser;
+  parser.setApplicationDescription(QStringLiteral("Lingmo Session"));
+  parser.addHelpOption();
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription(QStringLiteral("Lingmo Session"));
-    parser.addHelpOption();
+  QCommandLineOption waylandOption(QStringList() << "w"
+                                                 << "wayland"
+                                                 << "Wayland Mode");
+  parser.addOption(waylandOption);
+  parser.process(app);
 
-    QCommandLineOption waylandOption(QStringList() << "w" << "wayland" << "Wayland Mode");
-    parser.addOption(waylandOption);
-    parser.process(app);
+  new Application(parser, &app);
 
-    new Application(parser, &app);
-
-    return app.exec();
+  return app.exec();
 }
