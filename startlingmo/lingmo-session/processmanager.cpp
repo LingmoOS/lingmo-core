@@ -26,8 +26,13 @@
 
 #include "daemon-helper.h"
 
+ProcessManager *s_self;
+
 ProcessManager::ProcessManager(Application *app, QObject *parent)
     : QObject(parent), m_app(app), m_wmStarted(false), m_waitLoop(nullptr) {
+  Q_ASSERT(!s_self);
+  s_self = this;
+
   qApp->installNativeEventFilter(this);
 }
 
@@ -78,11 +83,12 @@ void ProcessManager::startWindowManager() {
       qEnvironmentVariable("XDG_SESSION_TYPE") == QLatin1String("wayland");
 
   if (detcted_wayland || m_app->wayland()) {
-    StartServiceJob kwinWaylandJob(
-        QStringLiteral("lingmo_kwin_wayland_wrapper"),
-        {QStringLiteral("--xwayland")},
-        QStringLiteral("org.lingmo.KWinWrapper"));
-    kwinWaylandJob.exec(); // Wait untill kwin_wayland_wrapper started
+    auto kwinWaylandJob =
+        new StartServiceJob(QStringLiteral("lingmo_kwin_wayland_wrapper"),
+                            {QStringLiteral("--xwayland")},
+                            QStringLiteral("org.lingmo.KWinWrapper"));
+    kwinWaylandJob->setParent(this);
+    kwinWaylandJob->exec(); // Wait untill kwin_wayland_wrapper started
   } else {
     auto *wmProcess = new QProcess;
 
@@ -121,9 +127,23 @@ void ProcessManager::startDaemonProcess() {
   // QStringList());
   // //    list << qMakePair(QString("lingmo-clipboard"), QStringList());
   // list << qMakePair(QString("lingmo-chotkeys"), QStringList());
-  list << qMakePair(QString("foot"), QStringList());
+  const QVector<Job *> sequence = {
+      new StartProcessJob(QStringLiteral("foot"), {}),
+  };
+  Job *last = nullptr;
+  for (Job *job : sequence) {
+    if (!job) {
+      continue;
+    }
+    if (last) {
+      connect(last, &Job::finished, job, &Job::start);
+    }
+    last = job;
+  }
 
-  m_daemonAutoStartD = std::make_shared<LINGMO_SESSION::Daemon>(list);
+  // connect(sequence.last(), &Job::finished, this, &Startup::finishStartup);
+  sequence.first()->start();
+  // m_daemonAutoStartD = std::make_shared<LINGMO_SESSION::Daemon>(list);
 }
 
 void ProcessManager::loadAutoStartProcess() {
@@ -202,6 +222,16 @@ bool ProcessManager::nativeEventFilter(const QByteArray &eventType,
   return false;
 }
 
+bool ProcessManager::startDetached(QProcess *process) {
+  process->setProcessChannelMode(QProcess::ForwardedChannels);
+  process->start();
+  const bool ret = process->waitForStarted();
+  if (ret) {
+    m_processes << process;
+  }
+  return ret;
+}
+
 StartProcessJob::StartProcessJob(const QString &process,
                                  const QStringList &args,
                                  const QProcessEnvironment &additionalEnv)
@@ -258,7 +288,7 @@ void StartServiceJob::start() {
     return;
   }
   qDebug() << "Starting " << m_process->program() << m_process->arguments();
-  if (!startDetached(m_process)) {
+  if (!ProcessManager::self()->startDetached(m_process)) {
     qWarning() << "error starting process" << m_process->program()
                << m_process->arguments();
     emitResult();
@@ -267,11 +297,4 @@ void StartServiceJob::start() {
   if (m_serviceId.isEmpty()) {
     emitResult();
   }
-}
-
-bool StartServiceJob::startDetached(QProcess *process) {
-  process->setProcessChannelMode(QProcess::ForwardedChannels);
-  process->start();
-  const bool ret = process->waitForStarted();
-  return ret;
 }

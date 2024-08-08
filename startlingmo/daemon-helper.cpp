@@ -73,7 +73,7 @@ Job::~Job() {
 }
 
 void Job::emitResult() {
-  if (d_func()->isFinished) {
+  if (!d_func()->isFinished) {
     finishJob(true);
   }
 }

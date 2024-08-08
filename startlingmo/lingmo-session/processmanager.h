@@ -32,12 +32,20 @@
 #include "daemon-helper.h"
 
 class Application;
+class ProcessManager;
+
+extern ProcessManager *s_self;
+
 class ProcessManager : public QObject, public QAbstractNativeEventFilter {
   Q_OBJECT
-
 public:
   explicit ProcessManager(Application *app, QObject *parent = nullptr);
   ~ProcessManager();
+
+  static ProcessManager *self() {
+    Q_ASSERT(s_self);
+    return s_self;
+  }
 
   void start();
   void logout();
@@ -56,10 +64,14 @@ public:
                          long *result) override;
 
   void updateLaunchEnv(const QString &key, const QString &value);
+
+  bool startDetached(QProcess *process);
+
 private:
   Application *m_app;
   QMap<QString, QProcess *> m_systemProcess;
   QMap<QString, QProcess *> m_autoStartProcess;
+  QVector<QProcess *> m_processes;
 
   // Daemon helper for desktop components
   std::shared_ptr<LINGMO_SESSION::Daemon> m_desktopAutoStartD;
@@ -85,7 +97,7 @@ public:
       const QString &process, const QStringList &args,
       const QProcessEnvironment &additionalEnv = QProcessEnvironment());
   void start() override;
-  
+
 public Q_SLOTS:
   void finished(int exitCode, QProcess::ExitStatus e);
 
@@ -104,8 +116,6 @@ public:
       const QProcessEnvironment &additionalEnv = QProcessEnvironment());
 
   void start() override;
-
-  bool startDetached(QProcess *process);
 
 private:
   QProcess *m_process;
