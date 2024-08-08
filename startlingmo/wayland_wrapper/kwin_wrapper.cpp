@@ -30,6 +30,7 @@
 #include "UpdateLaunchEnvironment.hpp"
 
 #include <qdebug.h>
+#include <qloggingcategory.h>
 #include <signal.h>
 
 #include "wl-socket.h"
@@ -152,6 +153,7 @@ void KWinWrapper::run()
     auto envSyncJob = new UpdateLaunchEnvironmentJob(env);
     connect(envSyncJob, &UpdateLaunchEnvironmentJob::finished, this, []() {
         // The service name is merely there to indicate to the world that we're up and ready with all envs exported
+        qCDebug(KWIN_WRAPPER) << "KWinWrapper is ready";
         QDBusConnection::sessionBus().registerService(QStringLiteral("org.lingmo.KWinWrapper"));
     });
 }

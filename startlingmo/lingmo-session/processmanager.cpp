@@ -26,13 +26,6 @@
 
 #include "daemon-helper.h"
 
-void Delay_MSec(unsigned int msec) {
-  QEventLoop loop; // 定义一个新的事件循环
-  QTimer::singleShot(
-      msec, &loop, SLOT(quit())); // 创建单次定时器，槽函数为事件循环的退出函数
-  loop.exec(); // 事件循环开始执行，程序会卡在这里，直到定时时间到，本循环被退出
-}
-
 ProcessManager::ProcessManager(Application *app, QObject *parent)
     : QObject(parent), m_app(app), m_wmStarted(false), m_waitLoop(nullptr) {
   qApp->installNativeEventFilter(this);
@@ -48,6 +41,10 @@ ProcessManager::~ProcessManager() {
     delete p;
     m_systemProcess[i.key()] = nullptr;
   }
+}
+
+void ProcessManager::updateLaunchEnv(const QString &key, const QString &value) {
+  qputenv(key.toLatin1(), value.toLatin1());
 }
 
 void ProcessManager::start() {
@@ -81,14 +78,11 @@ void ProcessManager::startWindowManager() {
       qEnvironmentVariable("XDG_SESSION_TYPE") == QLatin1String("wayland");
 
   if (detcted_wayland || m_app->wayland()) {
-    StartServiceJob kwinWaylandJob(QStringLiteral("kwin_wayland_wrapper"),
-                                   {QStringLiteral("--xwayland")},
-                                   QStringLiteral("org.kde.KWinWrapper"));
-    // StartProcessJob kwinWaylandJob(QStringLiteral("kwin_wayland_wrapper"),
-    //                                {QStringLiteral("--xwayland")});
-    kwinWaylandJob.exec();
-
-    // Delay_MSec(10000);
+    StartServiceJob kwinWaylandJob(
+        QStringLiteral("lingmo_kwin_wayland_wrapper"),
+        {QStringLiteral("--xwayland")},
+        QStringLiteral("org.lingmo.KWinWrapper"));
+    kwinWaylandJob.exec(); // Wait untill kwin_wayland_wrapper started
   } else {
     auto *wmProcess = new QProcess;
 
@@ -123,7 +117,8 @@ void ProcessManager::startDaemonProcess() {
   // list << qMakePair(QString("lingmo-settings-daemon"), QStringList());
   // list << qMakePair(QString("lingmo-xembedsniproxy"), QStringList());
   // list << qMakePair(QString("lingmo-gmenuproxy"), QStringList());
-  // list << qMakePair(QString("lingmo-permission-surveillance"), QStringList());
+  // list << qMakePair(QString("lingmo-permission-surveillance"),
+  // QStringList());
   // //    list << qMakePair(QString("lingmo-clipboard"), QStringList());
   // list << qMakePair(QString("lingmo-chotkeys"), QStringList());
   list << qMakePair(QString("foot"), QStringList());

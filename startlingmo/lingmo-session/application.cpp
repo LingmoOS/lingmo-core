@@ -33,8 +33,10 @@
 
 // STL
 #include <optional>
+#include <qloggingcategory.h>
 
 #include "startlingmo.hpp"
+#include "debug.h"
 
 Application::Application(const QCommandLineParser &parser, QObject *parent)
     : QObject(parent), m_processManager(new ProcessManager(this)),
@@ -49,7 +51,6 @@ Application::Application(const QCommandLineParser &parser, QObject *parent)
 
   m_wayland = parser.isSet("wayland");
 
-
   m_networkProxyManager->update();
 
   // Launch Lingmo and user defined processes !
@@ -57,6 +58,12 @@ Application::Application(const QCommandLineParser &parser, QObject *parent)
 }
 
 bool Application::wayland() const { return m_wayland; }
+
+void Application::updateLaunchEnv(const QString &key, const QString &value) {
+  qCDebug(LINGMO_SESSION_D) << "Update launch env: " << key << value;
+  qputenv(key.toLatin1(), value.toLatin1());
+  m_processManager->updateLaunchEnv(key, value);
+}
 
 void Application::launch(const QString &exec, const QStringList &args) {
   QProcess process;
@@ -249,66 +256,6 @@ void Application::initKWinConfig() {
   settings.setValue("library", "org.lingmo.decoration");
   settings.setValue("theme", "");
   settings.endGroup();
-}
-
-bool Application::syncDBusEnvironment() {
-  int exitCode = 0;
-
-  // At this point all environment variables are set, let's send it to the DBus
-  // session server to update the activation environment
-  if (!QStandardPaths::findExecutable(
-           QStringLiteral("dbus-update-activation-environment"))
-           .isEmpty()) {
-    exitCode = runSync(QStringLiteral("dbus-update-activation-environment"),
-                       {QStringLiteral("--systemd"), QStringLiteral("--all")});
-  }
-
-  return exitCode == 0;
-}
-
-// Import systemd user environment.
-// Systemd read ~/.config/environment.d which applies to all systemd user unit.
-// But it won't work if lingmoDE is not started by systemd.
-void Application::importSystemdEnvrionment() {
-  auto environment = getSystemdEnvironment();
-  if (!environment) {
-    return;
-  }
-
-  for (auto &envString : environment->toStringList()) {
-    const auto env = envString.toLocal8Bit();
-    const int idx = env.indexOf('=');
-    if (Q_UNLIKELY(idx <= 0)) {
-      continue;
-    }
-
-    const auto name = env.left(idx);
-    if (isShellVariable(name) || isSessionVariable(name)) {
-      continue;
-    }
-    setEnvironmentVariable(name, env.mid(idx + 1));
-  }
-}
-
-void Application::createConfigDirectory() {
-  const QString configDir =
-      QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation);
-
-  if (!QDir().mkpath(configDir))
-    qDebug() << "Could not create config directory XDG_CONFIG_HOME: "
-             << configDir;
-}
-
-void Application::updateUserDirs() {
-  // bool isLingmoOS = QFile::exists("/etc/lingmoos");
-
-  // if (!isLingmoOS)
-  //     return;
-
-  // QProcess p;
-  // p.setEnvironment(QStringList() << "LC_ALL=C");
-  // p.start("xdg-user-dirs-update", QStringList() << "--force");
-  // p.waitForFinished(-1);
 }
 
 int Application::runSync(const QString &program, const QStringList &args,

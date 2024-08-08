@@ -16,14 +16,16 @@ set(SOURCES
         powermanager/powerproviders.cpp
 )
 
-qt5_add_dbus_adaptor(DBUS_SOURCES
+qt_add_dbus_adaptor(DBUS_SOURCES
                      com.lingmo.Session.xml
                      application.h Application
                      sessionadaptor SessionAdaptor)
-set_source_files_properties(${DBUS_SOURCES} PROPERTIES SKIP_AUTOGEN ON)
+# set_source_files_properties(${DBUS_SOURCES} PROPERTIES SKIP_AUTOGEN ON)
 
 find_package(KF5WindowSystem)
 find_package(Threads)
+
+ecm_qt_declare_logging_category(SOURCES  HEADER debug.h IDENTIFIER LINGMO_SESSION_D CATEGORY_NAME org.lingmo.session)
 
 add_executable(${TARGET} ${SOURCES} ${DBUS_SOURCES})
 target_link_libraries(${TARGET}
@@ -42,4 +44,3 @@ target_link_libraries(${TARGET}
 target_include_directories(${TARGET} PRIVATE ${CMAKE_SOURCE_DIR}/startlingmo)
 
 install(TARGETS ${TARGET} DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(FILES lingmo-xsession.desktop DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/xsessions/)

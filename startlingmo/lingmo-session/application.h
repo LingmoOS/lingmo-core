@@ -41,6 +41,8 @@ public:
   bool wayland() const;
 
 public slots:
+  void updateLaunchEnv(const QString &key, const QString &value);
+
   void logout() { m_processManager->logout(); }
 
   void reboot() {

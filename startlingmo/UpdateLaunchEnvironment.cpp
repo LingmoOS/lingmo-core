@@ -6,6 +6,7 @@
 #include <QDBusPendingReply>
  
 #include <QTimer>
+#include <qloggingcategory.h>
 
 #include "debug.h"
 #include "startlingmo.hpp"
@@ -68,12 +69,12 @@ void UpdateLaunchEnvironmentJob::start()
         const QString value = d->environment.value(varName);
  
         // plasma-session
-        QDBusMessage plasmaSessionMsg = QDBusMessage::createMethodCall(QStringLiteral("org.kde.Startup"),
-                                                                       QStringLiteral("/Startup"),
-                                                                       QStringLiteral("org.kde.Startup"),
+        QDBusMessage lingmoSessionMsg = QDBusMessage::createMethodCall(QStringLiteral("com.lingmo.Session"),
+                                                                       QStringLiteral("/Session"),
+                                                                       QStringLiteral("com.lingmo.Session"),
                                                                        QStringLiteral("updateLaunchEnv"));
-        plasmaSessionMsg.setArguments({QVariant::fromValue(varName), QVariant::fromValue(value)});
-        auto plasmaSessionReply = QDBusConnection::sessionBus().asyncCall(plasmaSessionMsg);
+        lingmoSessionMsg.setArguments({QVariant::fromValue(varName), QVariant::fromValue(value)});
+        auto plasmaSessionReply = QDBusConnection::sessionBus().asyncCall(lingmoSessionMsg);
         d->monitorReply(plasmaSessionReply);
  
         // DBus-activation environment

@@ -55,6 +55,7 @@ public:
   bool nativeEventFilter(const QByteArray &eventType, void *message,
                          long *result) override;
 
+  void updateLaunchEnv(const QString &key, const QString &value);
 private:
   Application *m_app;
   QMap<QString, QProcess *> m_systemProcess;
