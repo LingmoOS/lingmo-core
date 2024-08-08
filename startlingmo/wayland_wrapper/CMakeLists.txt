@@ -17,6 +17,7 @@ ecm_qt_declare_logging_category(lingmo_kwin_wayland_wrapper
         Warning
 )
 
-target_link_libraries(lingmo_kwin_wayland_wrapper Qt::Core Qt::DBus KF5::DBusAddons KF5::CoreAddons KWinXwaylandCommon)
+target_link_libraries(lingmo_kwin_wayland_wrapper Qt::Core Qt::DBus KWinXwaylandCommon startlingmo)
+target_include_directories(lingmo_kwin_wayland_wrapper PRIVATE ${CMAKE_SOURCE_DIR}/startlingmo)
 set_property(TARGET lingmo_kwin_wayland_wrapper PROPERTY C_STANDARD 11)
 install(TARGETS lingmo_kwin_wayland_wrapper ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})

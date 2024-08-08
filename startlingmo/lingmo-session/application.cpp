@@ -49,33 +49,8 @@ Application::Application(const QCommandLineParser &parser, QObject *parent)
 
   m_wayland = parser.isSet("wayland");
 
-  // createConfigDirectory();
-  // initKWinConfig();
-  // initLanguage();
-  // initScreenScaleFactors();
-  // initXResource();
-
-  // initEnvironments();
-
-  if (!syncDBusEnvironment()) {
-    // Startup error
-    qDebug() << "Could not sync environment to dbus.";
-    qApp->exit(1);
-  }
-
-  // We import systemd environment after we sync the dbus environment here.
-  // Otherwise it may leads to some unwanted order of applying environment
-  // variables (e.g. LANG and LC_*)
-  // ref plasma
-  importSystemdEnvrionment();
-
-  // qunsetenv("XCURSOR_THEME");
-  // qunsetenv("XCURSOR_SIZE");
-  // qunsetenv("SESSION_MANAGER");
 
   m_networkProxyManager->update();
-
-  // QTimer::singleShot(50, this, &Application::updateUserDirs);
 
   // Launch Lingmo and user defined processes !
   QTimer::singleShot(100, m_processManager, &ProcessManager::start);

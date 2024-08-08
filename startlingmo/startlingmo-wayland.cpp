@@ -10,6 +10,8 @@
 
 #include "startlingmo.hpp"
 
+#include "debug.h"
+
 extern "C" {
 #include "signal.h"
 }
@@ -72,6 +74,7 @@ int main(int argc, char **argv) {
 
   setupLingmoEnvironment();
   initLanguage();
+  initScreenScaleFactors();
 
   qputenv("XDG_SESSION_TYPE", "wayland");
 

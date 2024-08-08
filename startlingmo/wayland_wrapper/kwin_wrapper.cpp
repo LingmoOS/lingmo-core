@@ -26,9 +26,10 @@
 #include <QProcess>
 #include <QTemporaryFile>
 
-#include <KSignalHandler>
-#include <UpdateLaunchEnvironmentJob>
+#include "signalhandler.h"
+#include "UpdateLaunchEnvironment.hpp"
 
+#include <qdebug.h>
 #include <signal.h>
 
 #include "wl-socket.h"
@@ -151,7 +152,7 @@ void KWinWrapper::run()
     auto envSyncJob = new UpdateLaunchEnvironmentJob(env);
     connect(envSyncJob, &UpdateLaunchEnvironmentJob::finished, this, []() {
         // The service name is merely there to indicate to the world that we're up and ready with all envs exported
-        QDBusConnection::sessionBus().registerService(QStringLiteral("org.kde.KWinWrapper"));
+        QDBusConnection::sessionBus().registerService(QStringLiteral("org.lingmo.KWinWrapper"));
     });
 }
 
@@ -160,8 +161,8 @@ int main(int argc, char **argv)
     QCoreApplication app(argc, argv);
     app.setQuitLockEnabled(false); // don't exit when the first KJob finishes
 
-    KSignalHandler::self()->watchSignal(SIGTERM);
-    QObject::connect(KSignalHandler::self(), &KSignalHandler::signalReceived, &app, [&app](int signal) {
+    SignalHandler::self()->addSignal(SIGTERM);
+    QObject::connect(SignalHandler::self(), &SignalHandler::signalReceived, &app, [&app](int signal) {
         if (signal == SIGTERM) {
             app.quit();
         }

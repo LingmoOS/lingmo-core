@@ -13,14 +13,31 @@ find_package(Qt5 COMPONENTS Core DBus REQUIRED)
 find_package(ECM ${KF6_MIN_VERSION} REQUIRED NO_MODULE)
 list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 
+include(KDEInstallDirs)
+include(FindKWinPath)
+include(ECMQtDeclareLoggingCategory)
+
+find_kwin_wayland_bin_path()
+find_kwin_bin_path()
+
+configure_file(config-startlingmo.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-startlingmo.h)
+
 find_package(KF5 REQUIRED COMPONENTS DBusAddons CoreAddons)
 
 find_package(LibKWorkspace REQUIRED)
 
 find_package(KF5Wayland REQUIRED)
 
+SET(startlingmo_SRCS
+    startlingmo.cpp 
+    daemon-helper.cpp 
+    UpdateLaunchEnvironment.cpp
+    signalhandler.cpp
+)
 
-add_library(startlingmo OBJECT startlingmo.cpp property.cpp)
+ecm_qt_declare_logging_category(startlingmo_SRCS  HEADER debug.h IDENTIFIER LINGMO_STARTUP CATEGORY_NAME org.lingmo.startup)
+
+add_library(startlingmo OBJECT ${startlingmo_SRCS})
 target_link_libraries(startlingmo 
     PUBLIC 
         Qt5::Core
@@ -38,15 +55,6 @@ target_link_libraries(startlingmo-wayland
         Qt5::Core
         Qt5::DBus
 )
-
-include(KDEInstallDirs)
-include(FindKWinPath)
-include(ECMQtDeclareLoggingCategory)
-
-find_kwin_wayland_bin_path()
-find_kwin_bin_path()
-
-configure_file(config-startlingmo.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-startlingmo.h)
 
 add_subdirectory(lingmo-session) 
 add_subdirectory(wayland_wrapper)

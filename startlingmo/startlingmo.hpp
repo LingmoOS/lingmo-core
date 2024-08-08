@@ -12,8 +12,6 @@
 #include <QStringList>
 #include <optional>
 
-Q_DECLARE_LOGGING_CATEGORY(LINGMO_STARTUP)
-
 void sigtermHandler(int signalNumber);
 
 QStringList allServices(const QLatin1String &prefix);
@@ -57,4 +55,6 @@ struct KillBeforeDeleter {
 };
 
 bool isSessionVariable(const QByteArray &name);
+
+void initScreenScaleFactors();
 #endif // STARTLINGMO_HPP

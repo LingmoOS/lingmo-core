@@ -14,9 +14,6 @@ set(SOURCES
 
         powermanager/power.cpp
         powermanager/powerproviders.cpp
-
-        daemon-helper.cpp
-        daemon-helper.h
 )
 
 qt5_add_dbus_adaptor(DBUS_SOURCES

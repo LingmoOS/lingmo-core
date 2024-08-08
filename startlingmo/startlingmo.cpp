@@ -14,12 +14,14 @@
 #include <QProcess>
 #include <QSettings>
 #include <QStandardPaths>
-#include <UpdateLaunchEnvironmentJob>
+#include <QtMath>
+
+#include "debug.h"
+
+#include "UpdateLaunchEnvironment.hpp"
 
 extern QTextStream out;
 QTextStream out(stderr);
-
-Q_LOGGING_CATEGORY(LINGMO_STARTUP, "org.lingmo.startup")
 
 void sigtermHandler(int signalNumber) {
   Q_UNUSED(signalNumber)
@@ -457,4 +459,20 @@ bool startLingmoSession(bool wayland) {
     e.exec();
   }
   return rc;
+}
+
+void initScreenScaleFactors() {
+  QSettings settings(QSettings::UserScope, "lingmoos", "theme");
+  qreal scaleFactor = settings.value("PixelRatio", 1.0).toReal();
+
+  qputenv("QT_SCREEN_SCALE_FACTORS", QByteArray::number(scaleFactor));
+
+  // for Gtk
+  if (qFloor(scaleFactor) > 1) {
+    qputenv("GDK_SCALE", QByteArray::number(scaleFactor, 'g', 0));
+    qputenv("GDK_DPI_SCALE", QByteArray::number(1.0 / scaleFactor, 'g', 3));
+  } else {
+    qputenv("GDK_SCALE", QByteArray::number(qFloor(scaleFactor), 'g', 0));
+    qputenv("GDK_DPI_SCALE", QByteArray::number(qFloor(scaleFactor), 'g', 0));
+  }
 }
