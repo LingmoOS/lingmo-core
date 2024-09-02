@@ -476,3 +476,38 @@ void initScreenScaleFactors() {
     qputenv("GDK_DPI_SCALE", QByteArray::number(qFloor(scaleFactor), 'g', 0));
   }
 }
+
+void messageBox(const QString &text) {
+  out << text;
+  runSync(QStringLiteral("xmessage"),
+          {QStringLiteral("-geometry"), QStringLiteral("500x100"), text});
+}
+
+void cleanupPlasmaEnvironment(
+    const std::optional<QProcessEnvironment> &oldSystemdEnvironment) {
+
+  if (!oldSystemdEnvironment) {
+    return;
+  }
+
+  auto currentEnv = getSystemdEnvironment();
+  if (!currentEnv) {
+    return;
+  }
+
+  // According to systemd documentation:
+  // If a variable is listed in both, the variable is set after this method
+  // returns, i.e. the set list overrides the unset list. So this will
+  // effectively restore the state to the values in oldSystemdEnvironment.
+  QDBusMessage message = QDBusMessage::createMethodCall(
+      QStringLiteral("org.freedesktop.systemd1"),
+      QStringLiteral("/org/freedesktop/systemd1"),
+      QStringLiteral("org.freedesktop.systemd1.Manager"),
+      QStringLiteral("UnsetAndSetEnvironment"));
+  message.setArguments({currentEnv.value().keys(),
+                        oldSystemdEnvironment.value().toStringList()});
+
+  // The session program gonna quit soon, ensure the message is flushed.
+  auto reply = QDBusConnection::sessionBus().asyncCall(message);
+  reply.waitForFinished();
+}

@@ -13,9 +13,7 @@
 
 #include "debug.h"
 
-extern "C" {
 #include "signal.h"
-}
 
 extern QTextStream out;
 

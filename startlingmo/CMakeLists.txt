@@ -56,10 +56,21 @@ target_link_libraries(startlingmo-wayland
         Qt5::DBus
 )
 
+add_executable(startlingmo-x11 startlingmo-x11.cpp)
+target_link_libraries(startlingmo-x11  
+    PRIVATE 
+        startlingmo
+    PUBLIC
+        Qt5::Core
+        Qt5::DBus
+)
+
 add_subdirectory(lingmo-session) 
 add_subdirectory(wayland_wrapper)
 
 install(TARGETS startlingmo-wayland ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
+install(TARGETS startlingmo-x11 ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
 install(PROGRAMS lingmo-sourceenv.sh DESTINATION ${KDE_INSTALL_LIBEXECDIR})
 install(FILES lingmo-wayland-session.desktop DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/wayland-sessions/)
+install(FILES lingmo-xorg-session.desktop DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/xsessions/)
 

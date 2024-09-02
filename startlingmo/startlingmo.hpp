@@ -57,4 +57,10 @@ struct KillBeforeDeleter {
 bool isSessionVariable(const QByteArray &name);
 
 void initScreenScaleFactors();
+
+void messageBox(const QString &text);
+
+void cleanupPlasmaEnvironment(
+    const std::optional<QProcessEnvironment> &oldSystemdEnvironment);
+
 #endif // STARTLINGMO_HPP
