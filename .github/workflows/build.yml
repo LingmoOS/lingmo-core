@@ -16,13 +16,13 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Update repository
-      run: sudo apt-get update -y
+      run:  apt-get update -y
 
     - name: Install the basic dev packages
-      run: sudo apt-get install -y equivs curl git devscripts lintian build-essential automake autotools-dev cmake g++
+      run:  apt-get install -y equivs curl git devscripts lintian build-essential automake autotools-dev cmake g++
 
     - name: Install build dependencies
-      run: sudo mk-build-deps -i -t "apt-get --yes" -r
+      run:  mk-build-deps -i -t "apt-get --yes" -r
 
     - name: Build Package
-      run: sudo dpkg-buildpackage -b -uc -us -j$(nproc)
+      run:  dpkg-buildpackage -b -uc -us -j$(nproc)
