@@ -20,13 +20,14 @@
 #ifndef PROCESSMANAGER_H
 #define PROCESSMANAGER_H
 
-#include <QApplication>
 #include <QAbstractNativeEventFilter>
-#include <QObject>
-#include <QProcess>
+#include <QApplication>
 #include <QEventLoop>
 #include <QMap>
+#include <QObject>
+#include <QProcess>
 #include <memory>
+#include <qobjectdefs.h>
 
 #include "daemon-helper.h"
 
@@ -70,6 +71,58 @@ private:
 
     bool m_wmStarted;
     QEventLoop *m_waitLoop;
+};
+
+using namespace LINGMO_SESSION;
+/**
+ * Launches a process, and waits for the process to start
+ */
+class LaunchProcess : public Job {
+  Q_OBJECT
+public:
+  LaunchProcess(
+      const QString &process, const QStringList &args,
+      const QProcessEnvironment &additionalEnv = QProcessEnvironment());
+  void start() override;
+
+private:
+  QProcess *m_process;
+};
+
+/**
+ * Launches a process, and waits for the process to finish
+ */
+class StartProcessJob : public Job {
+  Q_OBJECT
+public:
+  StartProcessJob(
+      const QString &process, const QStringList &args,
+      const QProcessEnvironment &additionalEnv = QProcessEnvironment());
+  void start() override;
+
+public Q_SLOTS:
+  void finished(int exitCode, QProcess::ExitStatus e);
+
+private:
+  QProcess *m_process;
+};
+
+/**
+ * Launches a process, and waits for the service to appear on the session bus
+ */
+class StartServiceJob : public Job {
+  Q_OBJECT
+public:
+  StartServiceJob(
+      const QString &process, const QStringList &args, const QString &serviceId,
+      const QProcessEnvironment &additionalEnv = QProcessEnvironment());
+
+  void start() override;
+
+private:
+  QProcess *m_process;
+  const QString m_serviceId;
+  const QProcessEnvironment m_additionalEnv;
 };
 
 #endif // PROCESSMANAGER_H
