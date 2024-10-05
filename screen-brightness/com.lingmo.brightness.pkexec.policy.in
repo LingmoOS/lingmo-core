@@ -11,5 +11,5 @@
       <allow_active>yes</allow_active>
     </defaults>
     <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/lingmo-screen-brightness</annotate>
-  </action
+  </action>
 </policyconfig>
