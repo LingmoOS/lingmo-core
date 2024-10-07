@@ -1,19 +1,18 @@
 {
   "image": "docker.io/library/debian:trixie",
-"features": {
+  "features": {
   },
-  // 设置工作区路径
-  "workspaceFolder": "/workspace",
   // VSCode 扩展
   "customizations": {
     "vscode": {
       "extensions": [
-        "ms-azuretools.vscode-docker"
+        "ms-azuretools.vscode-docker",
+        "ms-vscode.cpptools-extension-pack"
       ]
     }
   },
   // 初始化命令
-  "postCreateCommand": "apt-get update && apt-get install -y curl git",
+  "postCreateCommand": "apt-get update && apt-get install -y curl git build-essential cmake ninja-build",
   // 创建时自动运行的任务
   "postAttachCommand": "echo 'Codespace ready!'",
   // 启动终端配置
