@@ -85,7 +85,7 @@ ThemeManager::ThemeManager(QObject *parent)
     m_cursorTheme = m_settings->value("CursorTheme", "default").toString();
     m_cursorSize = m_settings->value("CursorSize", 24).toInt();
     m_iconTheme = m_settings->value("IconTheme", "Crule").toString();
-    m_darkIconTheme = m_settings->value("IconTheme", "Crule-dark").toString();
+    m_darkIconTheme = m_settings->value("DarkIconTheme", "Crule-dark").toString();
 
     // Start the DE and need to update the settings again.
     updateGtk3Config();
