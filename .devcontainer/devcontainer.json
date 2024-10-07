@@ -1,0 +1,25 @@
+{
+  "image": "docker.io/library/debian:trixie",
+"features": {
+  },
+  // 设置工作区路径
+  "workspaceFolder": "/workspace",
+  // VSCode 扩展
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  },
+  // 初始化命令
+  "postCreateCommand": "apt-get update && apt-get install -y curl git",
+  // 创建时自动运行的任务
+  "postAttachCommand": "echo 'Codespace ready!'",
+  // 启动终端配置
+  "settings": {
+    "terminal.integrated.shell.linux": "/usr/bin/bash"
+  },
+  // 其他需要的 Docker 配置
+  "remoteUser": "root"
+}
