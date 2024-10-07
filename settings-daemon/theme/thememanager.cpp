@@ -133,6 +133,8 @@ void ThemeManager::setDarkMode(bool darkMode)
     m_isDarkMode = darkMode;
     m_settings->setValue("DarkMode", darkMode);
 
+    setIconTheme(darkMode ? "Crule-dark" : "Crule");
+
     updateGtk3Config();
 
     emit darkModeChanged(m_isDarkMode);
@@ -456,7 +458,7 @@ void ThemeManager::updateGtk3Config()
     // dark mode
     settings.setValue("gtk-application-prefer-dark-theme", isDarkMode());
     // icon theme
-    settings.setValue("gtk-icon-theme-name", isDarkMode() ? "Crule-dark" : "Crule");
+    settings.setValue("gtk-icon-theme-name", m_iconTheme);
     // other
     settings.setValue("gtk-enable-animations", true);
     // theme
