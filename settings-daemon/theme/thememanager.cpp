@@ -85,6 +85,7 @@ ThemeManager::ThemeManager(QObject *parent)
     m_cursorTheme = m_settings->value("CursorTheme", "default").toString();
     m_cursorSize = m_settings->value("CursorSize", 24).toInt();
     m_iconTheme = m_settings->value("IconTheme", "Crule").toString();
+    m_darkIconTheme = m_settings->value("IconTheme", "Crule-dark").toString();
 
     // Start the DE and need to update the settings again.
     updateGtk3Config();
@@ -132,8 +133,6 @@ void ThemeManager::setDarkMode(bool darkMode)
 
     m_isDarkMode = darkMode;
     m_settings->setValue("DarkMode", darkMode);
-
-    setIconTheme(darkMode ? "Crule-dark" : "Crule");
 
     updateGtk3Config();
 
@@ -458,7 +457,7 @@ void ThemeManager::updateGtk3Config()
     // dark mode
     settings.setValue("gtk-application-prefer-dark-theme", isDarkMode());
     // icon theme
-    settings.setValue("gtk-icon-theme-name", m_iconTheme);
+    settings.setValue("gtk-icon-theme-name", isDarkMode() ? m_darkIconTheme : m_iconTheme);
     // other
     settings.setValue("gtk-enable-animations", true);
     // theme
@@ -616,6 +615,22 @@ void ThemeManager::setIconTheme(const QString &iconTheme)
 
     m_iconTheme = iconTheme;
     m_settings->setValue("IconTheme", m_iconTheme);
+    updateGtk3Config();
+    emit iconThemeChanged();
+}
+
+QString ThemeManager::darkIconTheme() const
+{
+    return m_darkIconTheme;
+}
+
+void ThemeManager::setDarkIconTheme(const QString &iconTheme)
+{
+    if (m_darkIconTheme == iconTheme)
+        return;
+
+    m_darkIconTheme = iconTheme;
+    m_settings->setValue("DarkIconTheme", m_iconTheme);
     updateGtk3Config();
     emit iconThemeChanged();
 }
