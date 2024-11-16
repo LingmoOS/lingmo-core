@@ -24,49 +24,56 @@
 #include <chrono>
 #include <thread>
 
-#include "processmanager.h"
 #include "networkproxymanager.h"
 #include "powermanager/power.h"
+#include "processmanager.h"
 
-class Application : public QApplication
-{
+class Application : public QApplication {
     Q_OBJECT
 
 public:
-    explicit Application(int &argc, char **argv);
+    explicit Application(int& argc, char** argv);
 
     bool wayland() const;
 
 public slots:
-    void logout() {
+    void logout()
+    {
         m_processManager->logout();
     }
 
-    void reboot() {
+    void reboot()
+    {
         m_power.reboot();
         QCoreApplication::exit(0);
     }
 
-    void powerOff() {
+    void powerOff()
+    {
         m_power.shutdown();
         QCoreApplication::exit(0);
     }
 
-    void suspend() {
+    void suspend()
+    {
         m_power.suspend();
     }
 
-    [[maybe_unused]] void startDesktopProcess() {
+    [[maybe_unused]] void startDesktopProcess()
+    {
         // Start Lingmo Desktop Environment
         m_processManager->startDesktopProcess();
     }
 
-    [[maybe_unused]] void updateNetworkProxy() {
+    [[maybe_unused]] void updateNetworkProxy()
+    {
         m_networkProxyManager->update();
     }
 
-    void launch(const QString &exec, const QStringList &args);
-    void launch(const QString &exec, const QString &workingDir, const QStringList &args);
+    [[maybe_unused]] void updateLaunchEnv(const QString &key, const QString &value);
+
+    void launch(const QString& exec, const QStringList& args);
+    void launch(const QString& exec, const QString& workingDir, const QStringList& args);
 
 private:
     void initEnvironments();
@@ -78,11 +85,11 @@ private:
     void importSystemdEnvrionment();
     void createConfigDirectory();
     void updateUserDirs();
-    int runSync(const QString &program, const QStringList &args, const QStringList &env = {});
+    int runSync(const QString& program, const QStringList& args, const QStringList& env = {});
 
 private:
-    ProcessManager *m_processManager;
-    NetworkProxyManager *m_networkProxyManager;
+    ProcessManager* m_processManager;
+    NetworkProxyManager* m_networkProxyManager;
     Power m_power;
 
     bool m_wayland;

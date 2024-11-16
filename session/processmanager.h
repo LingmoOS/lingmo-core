@@ -32,6 +32,10 @@
 
 #include <KJob>
 
+class ProcessManager;
+
+extern ProcessManager* s_self;
+
 class Application;
 class ProcessManager : public QObject, public QAbstractNativeEventFilter {
     Q_OBJECT
@@ -65,6 +69,9 @@ public:
     // Start a custom process
     bool startDetached(QProcess *process);
 
+    // Update the launch environment for a process
+    void updateLaunchEnv(const QString& key, const QString& value);
+
 private:
     Application* m_app;
     QMap<QString, QProcess*> m_systemProcess;
@@ -82,8 +89,6 @@ private:
 
     bool m_wmStarted;
     QEventLoop* m_waitLoop;
-
-    static ProcessManager* s_self;
 };
 
 /**

@@ -28,5 +28,9 @@
       <arg name="workingDirectory" type="s" direction="in"/>
       <arg name="args" type="as" direction="in"/>
     </method>
+    <method name="updateLaunchEnv">
+      <arg name="key" type="s" direction="in"/>
+       <arg name="value" type="s" direction="in"/>
+    </method>
   </interface>
 </node>
