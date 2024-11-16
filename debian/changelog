@@ -1,3 +1,9 @@
+lingmo-core (2.0.2) unstable; urgency=high
+
+  * Change to native package.
+
+ -- LingmoOS OS Team <team@lingmo.org>  Fri, 4 Oct 2024 12:50:00 +0800
+
 lingmo-core (2.0.1) unstable; urgency=high
 
   [ Elysia ]

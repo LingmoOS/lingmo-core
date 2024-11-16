@@ -47,6 +47,7 @@ class ThemeManager : public QObject
     Q_PROPERTY(QString cursorTheme READ cursorTheme WRITE setCursorTheme NOTIFY cursorThemeChanged)
     Q_PROPERTY(int cursorSize READ cursorSize WRITE setCursorSize NOTIFY cursorSizeChanged)
     Q_PROPERTY(QString iconTheme READ iconTheme WRITE setIconTheme NOTIFY iconThemeChanged)
+    Q_PROPERTY(QString darkIconTheme READ darkIconTheme WRITE setDarkIconTheme NOTIFY iconThemeChanged)
 
 public:
     static ThemeManager *self();
@@ -114,6 +115,9 @@ public:
     QString iconTheme() const;
     void setIconTheme(const QString &iconTheme);
 
+    QString darkIconTheme() const;
+    void setDarkIconTheme(const QString &iconTheme);
+
     void updateFontConfig();
 
 signals:
@@ -152,7 +156,9 @@ private:
     QString m_cursorTheme;
     int m_cursorSize;
 
-    QString m_iconTheme;
+    QString m_iconTheme = "Crule";
+
+    QString m_darkIconTheme = "Crule-dark";
 };
 
 #endif
