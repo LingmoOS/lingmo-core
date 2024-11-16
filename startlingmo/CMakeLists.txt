@@ -65,8 +65,8 @@ target_link_libraries(startlingmo-x11
         Qt5::DBus
 )
 
-add_subdirectory(lingmo-session) 
-add_subdirectory(wayland_wrapper)
+# add_subdirectory(lingmo-session) 
+#add_subdirectory(wayland_wrapper)
 
 install(TARGETS startlingmo-wayland ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
 install(TARGETS startlingmo-x11 ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})

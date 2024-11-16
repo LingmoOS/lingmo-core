@@ -1,3 +1,8 @@
+find_package(ECM REQUIRED NO_MODULE)
+list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
+
+include(ECMQtDeclareLoggingCategory)
+
 add_subdirectory(lib)
 
 add_executable(lingmo_kwin_wayland_wrapper)
