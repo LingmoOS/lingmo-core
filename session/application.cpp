@@ -106,6 +106,13 @@ Application::Application(int& argc, char** argv)
 
     m_wayland = parser.isSet(waylandOption);
 
+    if (m_wayland) {
+        qputenv("XDG_SESSION_TYPE", "wayland");
+        qputenv("QT_QPA_PLATFORM", "wayland");
+    } else {
+        qputenv("QT_QPA_PLATFORM", QByteArrayLiteral("xcb"));
+    }
+
     createConfigDirectory();
     initKWinConfig();
     initLanguage();

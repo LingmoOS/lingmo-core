@@ -55,7 +55,7 @@
 <context>
     <name>ThemeManager</name>
     <message>
-        <location filename="../theme/thememanager.cpp" line="293"/>
+        <location filename="../theme/thememanager.cpp" line="294"/>
         <source>Screen scaling needs to be re-login to take effect</source>
         <translation type="unfinished"></translation>
     </message>
