@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2023-2024 LingmoOS Team.
  *
- * Author:     revenmartin <revenmartin@gmail.com>
+ * Author:     Reion Wong <reion@lingmoos.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,21 +17,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "application.h"
-#include <QQuickWindow>
+#ifndef NETWORKPROXYMANAGER_H
+#define NETWORKPROXYMANAGER_H
 
-int main(int argc, char *argv[])
+#include <QObject>
+#include <QSettings>
+
+class NetworkProxyManager : public QObject
 {
-    // putenv((char *)"SESSION_MANAGER=");
+    Q_OBJECT
 
-    // force xcb QPA plugin as session manager server is very X11 specific.
-    qputenv("QT_QPA_PLATFORM", QByteArrayLiteral("xcb"));
+public:
+    explicit NetworkProxyManager(QObject *parent = nullptr);
 
-    QQuickWindow::setDefaultAlphaBuffer(true);
-    QCoreApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
+    void update();
 
-    Application a(argc, argv);
-    a.setQuitOnLastWindowClosed(false);
+private:
+    QSettings m_settings;
 
-    return a.exec();
-}
+    int m_flag;
+    bool m_useSameProxy;
+
+    QString m_scriptProxy;
+    QString m_httpProxy;
+    QString m_ftpProxy;
+    QString m_socksProxy;
+
+    QString m_httpProxyPort;
+    QString m_ftpProxyPort;
+    QString m_socksProxyPort;
+};
+
+#endif // NETWORKPROXYMANAGER_H

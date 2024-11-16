@@ -127,14 +127,6 @@ Application::Application(int &argc, char **argv)
     qunsetenv("XCURSOR_SIZE");
     qunsetenv("SESSION_MANAGER");
 
-    if (m_wayland) {
-        qputenv("XDG_SESSION_TYPE", "wayland");
-        qputenv("QT_QPA_PLATFORM", "wayland");
-    } else {
-        // force xcb QPA plugin as session manager server is very X11 specific.
-        qputenv("QT_QPA_PLATFORM", QByteArrayLiteral("xcb")); 
-    }
-
     m_networkProxyManager->update();
 
     QTimer::singleShot(50, this, &Application::updateUserDirs);

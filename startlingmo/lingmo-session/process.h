@@ -17,21 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "application.h"
-#include <QQuickWindow>
+#ifndef PROCESS_H
+#define PROCESS_H
 
-int main(int argc, char *argv[])
+#include <QProcess>
+
+class Process : public QProcess
 {
-    // putenv((char *)"SESSION_MANAGER=");
+    Q_OBJECT
 
-    // force xcb QPA plugin as session manager server is very X11 specific.
-    qputenv("QT_QPA_PLATFORM", QByteArrayLiteral("xcb"));
+public:
+    Process(QObject *parent = nullptr);
+    ~Process();
+};
 
-    QQuickWindow::setDefaultAlphaBuffer(true);
-    QCoreApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
-
-    Application a(argc, argv);
-    a.setQuitOnLastWindowClosed(false);
-
-    return a.exec();
-}
+#endif

@@ -18,20 +18,28 @@
  */
 
 #include "application.h"
+#include <QCommandLineOption>
+#include <QCoreApplication>
 #include <QQuickWindow>
+#include <qcommandlineparser.h>
 
-int main(int argc, char *argv[])
-{
-    // putenv((char *)"SESSION_MANAGER=");
+int main(int argc, char *argv[]) {
+  QQuickWindow::setDefaultAlphaBuffer(true);
+  QCoreApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
 
-    // force xcb QPA plugin as session manager server is very X11 specific.
-    qputenv("QT_QPA_PLATFORM", QByteArrayLiteral("xcb"));
+  QCoreApplication app(argc, argv);
 
-    QQuickWindow::setDefaultAlphaBuffer(true);
-    QCoreApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
+  QCommandLineParser parser;
+  parser.setApplicationDescription(QStringLiteral("Lingmo Session"));
+  parser.addHelpOption();
 
-    Application a(argc, argv);
-    a.setQuitOnLastWindowClosed(false);
+  QCommandLineOption waylandOption(QStringList() << "w"
+                                                 << "wayland"
+                                                 << "Wayland Mode");
+  parser.addOption(waylandOption);
+  parser.process(app);
 
-    return a.exec();
+  new Application(parser, &app);
+
+  return app.exec();
 }
