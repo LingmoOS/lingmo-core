@@ -18,16 +18,17 @@
  */
 
 #include "application.h"
+#include "debug.h"
 #include "sessionadaptor.h"
 
 // Qt
 #include <QCommandLineOption>
 #include <QDBusConnection>
-#include <QStandardPaths>
-#include <QSettings>
-#include <QProcess>
 #include <QDebug>
 #include <QDir>
+#include <QProcess>
+#include <QSettings>
+#include <QStandardPaths>
 
 #include <QDBusConnectionInterface>
 #include <QDBusServiceWatcher>
@@ -39,9 +40,9 @@ std::optional<QStringList> getSystemdEnvironment()
 {
     QStringList list;
     auto msg = QDBusMessage::createMethodCall(QStringLiteral("org.freedesktop.systemd1"),
-                                              QStringLiteral("/org/freedesktop/systemd1"),
-                                              QStringLiteral("org.freedesktop.DBus.Properties"),
-                                              QStringLiteral("Get"));
+        QStringLiteral("/org/freedesktop/systemd1"),
+        QStringLiteral("org.freedesktop.DBus.Properties"),
+        QStringLiteral("Get"));
     msg << QStringLiteral("org.freedesktop.systemd1.Manager") << QStringLiteral("Environment");
     auto reply = QDBusConnection::sessionBus().call(msg);
     if (reply.type() == QDBusMessage::ErrorMessage) {
@@ -61,12 +62,12 @@ std::optional<QStringList> getSystemdEnvironment()
     return variant.toStringList();
 }
 
-bool isShellVariable(const QByteArray &name)
+bool isShellVariable(const QByteArray& name)
 {
     return name == "_" || name.startsWith("SHLVL");
 }
 
-bool isSessionVariable(const QByteArray &name)
+bool isSessionVariable(const QByteArray& name)
 {
     // Check is variable is specific to session.
     return name == "DISPLAY" || name == "XAUTHORITY" || //
@@ -74,14 +75,14 @@ bool isSessionVariable(const QByteArray &name)
         name.startsWith("XDG_");
 }
 
-void setEnvironmentVariable(const QByteArray &name, const QByteArray &value)
+void setEnvironmentVariable(const QByteArray& name, const QByteArray& value)
 {
     if (qgetenv(name) != value) {
         qputenv(name, value);
     }
 }
 
-Application::Application(int &argc, char **argv)
+Application::Application(int& argc, char** argv)
     : QApplication(argc, argv)
     , m_processManager(new ProcessManager(this))
     , m_networkProxyManager(new NetworkProxyManager)
@@ -97,11 +98,20 @@ Application::Application(int &argc, char **argv)
     parser.setApplicationDescription(QStringLiteral("Lingmo Session"));
     parser.addHelpOption();
 
-    QCommandLineOption waylandOption(QStringList() << "w" << "wayland" << "Wayland Mode");
+    QCommandLineOption waylandOption(QStringList() << "w"
+                                                   << "wayland"
+                                                   << "Wayland Mode");
     parser.addOption(waylandOption);
     parser.process(*this);
 
     m_wayland = parser.isSet(waylandOption);
+
+    if (m_wayland) {
+        qputenv("XDG_SESSION_TYPE", "wayland");
+        qputenv("QT_QPA_PLATFORM", "wayland");
+    } else {
+        qputenv("QT_QPA_PLATFORM", QByteArrayLiteral("xcb"));
+    }
 
     createConfigDirectory();
     initKWinConfig();
@@ -140,7 +150,7 @@ bool Application::wayland() const
     return m_wayland;
 }
 
-void Application::launch(const QString &exec, const QStringList &args)
+void Application::launch(const QString& exec, const QStringList& args)
 {
     QProcess process;
     process.setProgram(exec);
@@ -149,7 +159,7 @@ void Application::launch(const QString &exec, const QStringList &args)
     process.startDetached();
 }
 
-void Application::launch(const QString &exec, const QString &workingDir, const QStringList &args)
+void Application::launch(const QString& exec, const QString& workingDir, const QStringList& args)
 {
     QProcess process;
     process.setProgram(exec);
@@ -183,7 +193,7 @@ void Application::initEnvironments()
     // Qt
     qputenv("QT_QPA_PLATFORMTHEME", "lingmo");
     qputenv("QT_PLATFORM_PLUGIN", "lingmo");
-    
+
     // ref: https://stackoverflow.com/questions/34399993/qml-performance-issue-when-updating-an-item-in-presence-of-many-non-overlapping
     qputenv("QT_QPA_UPDATE_IDLE_TIME", "10");
 
@@ -208,7 +218,7 @@ void Application::initLanguage()
         if (file.open(QIODevice::ReadOnly)) {
             QStringList lines = QString(file.readAll()).split('\n');
 
-            for (const QString &line : lines) {
+            for (const QString& line : lines) {
                 if (line.startsWith('#'))
                     continue;
 
@@ -276,14 +286,14 @@ void Application::initXResource()
                                   "Xft.antialias: %4\n"
                                   "Xft.hintstyle: %5\n"
                                   "Xft.rgba: rgb")
-                          .arg(fontDpi)
-                          .arg(cursorTheme)
-                          .arg(cursorSize)
-                          .arg(xftAntialias)
-                          .arg(xftHintStyle);
+                              .arg(fontDpi)
+                              .arg(cursorTheme)
+                              .arg(cursorSize)
+                              .arg(xftAntialias)
+                              .arg(xftHintStyle);
 
     QProcess p;
-    p.start(QStringLiteral("xrdb"), {QStringLiteral("-quiet"), QStringLiteral("-merge"), QStringLiteral("-nocpp")});
+    p.start(QStringLiteral("xrdb"), { QStringLiteral("-quiet"), QStringLiteral("-merge"), QStringLiteral("-nocpp") });
     p.setProcessChannelMode(QProcess::ForwardedChannels);
     p.write(datas.toLatin1());
     p.closeWriteChannel();
@@ -293,7 +303,7 @@ void Application::initXResource()
     qputenv("LINGMO_FONT_DPI", QByteArray::number(fontDpi));
 
     // Init cursor
-    runSync("cupdatecursor", {cursorTheme, QString::number(cursorSize)});
+    runSync("cupdatecursor", { cursorTheme, QString::number(cursorSize) });
     // qputenv("XCURSOR_THEME", cursorTheme.toLatin1());
     // qputenv("XCURSOR_SIZE", QByteArray::number(cursorSize * scaleFactor));
 }
@@ -301,7 +311,7 @@ void Application::initXResource()
 void Application::initKWinConfig()
 {
     QSettings settings(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/kwinrc",
-                       QSettings::IniFormat);
+        QSettings::IniFormat);
 
     settings.beginGroup("Effect-Blur");
     settings.setValue("BlurStrength", 10);
@@ -346,7 +356,7 @@ void Application::importSystemdEnvrionment()
         return;
     }
 
-    for (auto &envString : environment.value()) {
+    for (auto& envString : environment.value()) {
         const auto env = envString.toLocal8Bit();
         const int idx = env.indexOf('=');
         if (Q_UNLIKELY(idx <= 0)) {
@@ -382,7 +392,7 @@ void Application::updateUserDirs()
     // p.waitForFinished(-1);
 }
 
-int Application::runSync(const QString &program, const QStringList &args, const QStringList &env)
+int Application::runSync(const QString& program, const QStringList& args, const QStringList& env)
 {
     QProcess p;
 
@@ -398,4 +408,11 @@ int Application::runSync(const QString &program, const QStringList &args, const 
     }
 
     return p.exitCode();
+}
+
+void Application::updateLaunchEnv(const QString& key, const QString& value)
+{
+    qCDebug(LINGMO_SESSION_D) << "Update launch env: " << key << value;
+    qputenv(key.toLatin1(), value.toLatin1());
+    m_processManager->updateLaunchEnv(key, value);
 }

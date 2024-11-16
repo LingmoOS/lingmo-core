@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Exec=lingmo-session --wayland
+Name=Lingmo Desktop (Wayland Experimental)
+Keywords=session
+Comment=session

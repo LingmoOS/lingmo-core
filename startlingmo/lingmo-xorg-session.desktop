@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Exec=startlingmo-x11
+TryExec=startlingmo-x11
+Name=Lingmo Desktop (Xorg Session)
+Keywords=session
+Comment=session

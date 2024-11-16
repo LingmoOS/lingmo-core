@@ -20,24 +20,35 @@
 #ifndef PROCESSMANAGER_H
 #define PROCESSMANAGER_H
 
-#include <QApplication>
 #include <QAbstractNativeEventFilter>
-#include <QObject>
-#include <QProcess>
+#include <QApplication>
 #include <QEventLoop>
 #include <QMap>
+#include <QObject>
+#include <QProcess>
 #include <memory>
 
 #include "daemon-helper.h"
 
+#include <KJob>
+
+class ProcessManager;
+
+extern ProcessManager* s_self;
+
 class Application;
-class ProcessManager : public QObject, public QAbstractNativeEventFilter
-{
+class ProcessManager : public QObject, public QAbstractNativeEventFilter {
     Q_OBJECT
 
 public:
-    explicit ProcessManager(Application *app, QObject *parent = nullptr);
+    explicit ProcessManager(Application* app, QObject* parent = nullptr);
     ~ProcessManager();
+
+    static ProcessManager* self()
+    {
+        Q_ASSERT(s_self);
+        return s_self;
+    }
 
     void start();
     void logout();
@@ -52,12 +63,20 @@ public:
      */
     void loadAutoStartProcess();
 
-    bool nativeEventFilter(const QByteArray & eventType, void * message, long * result) override;
+    bool nativeEventFilter(const QByteArray& eventType, void* message,
+        long* result) override;
+
+    // Start a custom process
+    bool startDetached(QProcess *process);
+
+    // Update the launch environment for a process
+    void updateLaunchEnv(const QString& key, const QString& value);
 
 private:
-    Application *m_app;
-    QMap<QString, QProcess *> m_systemProcess;
-    QMap<QString, QProcess *> m_autoStartProcess;
+    Application* m_app;
+    QMap<QString, QProcess*> m_systemProcess;
+    QMap<QString, QProcess*> m_autoStartProcess;
+    QVector<QProcess *> m_processes;
 
     // Daemon helper for desktop components
     std::shared_ptr<LINGMO_SESSION::Daemon> m_desktopAutoStartD;
@@ -69,7 +88,57 @@ private:
     std::shared_ptr<LINGMO_SESSION::Daemon> m_userAutoStartD;
 
     bool m_wmStarted;
-    QEventLoop *m_waitLoop;
+    QEventLoop* m_waitLoop;
 };
 
+/**
+ * Launches a process, and waits for the process to start
+ */
+class LaunchProcess : public KJob {
+    Q_OBJECT
+public:
+    LaunchProcess(
+        const QString& process, const QStringList& args,
+        const QProcessEnvironment& additionalEnv = QProcessEnvironment());
+    void start() override;
+
+private:
+    QProcess* m_process;
+};
+
+/**
+ * Launches a process, and waits for the process to finish
+ */
+class StartProcessJob : public KJob {
+    Q_OBJECT
+public:
+    StartProcessJob(
+        const QString& process, const QStringList& args,
+        const QProcessEnvironment& additionalEnv = QProcessEnvironment());
+    void start() override;
+
+public Q_SLOTS:
+    void finished(int exitCode, QProcess::ExitStatus e);
+
+private:
+    QProcess* m_process;
+};
+
+/**
+ * Launches a process, and waits for the service to appear on the session bus
+ */
+class StartServiceJob : public KJob {
+    Q_OBJECT
+public:
+    StartServiceJob(
+        const QString& process, const QStringList& args, const QString& serviceId,
+        const QProcessEnvironment& additionalEnv = QProcessEnvironment());
+
+    void start() override;
+
+private:
+    QProcess* m_process;
+    const QString m_serviceId;
+    const QProcessEnvironment m_additionalEnv;
+};
 #endif // PROCESSMANAGER_H
