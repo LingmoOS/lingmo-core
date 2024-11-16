@@ -1,14 +1,11 @@
-find_package(ECM REQUIRED NO_MODULE)
-list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
-
-include(ECMQtDeclareLoggingCategory)
-
 add_subdirectory(lib)
 
 add_executable(lingmo_kwin_wayland_wrapper)
 target_sources(lingmo_kwin_wayland_wrapper PRIVATE
     kwin_wrapper.cpp
     wl-socket.c
+    signalhandler.cpp
+    UpdateLaunchEnvironment.cpp
 )
 
 ecm_qt_declare_logging_category(lingmo_kwin_wayland_wrapper
@@ -22,7 +19,6 @@ ecm_qt_declare_logging_category(lingmo_kwin_wayland_wrapper
         Warning
 )
 
-target_link_libraries(lingmo_kwin_wayland_wrapper Qt::Core Qt::DBus KWinXwaylandCommon startlingmo)
-target_include_directories(lingmo_kwin_wayland_wrapper PRIVATE ${CMAKE_SOURCE_DIR}/startlingmo)
+target_link_libraries(lingmo_kwin_wayland_wrapper Qt::Core Qt::DBus KWinXwaylandCommon)
 set_property(TARGET lingmo_kwin_wayland_wrapper PROPERTY C_STANDARD 11)
 install(TARGETS lingmo_kwin_wayland_wrapper ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
