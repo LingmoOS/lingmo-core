@@ -47,6 +47,10 @@ void Daemon::startProcess(const QPair<QString, QStringList> &processInfo) {
     connect(process, &QProcess::errorOccurred,
             this, &Daemon::onProcessError);
 
+  auto xcb_extra = QProcessEnvironment();
+  xcb_extra.insert("QT_QPA_PLATFORM", "xcb");
+
+  process->setProcessEnvironment(xcb_extra);
   process->start(processInfo.first, processInfo.second);
   if (process->waitForStarted()) {
     qDebug() << "Process started:" << processInfo.first << "PID:" << process->processId();
