@@ -51,5 +51,6 @@ target_link_libraries(${TARGET}
 
 install(TARGETS ${TARGET} DESTINATION ${CMAKE_INSTALL_BINDIR})
 install(FILES lingmo-xsession.desktop DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/xsessions/)
+install(FILES lingmo-wayland-session.desktop DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/wayland-sessions/)
 
 add_subdirectory(wayland_wrapper)
