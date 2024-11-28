@@ -21,8 +21,10 @@
 #include <KDirWatch>
 // #include <KSharedConfig>
 #include <KWindowSystem>
+#include <KX11Extras>
+#include <KWindowInfo>
 
-#include <QX11Info>
+#include <QtGui/private/qtx11extras_p.h>
 #include <xcb/xcb.h>
 
 #include "window.h"
@@ -109,10 +111,10 @@ bool MenuProxy::init()
 
     enableGtkSettings(true);
 
-    connect(KWindowSystem::self(), &KWindowSystem::windowAdded, this, &MenuProxy::onWindowAdded);
-    connect(KWindowSystem::self(), &KWindowSystem::windowRemoved, this, &MenuProxy::onWindowRemoved);
+    connect(KX11Extras::self(), &KX11Extras::windowAdded, this, &MenuProxy::onWindowAdded);
+    connect(KX11Extras::self(), &KX11Extras::windowRemoved, this, &MenuProxy::onWindowRemoved);
 
-    const auto windows = KWindowSystem::windows();
+    const auto windows = KX11Extras::windows();
     for (WId id : windows) {
         onWindowAdded(id);
     }
@@ -130,8 +132,8 @@ void MenuProxy::teardown()
 
     QDBusConnection::sessionBus().unregisterService(s_ourServiceName);
 
-    disconnect(KWindowSystem::self(), &KWindowSystem::windowAdded, this, &MenuProxy::onWindowAdded);
-    disconnect(KWindowSystem::self(), &KWindowSystem::windowRemoved, this, &MenuProxy::onWindowRemoved);
+    disconnect(KX11Extras::self(), &KX11Extras::windowAdded, this, &MenuProxy::onWindowAdded);
+    disconnect(KX11Extras::self(), &KX11Extras::windowRemoved, this, &MenuProxy::onWindowRemoved);
 
     qDeleteAll(m_windows);
     m_windows.clear();
