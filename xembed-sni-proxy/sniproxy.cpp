@@ -18,11 +18,12 @@
 #include <QGuiApplication>
 #include <QScreen>
 #include <QTimer>
-#include <QX11Info>
+#include <QtGui/private/qtx11extras_p.h>
 
 #include <QBitmap>
 
 #include <KWindowSystem>
+#include <KWindowInfo>
 #include <netwm.h>
 
 #include "statusnotifieritemadaptor.h"
