@@ -54,7 +54,6 @@ Build-Depends: cmake,
                libkf6coreaddons-dev,
                libkf6idletime-dev,
                libpolkit-qt6-1-dev
-
 Standards-Version: 4.5.0
 Homepage: https://github.com/LingmoOS/core
 
