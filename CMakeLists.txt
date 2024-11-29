@@ -25,7 +25,7 @@ include(GNUInstallDirs)
 
 add_subdirectory(polkit-agent)
 add_subdirectory(screen-brightness)
-# add_subdirectory(session)
+add_subdirectory(session)
 # add_subdirectory(settings-daemon)
 add_subdirectory(shutdown-ui)
 add_subdirectory(xembed-sni-proxy)
