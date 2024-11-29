@@ -36,7 +36,7 @@ add_subdirectory(gmenuproxy)
 add_subdirectory(notificationd)
 add_subdirectory(sddm-helper)
 add_subdirectory(clipboard)
-# add_subdirectory(chotkeys)
+add_subdirectory(chotkeys)
 
 install(FILES lingmo DESTINATION /etc/ COMPONENT Runtime)
 install(FILES Desktop/Lingmo DESTINATION /etc/Desktop/ COMPONENT Runtime)
