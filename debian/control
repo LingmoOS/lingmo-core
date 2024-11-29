@@ -1,9 +1,9 @@
 Source: lingmo-core
 Section: devel
 Priority: optional
-Maintainer: LingmoOS <lingmo@lingmo.org>
+Maintainer: LingmoOS <team@lingmo.org>
 Build-Depends: cmake,
-               debhelper (>= 9),
+               debhelper-compat (= 13),
                extra-cmake-modules,
                pkg-config,
                xserver-xorg-input-libinput-dev,
@@ -54,8 +54,8 @@ Build-Depends: cmake,
                libkf6coreaddons-dev,
                libkf6idletime-dev,
                libpolkit-qt6-1-dev
-Standards-Version: 4.5.0
-Homepage: https://github.com/LingmoOS/core
+Standards-Version: 4.5.1
+Homepage: https://github.com/LingmoOS/lingmo-core
 
 Package: lingmo-core
 Architecture: any
