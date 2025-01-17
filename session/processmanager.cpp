@@ -106,6 +106,11 @@ void ProcessManager::startDesktopProcess()
     list << qMakePair(QString("lingmo-clipboard"), QStringList());
     list << qMakePair(QString("lingmo-wallpaper-color-pick"), QStringList());
 
+    if (QFile("/usr/bin/lingmo-welcome").exists() &&
+            !QFile("/run/live/medium/live/filesystem.squashfs").exists()) {
+        list << qMakePair(QString("/usr/bin/lingmo-welcome"), QStringList());
+    }
+
     m_desktopAutoStartD = std::make_shared<LINGMO_SESSION::Daemon>(list);
 
     // Auto start

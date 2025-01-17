@@ -1,3 +1,9 @@
+lingmo-core (2.0.3) helium; urgency=high
+
+  * Update.
+
+ -- LingmoOS OS Team <team@lingmo.org>  Fri, 17 Jan 2025 16:30:00 +0800
+
 lingmo-core (2.0.2) unstable; urgency=high
 
   * Change to native package.
