@@ -1,7 +1,7 @@
 Source: lingmo-core
 Section: devel
 Priority: optional
-Maintainer: LingmoOS <lingmo@lingmo.org>
+Maintainer: Lingmo OS Team <team@lingmo.org>
 Build-Depends: cmake,
                debhelper (>= 9),
                extra-cmake-modules,
@@ -42,7 +42,7 @@ Build-Depends: cmake,
                qttools5-dev,
                qttools5-dev-tools
 Standards-Version: 4.5.0
-Homepage: https://github.com/LingmoOS/core
+Homepage: https://github.com/LingmoOS/lingmo-core
 
 Package: lingmo-core
 Architecture: any
@@ -62,4 +62,4 @@ Depends: accountsservice,
          appmenu-gtk3-module,
          ${misc:Depends},
          ${shlibs:Depends}
-Description: LingmoOS System Components
+Description: Lingmo OS System Components
