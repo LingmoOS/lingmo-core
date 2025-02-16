@@ -18,6 +18,7 @@
 #include <QDBusInterface>
 #include <QDBusPendingCall>
 #include <QDBusPendingCallWatcher>
+#include <QDBusPendingReply>
 
 #include <QX11Info>
 #include <KWindowSystem>
