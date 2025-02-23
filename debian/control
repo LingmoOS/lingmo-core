@@ -29,7 +29,7 @@ Build-Depends: cmake,
                xserver-xorg-input-synaptics-dev,
                libxtst-dev,
                libsm-dev,
-               libpolkit-qt5-1-dev,
+               libpolkit-qt6-1-dev,
                libpolkit-agent-1-dev,
                qt6-base-dev,
                qt6-base-private-dev,
@@ -43,7 +43,6 @@ Build-Depends: cmake,
                libkf6globalaccel-dev,
                libkf6coreaddons-dev,
                libkf6idletime-dev,
-               libpolkit-qt6-1-dev
 Standards-Version: 4.5.1
 Homepage: https://github.com/LingmoOS/lingmo-core
 
