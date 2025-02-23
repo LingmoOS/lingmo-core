@@ -19,13 +19,13 @@ GlobalHotkeyManager::GlobalHotkeyManager(QObject* parent)
 }
 
 void GlobalHotkeyManager::bind_shortcut(std::uint64_t shortcut_id,
-    std::vector<int> key_combination,
+    std::set<int> key_combination,
     std::function<void()> callback)
 {
     // TODO: check if shortcut_id is already bound
     _shortcut_bindings.insert(
         { shortcut_id,
-            { key_combination, callback, std::make_shared<std::vector<int>>() } });
+            { key_combination, callback, std::make_shared<std::set<int>>() } });
 }
 
 bool GlobalHotkeyManager::_is_shortcut_activated(const std::uint64_t& shortcut_id)
@@ -49,18 +49,14 @@ void GlobalHotkeyManager::_handle_event(const py::handle& event, const uint64_t&
                     event.attr("code").cast<int>())
                 > 0) {
                 if (event.attr("value").cast<int>() == 1) {
-                    std::get<2>(shortcut)->push_back(event.attr("code").cast<int>());
+                    std::get<2>(shortcut)->insert(event.attr("code").cast<int>());
 
                     if (_is_shortcut_activated(shortcut_id)) {
                         std::get<1>(shortcut)();
                     }
                 } else {
                     // key release
-                    std::get<2>(shortcut)->erase(
-                        std::remove(std::get<2>(shortcut)->begin(),
-                            std::get<2>(shortcut)->end(),
-                            event.attr("code").cast<int>()),
-                        std::get<2>(shortcut)->end());
+                    std::get<2>(shortcut)->erase(event.attr("code").cast<int>());
                 }
             }
         } catch (const std::out_of_range& e) {

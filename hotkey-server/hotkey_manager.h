@@ -11,7 +11,7 @@
 #include <functional>
 #include <iostream>
 #include <map>
-#include <vector>
+#include <set>
 
 // Python
 #include <pybind11/embed.h>
@@ -32,7 +32,7 @@ public:
      * @param callback 当快捷键被激活时调用的函数。
      */
     void bind_shortcut(std::uint64_t shortcut_id,
-        std::vector<int> key_combination,
+        std::set<int> key_combination,
         std::function<void()> callback);
 
     /**
@@ -61,7 +61,7 @@ public:
 private:
     // Store shortcut bindings
     // Format: {shortcut_id: (key_combination, callback, key_combination)}
-    std::map<std::uint64_t, std::tuple<std::vector<int>, std::function<void()>, std::shared_ptr<std::vector<int>>>>
+    std::map<std::uint64_t, std::tuple<std::set<int>, std::function<void()>, std::shared_ptr<std::set<int>>>>
         _shortcut_bindings;
 
     pybind11::dict _device;
