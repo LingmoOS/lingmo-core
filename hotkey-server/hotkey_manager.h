@@ -46,7 +46,7 @@ public:
 
     /**
      * @brief Handles an event from the evdev library.
-     * 
+     *
      * @param event InputEvent from evdev
      * @param shortcut_id unique identifier of the shortcut registerd
      */
@@ -54,15 +54,17 @@ public:
 
     /**
      * @brief Start to listen for events from the evdev library.
-     * 
+     *
      */
     void listen_for_events();
 
 private:
-    pybind11::dict _device;
-
+    // Store shortcut bindings
+    // Format: {shortcut_id: (key_combination, callback, key_combination)}
     std::map<std::uint64_t, std::tuple<std::vector<int>, std::function<void()>, std::shared_ptr<std::vector<int>>>>
         _shortcut_bindings;
+
+    pybind11::dict _device;
 
     pybind11::module _evdev;
     pybind11::module _ecodes;
