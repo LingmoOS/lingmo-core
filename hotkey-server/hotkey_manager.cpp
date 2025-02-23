@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2025 Elysia <elysia@lingmo.org>
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
 #include "hotkey_manager.h"
 
 // For ecodes defines
