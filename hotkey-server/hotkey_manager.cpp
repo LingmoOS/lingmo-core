@@ -8,7 +8,7 @@ GlobalHotkeyManager::GlobalHotkeyManager(QObject* parent)
     _select = py::module::import("select");
 
     // Init devices
-    _device_paths = _evdev.attr("list_devices")();
+    auto _device_paths = _evdev.attr("list_devices")();
     for (const auto& path : _device_paths) {
         auto _input_device = _evdev.attr("InputDevice")(path);
 

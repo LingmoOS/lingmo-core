@@ -44,8 +44,18 @@ public:
      */
     bool _is_shortcut_activated(const std::uint64_t& shortcut_id);
 
+    /**
+     * @brief Handles an event from the evdev library.
+     * 
+     * @param event InputEvent from evdev
+     * @param shortcut_id unique identifier of the shortcut registerd
+     */
     void _handle_event(const pybind11::handle& event, const uint64_t& shortcut_id);
 
+    /**
+     * @brief Start to listen for events from the evdev library.
+     * 
+     */
     void listen_for_events();
 
 private:
@@ -57,6 +67,4 @@ private:
     pybind11::module _evdev;
     pybind11::module _ecodes;
     pybind11::module _select;
-
-    pybind11::object _device_paths;
 };
