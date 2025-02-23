@@ -5,11 +5,18 @@
  */
 #include "hotkey_manager.h"
 
+// Python
+#include <pybind11/embed.h>
+namespace py = pybind11;
+
 // For ecodes defines
 #include <linux/input-event-codes.h>
 
+#include <QCoreApplication>
+
 GlobalHotkeyManager::GlobalHotkeyManager(QObject* parent)
-    : QObject(parent)
+    : QObject(parent),
+    _thread_pool{new QThreadPool(this)}
 {
     _evdev = py::module::import("evdev");
     _select = py::module::import("select");
@@ -21,6 +28,11 @@ GlobalHotkeyManager::GlobalHotkeyManager(QObject* parent)
 
         _device[_input_device.attr("fd")] = _input_device;
     }
+}
+
+GlobalHotkeyManager::~GlobalHotkeyManager() {
+    // Wait for all threads to finish
+    _thread_pool->waitForDone(-1);
 }
 
 void GlobalHotkeyManager::bind_shortcut(std::uint64_t shortcut_id,
@@ -57,7 +69,7 @@ void GlobalHotkeyManager::_handle_event(const py::handle& event, const uint64_t&
                     std::get<2>(shortcut)->insert(event.attr("code").cast<int>());
 
                     if (_is_shortcut_activated(shortcut_id)) {
-                        std::get<1>(shortcut)();
+                        _thread_pool->start(std::get<1>(shortcut));
                     }
                 } else {
                     // key release

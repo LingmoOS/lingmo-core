@@ -9,7 +9,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
 find_package(Python 3 COMPONENTS Interpreter Development)
 find_package(pybind11 REQUIRED)
 
-find_package(Qt6 COMPONENTS Core DBus REQUIRED)
+find_package(Qt6 COMPONENTS Core DBus Concurrent REQUIRED)
 
 #遍历所有Cpp文件
 file(GLOB_RECURSE CPP_FILES *.cpp *.h)
@@ -27,4 +27,5 @@ target_link_libraries(hotkey-server
     pybind11::embed
     Qt6::Core
     Qt6::DBus
+    Qt6::Concurrent
 )

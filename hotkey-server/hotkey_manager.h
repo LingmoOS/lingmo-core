@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-#pragma once
-
+#ifndef HOTKEY_MANAGER_H
+#define HOTKEY_MANAGER_H
 // STL
 #include <cstdint>
 #include <functional>
@@ -14,16 +14,24 @@
 #include <set>
 
 // Python
+// Dealing with solts define problems
+// Qt's marco for slots conflict with the 
+// python's variable name
+#define QT_NO_SIGNALS_SLOTS_KEYWORDS
 #include <pybind11/embed.h>
 namespace py = pybind11;
 
 // Qt
 #include <QObject>
 
+#include <QThreadPool>
+
 class GlobalHotkeyManager : public QObject {
     Q_OBJECT
 public:
     explicit GlobalHotkeyManager(QObject* parent = nullptr);
+
+    ~GlobalHotkeyManager() override;
 
     /**
      * 绑定快捷键到回调函数。
@@ -68,4 +76,9 @@ private:
 
     pybind11::module _evdev;
     pybind11::module _select;
+
+    // Qt related
+    std::shared_ptr<QThreadPool> _thread_pool;
 };
+
+#endif // HOTKEY_MANAGER_H
