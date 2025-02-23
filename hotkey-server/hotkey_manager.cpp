@@ -1,10 +1,12 @@
 #include "hotkey_manager.h"
 
+// For ecodes defines
+#include <linux/input-event-codes.h>
+
 GlobalHotkeyManager::GlobalHotkeyManager(QObject* parent)
     : QObject(parent)
 {
     _evdev = py::module::import("evdev");
-    _ecodes = _evdev.attr("ecodes");
     _select = py::module::import("select");
 
     // Init devices
@@ -39,7 +41,7 @@ bool GlobalHotkeyManager::_is_shortcut_activated(const std::uint64_t& shortcut_i
 
 void GlobalHotkeyManager::_handle_event(const py::handle& event, const uint64_t& shortcut_id)
 {
-    if (event.attr("type").cast<int>() == _ecodes.attr("EV_KEY").cast<int>()) {
+    if (event.attr("type").cast<int>() == static_cast<int>(EV_KEY)) {
         try {
             auto shortcut = _shortcut_bindings.at(shortcut_id);
             auto shortcut_list = std::get<0>(shortcut);

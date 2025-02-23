@@ -10,13 +10,16 @@ namespace py = pybind11;
 
 #include "hotkey_manager.h"
 
+// For evdev
+#include <linux/input-event-codes.h>
+
 int main()
 {
     py::scoped_interpreter python;
 
     GlobalHotkeyManager manager;
 
-    manager.bind_shortcut(1, { 29, 56, 49}, []() { std::cout << "Shortcut activated" << std::endl; });
+    manager.bind_shortcut(1, { KEY_LEFTCTRL, KEY_LEFTALT, KEY_N}, []() { std::cout << "Shortcut activated" << std::endl; });
 
     try {
         manager.listen_for_events();

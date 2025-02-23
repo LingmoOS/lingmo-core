@@ -67,6 +67,5 @@ private:
     pybind11::dict _device;
 
     pybind11::module _evdev;
-    pybind11::module _ecodes;
     pybind11::module _select;
 };
