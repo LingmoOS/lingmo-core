@@ -1,13 +1,29 @@
 cmake_minimum_required(VERSION 3.15.0)
-project(TestPybind VERSION 0.1.0 LANGUAGES C CXX)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-find_package (Python 3 COMPONENTS Interpreter Development)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
+
+find_package(Python 3 COMPONENTS Interpreter Development)
 find_package(pybind11 REQUIRED)
 
-add_executable(TestPybind main.cpp)
+find_package(Qt6 COMPONENTS Core DBus REQUIRED)
 
-target_link_libraries(TestPybind PRIVATE pybind11::embed)
+#遍历所有Cpp文件
+file(GLOB_RECURSE CPP_FILES *.cpp *.h)
+foreach (filepath ${CPP_FILES})
+    string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" filename ${filepath})
+    list(APPEND sources_files ${filename})
+endforeach (filepath)
 
+add_executable(hotkey-server ${sources_files})
+
+target_include_directories(hotkey-server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+target_link_libraries(hotkey-server 
+    PRIVATE 
+    pybind11::embed
+    Qt6::Core
+    Qt6::DBus
+)
