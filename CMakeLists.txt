@@ -37,6 +37,7 @@ add_subdirectory(notificationd)
 add_subdirectory(sddm-helper)
 add_subdirectory(clipboard)
 add_subdirectory(chotkeys)
+add_subdirectory(hotkey-server)
 
 install(FILES lingmo DESTINATION /etc/ COMPONENT Runtime)
 install(FILES Desktop/Lingmo DESTINATION /etc/Desktop/ COMPONENT Runtime)
