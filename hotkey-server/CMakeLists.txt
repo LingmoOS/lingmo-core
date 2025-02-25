@@ -6,8 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # Required by pybind11
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
 
-find_package(Python 3 COMPONENTS Interpreter Development)
-find_package(pybind11 REQUIRED)
+include(FindLibinput)
 
 find_package(Qt6 COMPONENTS Core DBus Concurrent REQUIRED)
 
@@ -20,12 +19,16 @@ endforeach (filepath)
 
 add_executable(hotkey-server ${sources_files})
 
-target_include_directories(hotkey-server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(hotkey-server 
+    PRIVATE 
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${Libinput_INCLUDE_DIRS}
+)
 
 target_link_libraries(hotkey-server 
     PRIVATE 
-    pybind11::embed
     Qt6::Core
     Qt6::DBus
     Qt6::Concurrent
+    ${Libinput_LIBRARIES}
 )

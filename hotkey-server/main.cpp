@@ -5,25 +5,23 @@
 #include <map>
 #include <vector>
 
-#include <pybind11/embed.h>
-namespace py = pybind11;
 
 #include "hotkey_manager.h"
 
-// For evdev
-#include <linux/input-event-codes.h>
-
-#include "hotkey_server.h"
+#include <QCoreApplication>
 
 int main(int argc, char *argv[])
 {
-    HotkeyServer a(argc, argv);
+    QCoreApplication a(argc, argv);
+    [[maybe_unused]] GlobalHotkeyManager* manager = new GlobalHotkeyManager();
 
-    py::scoped_interpreter python;
-
-    GlobalHotkeyManager manager;
-
-    manager.bind_shortcut(1, { KEY_LEFTCTRL, KEY_LEFTALT, KEY_N}, []() { std::cout << "Shortcut activated" << std::endl; });
+    // auto thread = QThread::create([manager]() {
+    //     manager->listen_for_events();
+    // });
+    // QObject::connect(thread, &QThread::finished, [manager]() {
+    //     manager->stop_listening_for_events();
+    // });
+    // thread->start();
 
     return a.exec();
 }

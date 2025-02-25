@@ -5,95 +5,130 @@
  */
 #include "hotkey_manager.h"
 
-// Python
-#include <pybind11/embed.h>
-namespace py = pybind11;
-
-// For ecodes defines
-#include <linux/input-event-codes.h>
-
 #include <QCoreApplication>
 
 GlobalHotkeyManager::GlobalHotkeyManager(QObject* parent)
-    : QObject(parent),
-    _thread_pool{new QThreadPool(this)}
+    : QObject(parent)
+    , _thread_pool { new QThreadPool(this) }
 {
-    _evdev = py::module::import("evdev");
-    _select = py::module::import("select");
+    // Define the interface as const
+    const struct libinput_interface libinput_interface = {
+        [](const char* path, int flags, void* user_data) -> int {
+            return open(path, flags);
+        },
+        [](int fd, void* user_data) -> void {
+            close(fd);
+        }
+    };
 
-    // Init devices
-    auto _device_paths = _evdev.attr("list_devices")();
-    for (const auto& path : _device_paths) {
-        auto _input_device = _evdev.attr("InputDevice")(path);
-
-        _device[_input_device.attr("fd")] = _input_device;
+    // Create libinput context
+    libinput_ = libinput_path_create_context(&libinput_interface, nullptr);
+    if (!libinput_) {
+        cerr << "Failed to create libinput context." << endl;
+        exit(1);
     }
+
+    // Automatically add keyboard devices
+    addKeyboardDevices();
 }
 
-GlobalHotkeyManager::~GlobalHotkeyManager() {
+GlobalHotkeyManager::~GlobalHotkeyManager()
+{
+    libinput_unref(libinput_);
     // Wait for all threads to finish
     _thread_pool->waitForDone(-1);
 }
 
-void GlobalHotkeyManager::bind_shortcut(std::uint64_t shortcut_id,
-    std::set<int> key_combination,
-    std::function<void()> callback)
+void GlobalHotkeyManager::bindShortcut(const string& shortcutId, const unordered_set<int>& keyCombination, function<void()> callback)
 {
-    // TODO: check if shortcut_id is already bound
-    _shortcut_bindings.insert(
-        { shortcut_id,
-            { key_combination, callback, std::make_shared<std::set<int>>() } });
+    shortcuts_[shortcutId] = { keyCombination, callback, {} };
 }
 
-bool GlobalHotkeyManager::_is_shortcut_activated(const std::uint64_t& shortcut_id)
+void GlobalHotkeyManager::handleKeyEvent(struct libinput_event_keyboard* keyboardEvent, const uint64_t& shortcut_id)
 {
-    try {
-        auto shortcut = _shortcut_bindings.at(shortcut_id);
+    int keyCode = libinput_event_keyboard_get_key(keyboardEvent);
+    int keyState = libinput_event_keyboard_get_key_state(keyboardEvent);
 
-        return (*std::get<2>(shortcut) == std::get<0>(shortcut));
-    } catch (const std::out_of_range& e) {
-        return false;
-    }
-}
-
-void GlobalHotkeyManager::_handle_event(const py::handle& event, const uint64_t& shortcut_id)
-{
-    if (event.attr("type").cast<int>() == static_cast<int>(EV_KEY)) {
-        try {
-            auto shortcut = _shortcut_bindings.at(shortcut_id);
-            auto shortcut_list = std::get<0>(shortcut);
-            if (std::count(shortcut_list.begin(), shortcut_list.end(),
-                    event.attr("code").cast<int>())
-                > 0) {
-                if (event.attr("value").cast<int>() == 1) {
-                    std::get<2>(shortcut)->insert(event.attr("code").cast<int>());
-
-                    if (_is_shortcut_activated(shortcut_id)) {
-                        _thread_pool->start(std::get<1>(shortcut));
-                    }
-                } else {
-                    // key release
-                    std::get<2>(shortcut)->erase(event.attr("code").cast<int>());
+    for (auto& [shortcutId, shortcut] : shortcuts_) {
+        if (find(shortcut.keys.begin(), shortcut.keys.end(), keyCode) != shortcut.keys.end()) {
+            if (keyState == LIBINPUT_KEY_STATE_PRESSED) {
+                shortcut.pressedKeys.insert(keyCode);
+                if (shortcut.pressedKeys == shortcut.keys) {
+                    activeShortcuts_.insert(shortcutId);
+                    shortcut.callback();
                 }
+            } else if (keyState == LIBINPUT_KEY_STATE_RELEASED) {
+                shortcut.pressedKeys.erase(keyCode);
+                activeShortcuts_.erase(shortcutId);
             }
-        } catch (const std::out_of_range& e) {
-            return;
         }
     }
 }
 
-void GlobalHotkeyManager::listen_for_events()
+void GlobalHotkeyManager::listenForEvents()
 {
     while (true) {
-        auto res = _select.attr("select")(_device, py::list(), py::list())
-                       .cast<py::tuple>();
-        auto rdev = res[0];
-        for (const auto& device : rdev) {
-            for (const auto& event : _device[device].attr("read")()) {
-                for (auto& shortcut : _shortcut_bindings) {
-                    _handle_event(event, shortcut.first);
-                }
+        struct libinput_event* event = libinput_get_event(libinput_);
+
+        if (event == nullptr) {
+            libinput_dispatch(libinput_);
+            continue;
+        }
+
+        if (libinput_event_get_type(event) == LIBINPUT_EVENT_KEYBOARD_KEY) {
+            handleKeyEvent(libinput_event_get_keyboard_event(event), 0);
+        }
+
+        libinput_event_destroy(event);
+        libinput_dispatch(libinput_);
+    }
+}
+
+void GlobalHotkeyManager::addKeyboardDevices()
+{
+    // Use a standalone libinput context for this task
+    // otherwise the main libinput context will not be available
+    // after calling unref()
+    struct libinput* li;
+    const static struct libinput_interface interface = {
+        [](const char* path, int flags, void* user_data) -> int {
+            return open(path, flags);
+        },
+        [](int fd, void* user_data) -> void {
+            close(fd);
+        }
+    };
+
+    li = libinput_path_create_context(&interface, NULL);
+
+    // 尝试打开 /dev/input/ 目录，该目录通常包含输入设备文件
+    DIR* dir = opendir("/dev/input/");
+    if (!dir) {
+        cerr << "Failed to open /dev/input/ directory." << endl;
+        return;
+    }
+
+    struct dirent* entry;
+    while ((entry = readdir(dir)) != nullptr) {
+        string name = entry->d_name;
+        if (name.substr(0, 5) == "event") { // Check if it's an event device
+            string devicePath = "/dev/input/" + name;
+            struct libinput_device* device = libinput_path_add_device(li, devicePath.c_str());
+            if (device && libinput_device_has_capability(device, LIBINPUT_DEVICE_CAP_KEYBOARD)) {
+                cout << "Added device: " << devicePath << endl;
+                libinput_path_add_device(libinput_, devicePath.c_str());
+            } else {
+                cout << "Cannot check device: " << devicePath << ". Do you have permission?" << endl;
             }
         }
     }
+
+    libinput_unref(li);
+
+    closedir(dir);
+}
+
+void GlobalHotkeyManager::stop_listening_for_events()
+{
+    this->_should_exit = true;
 }
