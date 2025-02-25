@@ -76,7 +76,7 @@ void GlobalHotkeyManager::listenForEvents()
         }
 
         if (libinput_event_get_type(event) == LIBINPUT_EVENT_KEYBOARD_KEY) {
-            handleKeyEvent(libinput_event_get_keyboard_event(event), 0);
+            handleKeyEvent(libinput_event_get_keyboard_event(event));
         }
 
         libinput_event_destroy(event);

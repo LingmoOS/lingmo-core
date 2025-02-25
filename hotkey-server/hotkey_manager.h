@@ -81,9 +81,8 @@ private:
      * @brief Handles an event from the evdev library.
      *
      * @param keyboardEvent libinput_event_keyboard from libinput
-     * @param shortcut_id unique identifier of the shortcut registerd
      */
-    void handleKeyEvent(struct libinput_event_keyboard* keyboardEvent, const uint64_t& shortcut_id);
+    void handleKeyEvent(struct libinput_event_keyboard* keyboardEvent);
 
     /**
      * @brief Scan and Add keyboard devices to the libinput context.
