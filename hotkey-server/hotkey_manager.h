@@ -63,7 +63,7 @@ public:
      */
     void listenForEvents();
 
-    void stop_listening_for_events();
+    void stopListeningForEvents();
 
 private:
     libinput* libinput_;
@@ -76,6 +76,8 @@ private:
 
     // Whether the event listener should exit
     volatile bool _should_exit = false;
+    // Whether the event listener is currently running
+    volatile bool _is_listening = false;
 
     /**
      * @brief Handles an event from the evdev library.

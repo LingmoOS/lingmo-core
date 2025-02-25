@@ -44,7 +44,7 @@ void GlobalHotkeyManager::bindShortcut(const string& shortcutId, const unordered
     shortcuts_[shortcutId] = { keyCombination, callback, {} };
 }
 
-void GlobalHotkeyManager::handleKeyEvent(struct libinput_event_keyboard* keyboardEvent, const uint64_t& shortcut_id)
+void GlobalHotkeyManager::handleKeyEvent(struct libinput_event_keyboard* keyboardEvent)
 {
     int keyCode = libinput_event_keyboard_get_key(keyboardEvent);
     int keyState = libinput_event_keyboard_get_key_state(keyboardEvent);
@@ -67,7 +67,8 @@ void GlobalHotkeyManager::handleKeyEvent(struct libinput_event_keyboard* keyboar
 
 void GlobalHotkeyManager::listenForEvents()
 {
-    while (true) {
+    _is_listening = true;
+    while (!_should_exit) {
         struct libinput_event* event = libinput_get_event(libinput_);
 
         if (event == nullptr) {
@@ -76,12 +77,13 @@ void GlobalHotkeyManager::listenForEvents()
         }
 
         if (libinput_event_get_type(event) == LIBINPUT_EVENT_KEYBOARD_KEY) {
-            handleKeyEvent(libinput_event_get_keyboard_event(event));
+             handleKeyEvent(libinput_event_get_keyboard_event(event));
         }
 
         libinput_event_destroy(event);
         libinput_dispatch(libinput_);
     }
+    _is_listening = false;
 }
 
 void GlobalHotkeyManager::addKeyboardDevices()
@@ -128,7 +130,15 @@ void GlobalHotkeyManager::addKeyboardDevices()
     closedir(dir);
 }
 
-void GlobalHotkeyManager::stop_listening_for_events()
+void GlobalHotkeyManager::stopListeningForEvents()
 {
+    cout << "Stopping listening for events..." << endl;
     this->_should_exit = true;
+    while (true) {
+        // Wait for the listening thread to exit
+        if (!_is_listening) {
+            break;
+        }
+    }
+    this->_should_exit = false;
 }
