@@ -10,6 +10,7 @@
 #include "hotkey_manager.h"
 
 #include <QCoreApplication>
+#include <QTimer>
 
 int main(int argc, char *argv[])
 {
@@ -28,9 +29,20 @@ int main(int argc, char *argv[])
         });
         hotkeyManager->listenForEvents();
     });
-    QObject::connect(&a, &QCoreApplication::aboutToQuit, hotkeyManager, &GlobalHotkeyManager::stopListeningForEvents);
+    QObject::connect(&a, &QCoreApplication::aboutToQuit, [hotkeyManager, &hotkeyManagerThread](){
+        hotkeyManager->stopListeningForEvents();
+        hotkeyManager->deleteLater();
+        hotkeyManagerThread.exit();
+    });
 
     hotkeyManagerThread.start();
+
+    // Test kill app using timer
+    // Using about to quit
+    QTimer::singleShot(10000, [](){
+        std::cout << "Killing app" << std::endl;
+        qApp->exit();
+    });
 
     return a.exec();
 }
