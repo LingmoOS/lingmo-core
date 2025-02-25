@@ -34,7 +34,10 @@ GlobalHotkeyManager::GlobalHotkeyManager(QObject* parent)
 
 GlobalHotkeyManager::~GlobalHotkeyManager()
 {
-    libinput_unref(libinput_);
+    // This will cuase a segfault, why?
+    // if(libinput_ != nullptr) {
+    //     libinput_unref(libinput_);
+    // }
     // Wait for all threads to finish
     _thread_pool->waitForDone(-1);
 }

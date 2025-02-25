@@ -58,11 +58,15 @@ public:
     void bindShortcut(const string& shortcutId, const unordered_set<int>& keyCombination, function<void()> callback);
 
     /**
-     * @brief Start to listen for events from the evdev library.
+     * @brief Start to listen for events from the libinput library.
      *
      */
     void listenForEvents();
 
+    /**
+     * @brief Stop listening for events from the libinput library. This instance is NOT usable after this function is called.
+     * 
+     */
     void stopListeningForEvents();
 
 private:
