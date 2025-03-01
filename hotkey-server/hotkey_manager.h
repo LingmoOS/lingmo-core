@@ -8,6 +8,7 @@
 #define HOTKEY_MANAGER_H
 // STL
 #include <algorithm>
+#include <memory>
 #include <unordered_map>
 #include <unordered_set>
 #include <functional>
@@ -26,6 +27,8 @@
 // Qt
 #include <QObject>
 #include <QThreadPool>
+#include <QMutex>
+#include <QWaitCondition>
 
 using namespace std;
 
@@ -64,6 +67,12 @@ public:
     void listenForEvents();
 
     /**
+     * @brief Start listenForEvents() in a new thread.
+     * 
+     */
+    void startListeningForEvents();
+
+    /**
      * @brief Stop listening for events from the libinput library. This instance is NOT usable after this function is called.
      * 
      */
@@ -82,6 +91,9 @@ private:
     volatile bool _should_exit = false;
     // Whether the event listener is currently running
     volatile bool _is_listening = false;
+
+    // Used to store the thread that is listening for events
+    std::thread _worker_thread;
 
     /**
      * @brief Handles an event from the evdev library.

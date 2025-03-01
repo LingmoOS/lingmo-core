@@ -34,12 +34,8 @@ GlobalHotkeyManager::GlobalHotkeyManager(QObject* parent)
 
 GlobalHotkeyManager::~GlobalHotkeyManager()
 {
-    // This will cuase a segfault, why?
-    // if(libinput_ != nullptr) {
-    //     libinput_unref(libinput_);
-    // }
     // Wait for all threads to finish
-    _thread_pool->waitForDone(-1);
+    stopListeningForEvents(); // Ensure thread is stopped before destruction
 }
 
 void GlobalHotkeyManager::bindShortcut(const string& shortcutId, const unordered_set<int>& keyCombination, function<void()> callback)
@@ -58,7 +54,8 @@ void GlobalHotkeyManager::handleKeyEvent(struct libinput_event_keyboard* keyboar
                 shortcut.pressedKeys.insert(keyCode);
                 if (shortcut.pressedKeys == shortcut.keys) {
                     activeShortcuts_.insert(shortcutId);
-                    shortcut.callback();
+                    // Execute callback in the main thread
+                    QMetaObject::invokeMethod(this, shortcut.callback, Qt::QueuedConnection);
                 }
             } else if (keyState == LIBINPUT_KEY_STATE_RELEASED) {
                 shortcut.pressedKeys.erase(keyCode);
@@ -71,7 +68,14 @@ void GlobalHotkeyManager::handleKeyEvent(struct libinput_event_keyboard* keyboar
 void GlobalHotkeyManager::listenForEvents()
 {
     _is_listening = true;
-    while (!_should_exit) {
+    // Add a ref count to the libinput context
+    // this will be released in deconstructor
+    libinput_ref(libinput_);
+    while (true) {
+        if (_should_exit) {
+            _is_listening = false;
+            return;
+        }
         struct libinput_event* event = libinput_get_event(libinput_);
 
         if (event == nullptr) {
@@ -80,13 +84,12 @@ void GlobalHotkeyManager::listenForEvents()
         }
 
         if (libinput_event_get_type(event) == LIBINPUT_EVENT_KEYBOARD_KEY) {
-             handleKeyEvent(libinput_event_get_keyboard_event(event));
+            handleKeyEvent(libinput_event_get_keyboard_event(event));
         }
 
         libinput_event_destroy(event);
         libinput_dispatch(libinput_);
     }
-    _is_listening = false;
 }
 
 void GlobalHotkeyManager::addKeyboardDevices()
@@ -133,15 +136,31 @@ void GlobalHotkeyManager::addKeyboardDevices()
     closedir(dir);
 }
 
+void GlobalHotkeyManager::startListeningForEvents()
+{
+    if (!_is_listening && !_should_exit) {
+        _should_exit = false;
+        _worker_thread = std::thread(&GlobalHotkeyManager::listenForEvents, this);
+    }
+}
+
 void GlobalHotkeyManager::stopListeningForEvents()
 {
     cout << "Stopping listening for events..." << endl;
-    this->_should_exit = true;
-    while (true) {
-        // Wait for the listening thread to exit
-        if (!_is_listening) {
-            break;
+    if (_is_listening) {
+        _should_exit = true;
+
+        while (true) {
+            if (!_is_listening) {
+                break;
+            }
+        }
+
+        // Join the worker thread
+        if (_worker_thread.joinable()) {
+            _worker_thread.join();
         }
     }
-    this->_should_exit = false;
+
+    _thread_pool->waitForDone(0);
 }
