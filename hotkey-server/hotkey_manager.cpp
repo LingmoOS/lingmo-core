@@ -109,6 +109,8 @@ void GlobalHotkeyManager::addKeyboardDevices()
 
     li = libinput_path_create_context(&interface, NULL);
 
+    libinput_ref(li);
+
     // 尝试打开 /dev/input/ 目录，该目录通常包含输入设备文件
     DIR* dir = opendir("/dev/input/");
     if (!dir) {
