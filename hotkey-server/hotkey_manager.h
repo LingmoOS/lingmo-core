@@ -13,6 +13,7 @@
 #include <unordered_set>
 #include <functional>
 #include <iostream>
+#include <QMutex>
 
 // libinput related
 #include <dirent.h> // 用于目录操作
@@ -28,7 +29,7 @@
 #include <QObject>
 #include <QThreadPool>
 #include <QMutex>
-#include <QWaitCondition>
+#include <QString>
 
 using namespace std;
 
@@ -46,6 +47,7 @@ public:
         unordered_set<int> keys;
         function<void()> callback;
         unordered_set<int> pressedKeys;
+        QString description;
     };
 
     explicit GlobalHotkeyManager(QObject* parent = nullptr);
@@ -57,8 +59,9 @@ public:
      * @param shortcut_id 快捷键的标识符。
      * @param keyCombination 构成快捷键的键码列表。
      * @param callback 当快捷键被激活时调用的函数。
+     * @param description 快捷键的描述信息。
      */
-    void bindShortcut(const string& shortcutId, const unordered_set<int>& keyCombination, function<void()> callback);
+    void bindShortcut(const string& shortcutId, const unordered_set<int>& keyCombination, function<void()> callback, const QString& description = "");
 
     /**
      * @brief Start to listen for events from the libinput library.
@@ -86,6 +89,9 @@ private:
 
     // Qt related
     std::shared_ptr<QThreadPool> _thread_pool;
+
+    // Mutex to protect the shortcuts_ map
+    QMutex _shortcuts_mutex;
 
     // Whether the event listener should exit
     volatile bool _should_exit = false;

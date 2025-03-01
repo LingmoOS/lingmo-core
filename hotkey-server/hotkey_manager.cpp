@@ -38,16 +38,18 @@ GlobalHotkeyManager::~GlobalHotkeyManager()
     stopListeningForEvents(); // Ensure thread is stopped before destruction
 }
 
-void GlobalHotkeyManager::bindShortcut(const string& shortcutId, const unordered_set<int>& keyCombination, function<void()> callback)
+void GlobalHotkeyManager::bindShortcut(const string& shortcutId, const unordered_set<int>& keyCombination, function<void()> callback, const QString& description)
 {
-    shortcuts_[shortcutId] = { keyCombination, callback, {} };
+    _shortcuts_mutex.lock();
+    shortcuts_[shortcutId] = { keyCombination, callback, {} , description};
+    _shortcuts_mutex.unlock();
 }
 
 void GlobalHotkeyManager::handleKeyEvent(struct libinput_event_keyboard* keyboardEvent)
 {
     int keyCode = libinput_event_keyboard_get_key(keyboardEvent);
     int keyState = libinput_event_keyboard_get_key_state(keyboardEvent);
-
+    _shortcuts_mutex.lock();
     for (auto& [shortcutId, shortcut] : shortcuts_) {
         if (find(shortcut.keys.begin(), shortcut.keys.end(), keyCode) != shortcut.keys.end()) {
             if (keyState == LIBINPUT_KEY_STATE_PRESSED) {
@@ -63,6 +65,7 @@ void GlobalHotkeyManager::handleKeyEvent(struct libinput_event_keyboard* keyboar
             }
         }
     }
+    _shortcuts_mutex.unlock();
 }
 
 void GlobalHotkeyManager::listenForEvents()
