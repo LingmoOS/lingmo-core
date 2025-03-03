@@ -3,7 +3,38 @@
 #include <linux/input-event-codes.h>
 #include <qnamespace.h>
 
-using namespace Lingmo::HotKey;
+namespace Lingmo::HotKey {
+
+NativeShortcut::NativeShortcut()
+    : key {}
+    , modifier {}
+    , valid(false)
+{
+}
+
+NativeShortcut::NativeShortcut(int _key, std::unordered_set<int> _modifier)
+    : key { _key }
+    , modifier { _modifier }
+    , valid(false)
+{
+}
+
+bool NativeShortcut::isValid() const
+{
+    return valid;
+}
+
+bool NativeShortcut::operator==(NativeShortcut other) const
+{
+    return (key == other.key) && (modifier == other.modifier) && valid == other.valid;
+}
+
+bool NativeShortcut::operator!=(NativeShortcut other) const
+{
+    return (key != other.key) || (modifier != other.modifier) || valid != other.valid;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
 
 int GetNativeKeycode(const Qt::Key& key)
 {
@@ -251,17 +282,20 @@ int GetNativeKeycode(const Qt::Key& key)
     }
 }
 
-int GetNativeModifier(const Qt::KeyboardModifiers& modifier)
+std::unordered_set<int> GetNativeModifier(const Qt::KeyboardModifiers& modifier)
 {
-    if (modifier == Qt::ShiftModifier) {
-        return KEY_LEFTSHIFT;
-    } else if (modifier == Qt::ControlModifier) {
-        return KEY_LEFTCTRL;
-    } else if (modifier == Qt::AltModifier) {
-        return KEY_LEFTALT;
-    } else if (modifier == Qt::MetaModifier) {
-        return KEY_LEFTMETA;
-    } else {
-        return KEY_UNKNOWN;
+    std::unordered_set<int> result = {};
+
+    if (modifier & Qt::ShiftModifier) {
+        result.insert(KEY_LEFTSHIFT);
+    } else if (modifier & Qt::ControlModifier) {
+        result.insert(KEY_LEFTCTRL);
+    } else if (modifier & Qt::AltModifier) {
+        result.insert(KEY_LEFTALT);
+    } else if (modifier & Qt::MetaModifier) {
+        result.insert(KEY_LEFTMETA);
     }
+
+    return result;
+}
 }

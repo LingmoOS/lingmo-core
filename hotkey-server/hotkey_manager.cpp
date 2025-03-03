@@ -5,6 +5,8 @@
  */
 #include "hotkey_manager.h"
 
+#include "keycode_helper.h"
+
 #include <QCoreApplication>
 
 GlobalHotkeyManager::GlobalHotkeyManager(QObject* parent)
@@ -42,6 +44,14 @@ void GlobalHotkeyManager::bindShortcut(const string& shortcutId, const unordered
 {
     _shortcuts_mutex.lock();
     shortcuts_[shortcutId] = { keyCombination, callback, {} , description};
+    _shortcuts_mutex.unlock();
+}
+
+void GlobalHotkeyManager::bindShortcut(const string& shortcutId, const Lingmo::HotKey::NativeShortcut& keyCombination, function<void()> callback, const QString& description) {
+    _shortcuts_mutex.lock();
+    unordered_set<int> keys = unordered_set<int>{keyCombination.key};
+    keys.insert(keyCombination.modifier.begin(), keyCombination.modifier.end());
+    shortcuts_[shortcutId] = { keys, callback, {} , description};
     _shortcuts_mutex.unlock();
 }
 

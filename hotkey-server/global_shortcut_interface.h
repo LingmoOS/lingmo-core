@@ -13,6 +13,9 @@
 // forward declaration
 class GlobalshortcutAdaptor;
 class GlobalHotkeyManager;
+namespace Lingmo::HotKey {
+class NativeShortcut;
+}
 
 class GlobalShortcutInterface : public QObject {
     Q_OBJECT
@@ -36,4 +39,6 @@ private:
 
     // Hotkey magaer
     GlobalHotkeyManager* m_hotkeyManager;
+
+    Lingmo::HotKey::NativeShortcut _getNativeShortcut(const Qt::Key& key, const Qt::KeyboardModifiers& modifiers);
 };

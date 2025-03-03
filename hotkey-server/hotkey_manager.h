@@ -7,13 +7,13 @@
 #ifndef HOTKEY_MANAGER_H
 #define HOTKEY_MANAGER_H
 // STL
+#include <QMutex>
 #include <algorithm>
+#include <functional>
+#include <iostream>
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
-#include <functional>
-#include <iostream>
-#include <QMutex>
 
 // libinput related
 #include <dirent.h> // 用于目录操作
@@ -21,15 +21,19 @@
 #include <unistd.h>
 
 #include <libinput.h>
+#include <linux/input-event-codes.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <linux/input-event-codes.h>
 
 // Qt
-#include <QObject>
-#include <QThreadPool>
 #include <QMutex>
+#include <QObject>
 #include <QString>
+#include <QThreadPool>
+
+namespace Lingmo::HotKey {
+class NativeShortcut;
+}
 
 using namespace std;
 
@@ -62,6 +66,8 @@ public:
      * @param description 快捷键的描述信息。
      */
     void bindShortcut(const string& shortcutId, const unordered_set<int>& keyCombination, function<void()> callback, const QString& description = "");
+    
+    void bindShortcut(const string& shortcutId, const Lingmo::HotKey::NativeShortcut& keyCombination, function<void()> callback, const QString& description = "");
 
     /**
      * @brief Start to listen for events from the libinput library.
@@ -71,13 +77,13 @@ public:
 
     /**
      * @brief Start listenForEvents() in a new thread.
-     * 
+     *
      */
     void startListeningForEvents();
 
     /**
      * @brief Stop listening for events from the libinput library. This instance is NOT usable after this function is called.
-     * 
+     *
      */
     void stopListeningForEvents();
 
