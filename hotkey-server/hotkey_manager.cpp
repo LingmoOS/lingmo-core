@@ -8,10 +8,24 @@
 #include "keycode_helper.h"
 
 #include <QCoreApplication>
+#include <libinput.h>
+#include <qnamespace.h>
+#include <thread>
 
 GlobalHotkeyManager::GlobalHotkeyManager(QObject* parent)
     : QObject(parent)
     , _thread_pool { new QThreadPool(this) }
+{
+    initLibinput();
+}
+
+GlobalHotkeyManager::~GlobalHotkeyManager()
+{
+    // Wait for all threads to finish
+    stopListeningForEvents(); // Ensure thread is stopped before destruction
+}
+
+void GlobalHotkeyManager::initLibinput()
 {
     // Define the interface as const
     const struct libinput_interface libinput_interface = {
@@ -32,26 +46,25 @@ GlobalHotkeyManager::GlobalHotkeyManager(QObject* parent)
 
     // Automatically add keyboard devices
     addKeyboardDevices();
-}
 
-GlobalHotkeyManager::~GlobalHotkeyManager()
-{
-    // Wait for all threads to finish
-    stopListeningForEvents(); // Ensure thread is stopped before destruction
+    // Clear previous state.
+    _should_exit = false;
+    _should_restart = false;
 }
 
 void GlobalHotkeyManager::bindShortcut(const string& shortcutId, const unordered_set<int>& keyCombination, function<void()> callback, const QString& description)
 {
     _shortcuts_mutex.lock();
-    shortcuts_[shortcutId] = { keyCombination, callback, {} , description};
+    shortcuts_[shortcutId] = { keyCombination, callback, {}, description };
     _shortcuts_mutex.unlock();
 }
 
-void GlobalHotkeyManager::bindShortcut(const string& shortcutId, const Lingmo::HotKey::NativeShortcut& keyCombination, function<void()> callback, const QString& description) {
+void GlobalHotkeyManager::bindShortcut(const string& shortcutId, const Lingmo::HotKey::NativeShortcut& keyCombination, function<void()> callback, const QString& description)
+{
     _shortcuts_mutex.lock();
-    unordered_set<int> keys = unordered_set<int>{keyCombination.key};
+    unordered_set<int> keys = unordered_set<int> { keyCombination.key };
     keys.insert(keyCombination.modifier.begin(), keyCombination.modifier.end());
-    shortcuts_[shortcutId] = { keys, callback, {} , description};
+    shortcuts_[shortcutId] = { keys, callback, {}, description };
     _shortcuts_mutex.unlock();
 }
 
@@ -78,6 +91,18 @@ void GlobalHotkeyManager::handleKeyEvent(struct libinput_event_keyboard* keyboar
     _shortcuts_mutex.unlock();
 }
 
+void GlobalHotkeyManager::restartLibinputAndListening()
+{
+    devices_list_.clear();
+    _is_listening = false;
+
+    this->stopListeningForEvents();
+    this->initLibinput();
+    libinput_ref(libinput_);
+
+    _is_listening = true;
+}
+
 void GlobalHotkeyManager::listenForEvents()
 {
     _is_listening = true;
@@ -89,6 +114,19 @@ void GlobalHotkeyManager::listenForEvents()
             _is_listening = false;
             return;
         }
+
+        if (_should_restart || checkKeyboardRemove()) {
+            // Need update keyboard device
+            // restart libinput context in order to do so
+            _should_check_keyboard = false;
+            _should_restart_mutex.lock();
+            restartLibinputAndListening();
+            _should_restart = false;
+            _should_check_keyboard = true;
+            _should_restart_mutex.unlock();
+            continue;
+        }
+
         struct libinput_event* event = libinput_get_event(libinput_);
 
         if (event == nullptr) {
@@ -140,6 +178,7 @@ void GlobalHotkeyManager::addKeyboardDevices()
             if (device && libinput_device_has_capability(device, LIBINPUT_DEVICE_CAP_KEYBOARD)) {
                 cout << "Added device: " << devicePath << endl;
                 libinput_path_add_device(libinput_, devicePath.c_str());
+                devices_list_.push_back({ devicePath, libinput_device_ref(device) });
             } else {
                 cout << "Cannot check device: " << devicePath << ". Do you have permission?" << endl;
             }
@@ -151,12 +190,90 @@ void GlobalHotkeyManager::addKeyboardDevices()
     closedir(dir);
 }
 
+bool GlobalHotkeyManager::checkKeyboardRemove()
+{
+    // check and Remove/add keyboard devices from the libinput context.
+    // This is necessary because the libinput context does not automatically
+    // detect devices that are added or removed.
+    for (const auto& [devicePath, device] : devices_list_) {
+        if (access(devicePath.c_str(), R_OK) != 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void GlobalHotkeyManager::checkKeyboardAdd()
+{
+    while (true) {
+        if(!_should_check_keyboard)
+            continue;
+
+        _should_restart_mutex.lock();
+
+        // Use a standalone libinput context for this task
+        // otherwise the main libinput context will not be available
+        // after calling unref()
+        struct libinput* li;
+        const static struct libinput_interface interface = {
+            [](const char* path, int flags, void* user_data) -> int {
+                return open(path, flags);
+            },
+            [](int fd, void* user_data) -> void {
+                close(fd);
+            }
+        };
+
+        li = libinput_path_create_context(&interface, NULL);
+
+        libinput_ref(li);
+
+        // 尝试打开 /dev/input/ 目录，该目录通常包含输入设备文件
+        DIR* dir = opendir("/dev/input/");
+        if (!dir) {
+            cerr << "Failed to open /dev/input/ directory." << endl;
+            exit(1);
+        }
+
+        struct dirent* entry;
+        while ((entry = readdir(dir)) != nullptr) {
+            string name = entry->d_name;
+            if (name.substr(0, 5) == "event") { // Check if it's an event device
+                string devicePath = "/dev/input/" + name;
+                struct libinput_device* device = libinput_path_add_device(li, devicePath.c_str());
+                if (device && libinput_device_has_capability(device, LIBINPUT_DEVICE_CAP_KEYBOARD)) {
+                    // Test if the device is in the list
+                    bool found = false;
+                    for (const auto& [path, dev] : devices_list_) {
+                        if (devicePath == path) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        _should_restart = true;
+                    }
+                }
+            }
+        }
+
+        libinput_unref(li);
+
+        closedir(dir);
+
+        _should_restart_mutex.unlock();
+
+        // Sleep 1s
+        // std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+}
+
 void GlobalHotkeyManager::startListeningForEvents()
 {
-    if (!_is_listening && !_should_exit) {
-        _should_exit = false;
-        _worker_thread = std::thread(&GlobalHotkeyManager::listenForEvents, this);
-    }
+    _should_exit = false;
+    _should_check_keyboard = true;
+    _worker_thread = std::thread(&GlobalHotkeyManager::listenForEvents, this);
+    _device_checker_thread = std::thread(&GlobalHotkeyManager::checkKeyboardAdd, this);
 }
 
 void GlobalHotkeyManager::stopListeningForEvents()

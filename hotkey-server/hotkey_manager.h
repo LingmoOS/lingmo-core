@@ -9,9 +9,13 @@
 // STL
 #include <QMutex>
 #include <algorithm>
+#include <cstddef>
 #include <functional>
 #include <iostream>
 #include <memory>
+#include <qcontainerfwd.h>
+#include <qlist.h>
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -88,10 +92,12 @@ public:
     void stopListeningForEvents();
 
 private:
-    libinput* libinput_;
+    struct libinput* libinput_;
     // registerd shortcuts
     unordered_map<string, ShortcutBinding> shortcuts_;
     unordered_set<string> activeShortcuts_;
+    
+    QList<QPair<std::string, struct libinput_device*>> devices_list_; // 存储设备路径的列表
 
     // Qt related
     std::shared_ptr<QThreadPool> _thread_pool;
@@ -99,13 +105,33 @@ private:
     // Mutex to protect the shortcuts_ map
     QMutex _shortcuts_mutex;
 
+    QMutex _should_restart_mutex;
+
     // Whether the event listener should exit
     volatile bool _should_exit = false;
     // Whether the event listener is currently running
     volatile bool _is_listening = false;
+    // Only can be modified by checkKeyboardDevice()
+    volatile bool _should_restart = false;
+
+    volatile bool _should_check_keyboard = true;
 
     // Used to store the thread that is listening for events
     std::thread _worker_thread;
+
+    std::thread _device_checker_thread;
+
+    /**
+     * @brief Initialize the libinput context, it will search for devices automatically.
+     * 
+     */
+    void initLibinput();
+
+    /**
+     * @brief Restart the libinput context and the event listener.
+     * 
+     */
+    void restartLibinputAndListening();
 
     /**
      * @brief Handles an event from the evdev library.
@@ -119,6 +145,13 @@ private:
      *
      */
     void addKeyboardDevices();
+
+    /**
+     * @brief check and Remove/add keyboard devices from the libinput context.
+     */
+    void checkKeyboardAdd();
+    
+    bool checkKeyboardRemove();
 };
 
 #endif // HOTKEY_MANAGER_H
