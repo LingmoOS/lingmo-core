@@ -111,9 +111,9 @@ private:
     volatile bool _should_exit = false;
     // Whether the event listener is currently running
     volatile bool _is_listening = false;
-    // Only can be modified by checkKeyboardDevice()
+    // Only can be modified unless you have the _should_restart_mutex lock
     volatile bool _should_restart = false;
-
+    // Only can be modified in listenForEvents(). read only in other places
     volatile bool _should_check_keyboard = true;
 
     // Used to store the thread that is listening for events
