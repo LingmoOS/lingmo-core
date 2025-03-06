@@ -70,14 +70,8 @@ public:
      * @param description 快捷键的描述信息。
      */
     void bindShortcut(const string& shortcutId, const unordered_set<int>& keyCombination, function<void()> callback, const QString& description = "");
-    
-    void bindShortcut(const string& shortcutId, const Lingmo::HotKey::NativeShortcut& keyCombination, function<void()> callback, const QString& description = "");
 
-    /**
-     * @brief Start to listen for events from the libinput library.
-     *
-     */
-    void listenForEvents();
+    void bindShortcut(const string& shortcutId, const Lingmo::HotKey::NativeShortcut& keyCombination, function<void()> callback, const QString& description = "");
 
     /**
      * @brief Start listenForEvents() in a new thread.
@@ -96,7 +90,7 @@ private:
     // registerd shortcuts
     unordered_map<string, ShortcutBinding> shortcuts_;
     unordered_set<string> activeShortcuts_;
-    
+
     QList<QPair<std::string, struct libinput_device*>> devices_list_; // 存储设备路径的列表
 
     // Qt related
@@ -123,15 +117,21 @@ private:
 
     /**
      * @brief Initialize the libinput context, it will search for devices automatically.
-     * 
+     *
      */
     void initLibinput();
 
     /**
      * @brief Restart the libinput context and the event listener.
-     * 
+     *
      */
-    void restartLibinputAndListening();
+    void recreateLibinputContext();
+
+    /**
+     * @brief Start to listen for events from the libinput library.
+     *
+     */
+    void listenForEvents();
 
     /**
      * @brief Handles an event from the evdev library.
@@ -150,7 +150,7 @@ private:
      * @brief check and Remove/add keyboard devices from the libinput context.
      */
     void checkKeyboardAdd();
-    
+
     bool checkKeyboardRemove();
 };
 

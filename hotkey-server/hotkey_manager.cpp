@@ -91,7 +91,7 @@ void GlobalHotkeyManager::handleKeyEvent(struct libinput_event_keyboard* keyboar
     _shortcuts_mutex.unlock();
 }
 
-void GlobalHotkeyManager::restartLibinputAndListening()
+void GlobalHotkeyManager::recreateLibinputContext()
 {
     devices_list_.clear();
     _is_listening = false;
@@ -120,7 +120,7 @@ void GlobalHotkeyManager::listenForEvents()
             // restart libinput context in order to do so
             _should_check_keyboard = false;
             _should_restart_mutex.lock();
-            restartLibinputAndListening();
+            recreateLibinputContext();
             _should_restart = false;
             _should_check_keyboard = true;
             _should_restart_mutex.unlock();
