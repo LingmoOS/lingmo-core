@@ -6,9 +6,11 @@
 #pragma once
 
 #include <QDBusAbstractAdaptor>
+#include <qcontainerfwd.h>
 #include <qtmetamacros.h>
 
 #include "dbushelper.h"
+#include "keycode_helper.h"
 
 // forward declaration
 class GlobalshortcutAdaptor;
@@ -29,7 +31,13 @@ Q_SIGNALS:
     void ShortcutsChanged(const Shortcut& shortcut);
 
 public Q_SLOTS:
-    void BindShortcut(const Shortcut& shortcut);
+    /**
+     * @brief Bind a shortcut
+     *
+     * @param shortcut  (in) The shortcut to bind
+     * @param success  (out) Whether the shortcut is successfully bound
+     */
+    void BindShortcut(const Shortcut& shortcut, bool& success);
     void UnbindShortcut(const QString& shortcutIdentifier);
     void ListShortcuts();
 
@@ -40,5 +48,22 @@ private:
     // Hotkey magaer
     GlobalHotkeyManager* m_hotkeyManager;
 
-    Lingmo::HotKey::NativeShortcut _getNativeShortcut(const Qt::Key& key, const Qt::KeyboardModifiers& modifiers);
+    // Store registered shortcuts
+    QList<QPair<QString, Lingmo::HotKey::NativeShortcut>> m_shortcuts;
+
+    /**
+     * @brief Get native shortcut from Qt key
+     *
+     * @param key
+     * @param modifiers
+     * @return Lingmo::HotKey::NativeShortcut
+     */
+    Lingmo::HotKey::NativeShortcut _getNativeShortcut(const Qt::Key& key, const Qt::KeyboardModifiers& modifiers, QString _description = "");
+public:
+    /**
+     * @brief Get registerd shortcut descriptions and details
+     *
+     * @return Shortcuts
+     */
+    Shortcuts shortcutDescriptions() const;
 };

@@ -39,19 +39,28 @@ int main(int argc, char* argv[])
 
     auto interface = GlobalShortcutInterface(&a);
 
-    auto testingShortcut = Shortcut({
-        "testing_shortcut",
+    auto testingShortcut1 = Shortcut({
+        "testing_shortcut1",
         {
             {"keys", "Ctrl+Alt+N"},
-            {"description", "Testing shortcut"}
+            {"description", "Testing shortcut1"}
         }
     });
 
-    interface.BindShortcut(testingShortcut);
+    bool status;
+    interface.BindShortcut(testingShortcut1, status);
 
     //Test Q_SLOT
     QObject::connect(&interface, &GlobalShortcutInterface::Activated, [](const QString& shortcutIdentifier){
         std::cout << "Shortcut " << shortcutIdentifier.toStdString() << " activated" << std::endl;
+    });
+
+    QTimer::singleShot(2000, [&interface]() {
+        auto all = interface.shortcutDescriptions();
+        std::cout << "Current registered shortcut: " << std::endl;
+        for (const auto& shortcut : all) {
+            std::cout << shortcut.first.toStdString() << " " << shortcut.second["trigger_description"].toString().toStdString() << std::endl;
+        }
     });
 
     return a.exec();
