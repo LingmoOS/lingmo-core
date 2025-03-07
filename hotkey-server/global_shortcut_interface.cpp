@@ -9,6 +9,7 @@
 #include <qkeysequence.h>
 #include <qvariant.h>
 
+#include "dbushelper.h"
 #include "globalshortcutadaptor.h"
 #include "hotkey_manager.h"
 #include "keycode_helper.h"
@@ -18,33 +19,48 @@ GlobalShortcutInterface::GlobalShortcutInterface(QObject* parent)
     , m_adaptor { new GlobalshortcutAdaptor(this) }
     , m_hotkeyManager { new GlobalHotkeyManager(this) }
 {
+    qDBusRegisterMetaType<Shortcut>();
+
+    // connect to D-Bus and register as an object:
+    QDBusConnection::sessionBus().registerService(QStringLiteral("org.lingmo.core.globalshortcut"));
+    QDBusConnection::sessionBus().registerObject(QStringLiteral("/GlobalShortcut"), this);
+
     // Start manager
     QMetaObject::invokeMethod(this, std::bind(&GlobalHotkeyManager::startListeningForEvents, m_hotkeyManager), Qt::QueuedConnection);
 }
 
-void GlobalShortcutInterface::BindShortcut(const Shortcut& shortcut, bool& success)
+uint GlobalShortcutInterface::BindShortcut(const Shortcuts& shortcut)
 {
-    auto identifier = shortcut.first;
-    auto shortcut_str_list = QKeySequence(shortcut.second["keys"].toString());
-    auto shortcut_description = shortcut.second["description"].toString();
-    // Convert into unordered_set<int>, using defines in evdevs
-    // TODO: Only support one key for now
-    auto keys = shortcut_str_list[0].toCombined();
-    auto key = Qt::Key(keys & ~Qt::KeyboardModifierMask);
-    auto modifiers = Qt::KeyboardModifiers(keys & Qt::KeyboardModifierMask);
+    bool success = false;
+    for (auto& s : shortcut) {
+        auto identifier = s.first;
+        auto shortcut_str_list = QKeySequence(s.second["keys"].toString());
+        auto shortcut_description = s.second["description"].toString();
+        // Convert into unordered_set<int>, using defines in evdevs
+        // TODO: Only support one key for now
+        auto keys = shortcut_str_list[0].toCombined();
+        auto key = Qt::Key(keys & ~Qt::KeyboardModifierMask);
+        auto modifiers = Qt::KeyboardModifiers(keys & Qt::KeyboardModifierMask);
 
-    auto nativeShortcut = _getNativeShortcut(key, modifiers, shortcut_description);
-    success = m_hotkeyManager->bindShortcut(identifier.toStdString(), nativeShortcut, [this, identifier]() { emit Activated(identifier); }, shortcut_description);
+        auto nativeShortcut = _getNativeShortcut(key, modifiers, shortcut_description);
+        success = m_hotkeyManager->bindShortcut(identifier.toStdString(), nativeShortcut, [this, identifier]() { emit Activated(identifier); }, shortcut_description);
+        if (success) {
+            m_shortcuts.emplaceBack(QPair<QString, Lingmo::HotKey::NativeShortcut> { identifier, nativeShortcut });
+        }
+    }
     if (success) {
-        m_shortcuts.emplaceBack(QPair<QString, Lingmo::HotKey::NativeShortcut> { identifier, nativeShortcut });
+        return 0;
+    } else {
+        return 1;
     }
 }
 
-uint GlobalShortcutInterface::UnbindShortcut(const QString& shortcutIdentifier) { }
-uint GlobalShortcutInterface::ListShortcuts(QVariantMap &results) { 
+uint GlobalShortcutInterface::UnbindShortcut(const QString& shortcutIdentifier) { return 0; }
+uint GlobalShortcutInterface::ListShortcuts(QVariantMap& results)
+{
 
     results = {
-        {"shortcuts", this->shortcutDescriptionsVariant()},
+        { "shortcuts", this->shortcutDescriptionsVariant() },
     };
     return 0;
 }

@@ -26,7 +26,7 @@
 class DBusAdaptor : public QDBusAbstractAdaptor
 {
     Q_OBJECT
-    Q_CLASSINFO("D-Bus Interface", "org.panda.settings")
+    Q_CLASSINFO("D-Bus Interface", "org.lingmo.settings")
 
 public:
     DBusAdaptor(Application *app)

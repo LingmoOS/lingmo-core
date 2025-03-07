@@ -37,7 +37,7 @@ public Q_SLOTS:
      * @param shortcut  (in) The shortcut to bind
      * @param success  (out) Whether the shortcut is successfully bound
      */
-    uint BindShortcut(const Shortcut& shortcut, bool& success);
+    uint BindShortcut(const Shortcuts& shortcut);
     uint UnbindShortcut(const QString& shortcutIdentifier);
     uint ListShortcuts(QVariantMap &results);
 
