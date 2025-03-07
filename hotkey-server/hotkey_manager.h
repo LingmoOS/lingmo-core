@@ -8,13 +8,8 @@
 #define HOTKEY_MANAGER_H
 // STL
 #include <QMutex>
-#include <algorithm>
-#include <cstddef>
 #include <functional>
-#include <iostream>
 #include <memory>
-#include <qcontainerfwd.h>
-#include <qlist.h>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -34,6 +29,9 @@
 #include <QObject>
 #include <QString>
 #include <QThreadPool>
+#include <qcontainerfwd.h>
+#include <qlist.h>
+
 
 namespace Lingmo::HotKey {
 class NativeShortcut;

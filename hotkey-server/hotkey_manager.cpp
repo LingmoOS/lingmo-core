@@ -4,13 +4,15 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 #include "hotkey_manager.h"
-
 #include "keycode_helper.h"
 
-#include <QCoreApplication>
-#include <libinput.h>
-#include <qnamespace.h>
 #include <thread>
+#include <iostream>
+
+#include <libinput.h>
+
+#include <QCoreApplication>
+#include <qnamespace.h>
 
 GlobalHotkeyManager::GlobalHotkeyManager(QObject* parent)
     : QObject(parent)
