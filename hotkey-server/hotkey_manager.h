@@ -66,10 +66,11 @@ public:
      * @param keyCombination 构成快捷键的键码列表。
      * @param callback 当快捷键被激活时调用的函数。
      * @param description 快捷键的描述信息。
+     * @return 如果绑定成功，则返回 true；否则返回 false。
      */
-    void bindShortcut(const string& shortcutId, const unordered_set<int>& keyCombination, function<void()> callback, const QString& description = "");
+    bool bindShortcut(const string& shortcutId, const unordered_set<int>& keyCombination, function<void()> callback, const QString& description = "");
 
-    void bindShortcut(const string& shortcutId, const Lingmo::HotKey::NativeShortcut& keyCombination, function<void()> callback, const QString& description = "");
+    bool bindShortcut(const string& shortcutId, const Lingmo::HotKey::NativeShortcut& keyCombination, function<void()> callback, const QString& description = "");
 
     /**
      * @brief Start listenForEvents() in a new thread.

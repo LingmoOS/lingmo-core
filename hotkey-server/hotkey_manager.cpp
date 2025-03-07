@@ -54,20 +54,35 @@ void GlobalHotkeyManager::initLibinput()
     _should_restart = false;
 }
 
-void GlobalHotkeyManager::bindShortcut(const string& shortcutId, const unordered_set<int>& keyCombination, function<void()> callback, const QString& description)
+bool GlobalHotkeyManager::bindShortcut(const string& shortcutId, const unordered_set<int>& keyCombination, function<void()> callback, const QString& description)
 {
     _shortcuts_mutex.lock();
+    // Check for duplicate shortcutId
+    if (shortcuts_.find(shortcutId) != shortcuts_.end()) {
+        cerr << "Duplicate shortcutId: " << shortcutId << endl;
+        _shortcuts_mutex.unlock();
+        return false;
+    } else {
+        // Check for duplicate keyCombination
+        for (const auto& [existingShortcutId, existingShortcut] : shortcuts_) {
+            if (existingShortcut.keys == keyCombination) {
+                cerr << "Duplicate keyCombination: Pending shortcutId: " << shortcutId << " conflicts with shortcutId: " << existingShortcutId << endl;
+                _shortcuts_mutex.unlock();
+                return false;
+            }
+        }
+    }
     shortcuts_[shortcutId] = { keyCombination, callback, {}, description };
     _shortcuts_mutex.unlock();
+
+    return true;
 }
 
-void GlobalHotkeyManager::bindShortcut(const string& shortcutId, const Lingmo::HotKey::NativeShortcut& keyCombination, function<void()> callback, const QString& description)
+bool GlobalHotkeyManager::bindShortcut(const string& shortcutId, const Lingmo::HotKey::NativeShortcut& keyCombination, function<void()> callback, const QString& description)
 {
-    _shortcuts_mutex.lock();
     unordered_set<int> keys = unordered_set<int> { keyCombination.key };
     keys.insert(keyCombination.modifier.begin(), keyCombination.modifier.end());
-    shortcuts_[shortcutId] = { keys, callback, {}, description };
-    _shortcuts_mutex.unlock();
+    return bindShortcut(shortcutId, keys, callback, description);
 }
 
 void GlobalHotkeyManager::handleKeyEvent(struct libinput_event_keyboard* keyboardEvent)
