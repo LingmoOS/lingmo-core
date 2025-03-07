@@ -37,9 +37,9 @@ public Q_SLOTS:
      * @param shortcut  (in) The shortcut to bind
      * @param success  (out) Whether the shortcut is successfully bound
      */
-    void BindShortcut(const Shortcut& shortcut, bool& success);
-    void UnbindShortcut(const QString& shortcutIdentifier);
-    void ListShortcuts();
+    uint BindShortcut(const Shortcut& shortcut, bool& success);
+    uint UnbindShortcut(const QString& shortcutIdentifier);
+    uint ListShortcuts(QVariantMap &results);
 
 private:
     // D-Bus adaptor
@@ -59,7 +59,14 @@ private:
      * @return Lingmo::HotKey::NativeShortcut
      */
     Lingmo::HotKey::NativeShortcut _getNativeShortcut(const Qt::Key& key, const Qt::KeyboardModifiers& modifiers, QString _description = "");
-public:
+
+    /**
+     * @brief Get registerd shortcut identifiers
+     * 
+     * @return QVariant 
+     */
+    QVariant shortcutDescriptionsVariant() const;
+
     /**
      * @brief Get registerd shortcut descriptions and details
      *

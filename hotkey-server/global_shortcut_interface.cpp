@@ -7,6 +7,7 @@
 
 #include <QtGui> // QKeySequence
 #include <qkeysequence.h>
+#include <qvariant.h>
 
 #include "globalshortcutadaptor.h"
 #include "hotkey_manager.h"
@@ -35,17 +36,30 @@ void GlobalShortcutInterface::BindShortcut(const Shortcut& shortcut, bool& succe
     auto nativeShortcut = _getNativeShortcut(key, modifiers, shortcut_description);
     success = m_hotkeyManager->bindShortcut(identifier.toStdString(), nativeShortcut, [this, identifier]() { emit Activated(identifier); }, shortcut_description);
     if (success) {
-        m_shortcuts.emplaceBack(QPair<QString, Lingmo::HotKey::NativeShortcut>{identifier, nativeShortcut});
+        m_shortcuts.emplaceBack(QPair<QString, Lingmo::HotKey::NativeShortcut> { identifier, nativeShortcut });
     }
 }
 
-void GlobalShortcutInterface::UnbindShortcut(const QString& shortcutIdentifier) { }
-void GlobalShortcutInterface::ListShortcuts() { }
+uint GlobalShortcutInterface::UnbindShortcut(const QString& shortcutIdentifier) { }
+uint GlobalShortcutInterface::ListShortcuts(QVariantMap &results) { 
+
+    results = {
+        {"shortcuts", this->shortcutDescriptionsVariant()},
+    };
+    return 0;
+}
 
 Lingmo::HotKey::NativeShortcut GlobalShortcutInterface::_getNativeShortcut(const Qt::Key& key, const Qt::KeyboardModifiers& modifiers, QString _description)
 {
     using namespace Lingmo::HotKey;
     return NativeShortcut { GetNativeKeycode(key), GetNativeModifier(modifiers), _description };
+}
+
+QVariant GlobalShortcutInterface::shortcutDescriptionsVariant() const
+{
+    QDBusArgument retVar;
+    retVar << shortcutDescriptions();
+    return QVariant::fromValue(retVar);
 }
 
 Shortcuts GlobalShortcutInterface::shortcutDescriptions() const

@@ -55,13 +55,13 @@ int main(int argc, char* argv[])
         std::cout << "Shortcut " << shortcutIdentifier.toStdString() << " activated" << std::endl;
     });
 
-    QTimer::singleShot(2000, [&interface]() {
-        auto all = interface.shortcutDescriptions();
-        std::cout << "Current registered shortcut: " << std::endl;
-        for (const auto& shortcut : all) {
-            std::cout << shortcut.first.toStdString() << " " << shortcut.second["trigger_description"].toString().toStdString() << std::endl;
-        }
-    });
+    // QTimer::singleShot(2000, [&interface]() {
+    //     auto all = interface.shortcutDescriptions();
+    //     std::cout << "Current registered shortcut: " << std::endl;
+    //     for (const auto& shortcut : all) {
+    //         std::cout << shortcut.first.toStdString() << " " << shortcut.second["trigger_description"].toString().toStdString() << std::endl;
+    //     }
+    // });
 
     return a.exec();
 }
