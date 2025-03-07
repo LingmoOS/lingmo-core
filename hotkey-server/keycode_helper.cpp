@@ -12,9 +12,10 @@ NativeShortcut::NativeShortcut()
 {
 }
 
-NativeShortcut::NativeShortcut(int _key, std::unordered_set<int> _modifier)
+NativeShortcut::NativeShortcut(int _key, std::unordered_set<int> _modifier, QString _description)
     : key { _key }
     , modifier { _modifier }
+    , description(_description)
     , valid(false)
 {
 }
@@ -282,18 +283,284 @@ int GetNativeKeycode(const Qt::Key& key)
     }
 }
 
+Qt::Key GetQtKeycode(const int& keycode)
+{
+    switch (keycode) {
+    case KEY_ESC:
+        return Qt::Key_Escape;
+    case KEY_1:
+        return Qt::Key_1;
+    case KEY_2:
+        return Qt::Key_2;
+    case KEY_3:
+        return Qt::Key_3;
+    case KEY_4:
+        return Qt::Key_4;
+    case KEY_5:
+        return Qt::Key_5;
+    case KEY_6:
+        return Qt::Key_6;
+    case KEY_7:
+        return Qt::Key_7;
+    case KEY_8:
+        return Qt::Key_8;
+    case KEY_9:
+        return Qt::Key_9;
+    case KEY_0:
+        return Qt::Key_0;
+    case KEY_MINUS:
+        return Qt::Key_Minus;
+    case KEY_EQUAL:
+        return Qt::Key_Equal;
+    case KEY_BACKSPACE:
+        return Qt::Key_Backspace;
+    case KEY_TAB:
+        return Qt::Key_Tab;
+    case KEY_Q:
+        return Qt::Key_Q;
+    case KEY_W:
+        return Qt::Key_W;
+    case KEY_E:
+        return Qt::Key_E;
+    case KEY_R:
+        return Qt::Key_R;
+    case KEY_T:
+        return Qt::Key_T;
+    case KEY_Y:
+        return Qt::Key_Y;
+    case KEY_U:
+        return Qt::Key_U;
+    case KEY_I:
+        return Qt::Key_I;
+    case KEY_O:
+        return Qt::Key_O;
+    case KEY_P:
+        return Qt::Key_P;
+    case KEY_LEFTBRACE:
+        return Qt::Key_BracketLeft;
+    case KEY_RIGHTBRACE:
+        return Qt::Key_BracketRight;
+    case KEY_ENTER:
+        return Qt::Key_Return;
+    case KEY_LEFTCTRL:
+        return Qt::Key_Control;
+    case KEY_A:
+        return Qt::Key_A;
+    case KEY_S:
+        return Qt::Key_S;
+    case KEY_D:
+        return Qt::Key_D;
+    case KEY_F:
+        return Qt::Key_F;
+    case KEY_G:
+        return Qt::Key_G;
+    case KEY_H:
+        return Qt::Key_H;
+    case KEY_J:
+        return Qt::Key_J;
+    case KEY_K:
+        return Qt::Key_K;
+    case KEY_L:
+        return Qt::Key_L;
+    case KEY_SEMICOLON:
+        return Qt::Key_Semicolon;
+    case KEY_APOSTROPHE:
+        return Qt::Key_Apostrophe;
+    case KEY_LEFTSHIFT:
+        return Qt::Key_Shift;
+    case KEY_BACKSLASH:
+        return Qt::Key_Backslash;
+    case KEY_Z:
+        return Qt::Key_Z;
+    case KEY_X:
+        return Qt::Key_X;
+    case KEY_C:
+        return Qt::Key_C;
+    case KEY_V:
+        return Qt::Key_V;
+    case KEY_B:
+        return Qt::Key_B;
+    case KEY_N:
+        return Qt::Key_N;
+    case KEY_M:
+        return Qt::Key_M;
+    case KEY_COMMA:
+        return Qt::Key_Comma;
+    case KEY_DOT:
+        return Qt::Key_Period;
+    case KEY_SLASH:
+        return Qt::Key_Slash;
+    // TODO: case KEY_RIGHTSHIFT: return Qt::Key_Shift;
+    case KEY_KPASTERISK:
+        return Qt::Key_Asterisk;
+    case KEY_LEFTALT:
+        return Qt::Key_Alt;
+    case KEY_SPACE:
+        return Qt::Key_Space;
+    case KEY_CAPSLOCK:
+        return Qt::Key_CapsLock;
+    case KEY_F1:
+        return Qt::Key_F1;
+    case KEY_F2:
+        return Qt::Key_F2;
+    case KEY_F3:
+        return Qt::Key_F3;
+    case KEY_F4:
+        return Qt::Key_F4;
+    case KEY_F5:
+        return Qt::Key_F5;
+    case KEY_F6:
+        return Qt::Key_F6;
+    case KEY_F7:
+        return Qt::Key_F7;
+    case KEY_F8:
+        return Qt::Key_F8;
+    case KEY_F9:
+        return Qt::Key_F9;
+    case KEY_F10:
+        return Qt::Key_F10;
+    case KEY_NUMLOCK:
+        return Qt::Key_NumLock;
+    case KEY_SCROLLLOCK:
+        return Qt::Key_ScrollLock;
+    // TODO: Qt do not have keys for keypad!
+    case KEY_ZENKAKUHANKAKU:
+        return Qt::Key_Zenkaku_Hankaku;
+    case KEY_F11:
+        return Qt::Key_F11;
+    case KEY_F12:
+        return Qt::Key_F12;
+    case KEY_KATAKANA:
+        return Qt::Key_Katakana;
+    case KEY_HIRAGANA:
+        return Qt::Key_Hiragana;
+    case KEY_HENKAN:
+        return Qt::Key_Henkan;
+    case KEY_MUHENKAN:
+        return Qt::Key_Muhenkan;
+    // TODO: case KEY_RIGHTCTRL: return Qt::Key_Control;
+    // TODO: case KEY_RIGHTALT: return Qt::Key_Alt;
+    case KEY_HOME:
+        return Qt::Key_Home;
+    case KEY_UP:
+        return Qt::Key_Up;
+    case KEY_PAGEUP:
+        return Qt::Key_PageUp;
+    case KEY_LEFT:
+        return Qt::Key_Left;
+    case KEY_RIGHT:
+        return Qt::Key_Right;
+    case KEY_END:
+        return Qt::Key_End;
+    case KEY_DOWN:
+        return Qt::Key_Down;
+    case KEY_PAGEDOWN:
+        return Qt::Key_PageDown;
+    case KEY_INSERT:
+        return Qt::Key_Insert;
+    case KEY_DELETE:
+        return Qt::Key_Delete;
+    case KEY_MUTE:
+        return Qt::Key_VolumeMute;
+    case KEY_VOLUMEDOWN:
+        return Qt::Key_VolumeDown;
+    case KEY_VOLUMEUP:
+        return Qt::Key_VolumeUp;
+    case KEY_POWER:
+        return Qt::Key_PowerDown;
+    case KEY_PAUSE:
+        return Qt::Key_Pause;
+    case KEY_LEFTMETA:
+        return Qt::Key_Meta;
+    // TODO: case KEY_RIGHTMETA: return Qt::Key_Meta;
+    case KEY_STOP:
+        return Qt::Key_Stop;
+    case KEY_AGAIN:
+        return Qt::Key_Redo;
+    case KEY_UNDO:
+        return Qt::Key_Undo;
+    case KEY_COPY:
+        return Qt::Key_Copy;
+    case KEY_OPEN:
+        return Qt::Key_Open;
+    case KEY_PASTE:
+        return Qt::Key_Paste;
+    case KEY_FIND:
+        return Qt::Key_Find;
+    case KEY_CUT:
+        return Qt::Key_Cut;
+    case KEY_HELP:
+        return Qt::Key_Help;
+    case KEY_MENU:
+        return Qt::Key_Menu;
+    case KEY_CALC:
+        return Qt::Key_Calculator;
+    case KEY_SLEEP:
+        return Qt::Key_Sleep;
+    case KEY_WAKEUP:
+        return Qt::Key_WakeUp;
+
+    case KEY_F13:
+        return Qt::Key_F13;
+    case KEY_F14:
+        return Qt::Key_F14;
+    case KEY_F15:
+        return Qt::Key_F15;
+    case KEY_F16:
+        return Qt::Key_F16;
+    case KEY_F17:
+        return Qt::Key_F17;
+    case KEY_F18:
+        return Qt::Key_F18;
+    case KEY_F19:
+        return Qt::Key_F19;
+    case KEY_F20:
+        return Qt::Key_F20;
+    case KEY_F21:
+        return Qt::Key_F21;
+    case KEY_F22:
+        return Qt::Key_F22;
+    case KEY_F23:
+        return Qt::Key_F23;
+    case KEY_F24:
+        return Qt::Key_F24;
+    default:
+        return Qt::Key_unknown;
+    }
+}
+
 std::unordered_set<int> GetNativeModifier(const Qt::KeyboardModifiers& modifier)
 {
     std::unordered_set<int> result = {};
 
     if (modifier & Qt::ShiftModifier) {
         result.insert(KEY_LEFTSHIFT);
-    } else if (modifier & Qt::ControlModifier) {
+    } 
+    if (modifier & Qt::ControlModifier) {
         result.insert(KEY_LEFTCTRL);
-    } else if (modifier & Qt::AltModifier) {
+    } 
+    if (modifier & Qt::AltModifier) {
         result.insert(KEY_LEFTALT);
-    } else if (modifier & Qt::MetaModifier) {
+    } 
+    if (modifier & Qt::MetaModifier) {
         result.insert(KEY_LEFTMETA);
+    }
+
+    return result;
+}
+
+Qt::KeyboardModifiers GetQtModifier(const int& modifier)
+{
+    Qt::KeyboardModifiers result = {};
+
+    if (modifier == KEY_LEFTSHIFT) {
+        result = Qt::ShiftModifier;
+    } else if (modifier == KEY_LEFTCTRL) {
+        result = Qt::ControlModifier;
+    } else if (modifier == KEY_LEFTALT) {
+        result = Qt::AltModifier;
+    } else if (modifier == KEY_LEFTMETA) {
+        result = Qt::MetaModifier;
     }
 
     return result;
