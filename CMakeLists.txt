@@ -10,8 +10,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_compile_options(-Wall -Werror)
-add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
+# add_compile_options(-Wall)
+# add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/)
 
