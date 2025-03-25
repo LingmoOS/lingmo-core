@@ -9,6 +9,7 @@
 #include "sniproxy.h"
 
 #include <algorithm>
+#include <qbitmap.h>
 #include <xcb/xcb_atom.h>
 #include <xcb/xcb_event.h>
 
@@ -357,8 +358,8 @@ QImage SNIProxy::convertFromNative(xcb_image_t *xcbImage) const
 
     if (format == QImage::Format_RGB32 && xcbImage->bpp == 32) {
         QImage m = image.createHeuristicMask();
-        QBitmap mask(QPixmap::fromImage(m));
-        QPixmap p = QPixmap::fromImage(image);
+        QBitmap mask = QBitmap::fromPixmap(QPixmap::fromImage(m));
+        QPixmap p = QBitmap::fromPixmap(QPixmap::fromImage(image));
         p.setMask(mask);
         image = p.toImage();
     }
