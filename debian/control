@@ -61,7 +61,6 @@ Depends: accountsservice,
          qml6-module-qtqml,
          qml6-module-qtquick-window,
          qml6-module-qtquick-shapes,
-         appmenu-gtk2-module,
          appmenu-gtk3-module,
          ${misc:Depends},
          ${shlibs:Depends}
