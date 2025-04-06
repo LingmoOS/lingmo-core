@@ -1,7 +1,6 @@
 find_package(ECM REQUIRED NO_MODULE)
 list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 
-find_package(Qt5 COMPONENTS Core Widgets DBus X11Extras REQUIRED)
 find_package(XCB MODULE REQUIRED COMPONENTS XCB KEYSYMS)
 find_package(X11)
 
@@ -19,10 +18,10 @@ add_executable(lingmo-chotkeys
 
 target_link_libraries(lingmo-chotkeys
     PRIVATE
-    Qt5::Core
-    Qt5::Widgets
-    Qt5::DBus
-    Qt5::X11Extras
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::DBus
+    Qt6::GuiPrivate
     ${XCB_LIBS}
     ${X11_LIBRARIES}
     XCB::KEYSYMS

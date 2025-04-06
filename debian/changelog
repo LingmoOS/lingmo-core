@@ -1,3 +1,9 @@
+lingmo-core (3.0.0) UNRELEASED; urgency=high
+
+  * Migrate to Qt6. [Elysia]
+
+ -- LingmoOS OS Team <team@lingmo.org>  Fri, 29 Nov 2024 19:25:45 +0800
+
 lingmo-core (2.0.2) unstable; urgency=high
 
   * Change to native package.
