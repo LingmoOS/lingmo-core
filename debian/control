@@ -1,7 +1,8 @@
 Source: lingmo-core
 Section: devel
 Priority: optional
-Maintainer: LingmoOS <team@lingmo.org>
+Maintainer: Lingmo OS Team <team@lingmo.org>
+
 Build-Depends: cmake,
                debhelper-compat (= 13),
                extra-cmake-modules,
@@ -64,4 +65,4 @@ Depends: accountsservice,
          appmenu-gtk3-module,
          ${misc:Depends},
          ${shlibs:Depends}
-Description: LingmoOS System Components
+Description: Lingmo OS System Components
