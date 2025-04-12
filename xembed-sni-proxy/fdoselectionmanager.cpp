@@ -11,7 +11,7 @@
 
 #include <QCoreApplication>
 #include <QTimer>
-#include <QX11Info>
+#include <QtGui/private/qtx11extras_p.h>
 
 #include <KSelectionOwner>
 
@@ -100,7 +100,7 @@ bool FdoSelectionManager::addDamageWatch(xcb_window_t client)
     return true;
 }
 
-bool FdoSelectionManager::nativeEventFilter(const QByteArray &eventType, void *message, long int *result)
+bool FdoSelectionManager::nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result)
 {
     Q_UNUSED(result)
 

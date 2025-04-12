@@ -20,9 +20,9 @@
 #include <QDBusPendingCallWatcher>
 #include <QDBusPendingReply>
 
-#include <QX11Info>
+#include <QtGui/private/qtx11extras_p.h>
 #include <KWindowSystem>
-#include <KWindowSystem/NETWM>
+#include <NETWM>
 
 #include "daemon-helper.h"
 
@@ -148,7 +148,7 @@ void ProcessManager::loadAutoStartProcess()
         const QStringList fileNames = d.entryList(QStringList() << QStringLiteral("*.desktop"));
         for (const QString &file : fileNames) {
             QSettings desktop(d.absoluteFilePath(file), QSettings::IniFormat);
-            desktop.setIniCodec("UTF-8");
+
             desktop.beginGroup("Desktop Entry");
 
             // Ignore files the require a specific desktop environment
@@ -187,7 +187,7 @@ void ProcessManager::loadAutoStartProcess()
     m_userAutoStartD = std::make_shared<LINGMO_SESSION::Daemon>(list, false);
 }
 
-bool ProcessManager::nativeEventFilter(const QByteArray &eventType, void *message, long *result)
+bool ProcessManager::nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result)
 {
     if (eventType != "xcb_generic_event_t") // We only want to handle XCB events
         return false;

@@ -2,7 +2,7 @@
 
 #include <QApplication>
 #include <QKeySequence>
-#include <QX11Info>
+#include <QtGui/private/qtx11extras_p.h>
 #include <QTimer>
 #include <QDebug>
 
@@ -27,7 +27,7 @@ Hotkeys::~Hotkeys()
     qApp->removeNativeEventFilter(this);
 }
 
-bool Hotkeys::nativeEventFilter(const QByteArray &eventType, void *message, long *result)
+bool Hotkeys::nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result)
 {
     Q_UNUSED(result);
 
