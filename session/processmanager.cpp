@@ -20,9 +20,9 @@
 #include <QDBusPendingCallWatcher>
 #include <QDBusPendingReply>
 
-#include <QtGui/private/qtx11extras_p.h>
+#include <QX11Info>
 #include <KWindowSystem>
-#include <NETWM>
+#include <KWindowSystem/NETWM>
 
 #include "daemon-helper.h"
 
@@ -100,12 +100,12 @@ void ProcessManager::startDesktopProcess()
 
     QList<QPair<QString, QStringList>> list;
     // Desktop components
+    list << qMakePair(QString("lingmo-desktop"), QStringList());
+    list << qMakePair(QString("lingmo-dock"), QStringList());
     list << qMakePair(QString("kwin_x11"), QStringList("--replace"));
     list << qMakePair(QString("lingmo-notificationd"), QStringList());
-    list << qMakePair(QString("lingmo-desktop"), QStringList());
     list << qMakePair(QString("lingmo-filemanager"), QStringList("--runtime"));
     list << qMakePair(QString("lingmo-statusbar"), QStringList());
-    list << qMakePair(QString("lingmo-dock"), QStringList());
     list << qMakePair(QString("lingmo-launcher"), QStringList());
     list << qMakePair(QString("lingmo-powerman"), QStringList());
     list << qMakePair(QString("lingmo-clipboard"), QStringList());
@@ -148,7 +148,7 @@ void ProcessManager::loadAutoStartProcess()
         const QStringList fileNames = d.entryList(QStringList() << QStringLiteral("*.desktop"));
         for (const QString &file : fileNames) {
             QSettings desktop(d.absoluteFilePath(file), QSettings::IniFormat);
-
+            desktop.setIniCodec("UTF-8");
             desktop.beginGroup("Desktop Entry");
 
             // Ignore files the require a specific desktop environment
@@ -187,7 +187,7 @@ void ProcessManager::loadAutoStartProcess()
     m_userAutoStartD = std::make_shared<LINGMO_SESSION::Daemon>(list, false);
 }
 
-bool ProcessManager::nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result)
+bool ProcessManager::nativeEventFilter(const QByteArray &eventType, void *message, long *result)
 {
     if (eventType != "xcb_generic_event_t") // We only want to handle XCB events
         return false;
