@@ -1,5 +1,5 @@
-#ifndef CUTEFISH_RECORDER_ENCODER_H
-#define CUTEFISH_RECORDER_ENCODER_H
+#ifndef LINGMO_RECORDER_ENCODER_H
+#define LINGMO_RECORDER_ENCODER_H
 
 #include "image.h"
 
@@ -130,4 +130,4 @@ private:
     std::deque<std::pair<std::vector<float>, int64_t>> m_earlyAudio;
 };
 
-#endif // CUTEFISH_RECORDER_ENCODER_H
+#endif // LINGMO_RECORDER_ENCODER_H

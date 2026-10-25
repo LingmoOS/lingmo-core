@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: 2026 LingmoOS Contributors
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#ifndef CUTEFISH_RECORDER_IMAGE_H
-#define CUTEFISH_RECORDER_IMAGE_H
+#ifndef LINGMO_RECORDER_IMAGE_H
+#define LINGMO_RECORDER_IMAGE_H
 
 #include "base/geometry.h"
 
@@ -47,4 +47,4 @@ struct DmaBuf
 //! @p image, which is in wl_output @p transform, the way it is shown.
 Image upright(const Image &image, uint32_t transform);
 
-#endif // CUTEFISH_RECORDER_IMAGE_H
+#endif // LINGMO_RECORDER_IMAGE_H

@@ -1,5 +1,5 @@
-#ifndef CUTEFISH_RECORDER_RECORDER_H
-#define CUTEFISH_RECORDER_RECORDER_H
+#ifndef LINGMO_RECORDER_RECORDER_H
+#define LINGMO_RECORDER_RECORDER_H
 
 #include "capture_session.h"
 #include "task_thread.h"
@@ -85,4 +85,4 @@ private:
     bool m_done = false;
 };
 
-#endif // CUTEFISH_RECORDER_RECORDER_H
+#endif // LINGMO_RECORDER_RECORDER_H

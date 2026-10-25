@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: 2026 LingmoOS Contributors
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#ifndef CUTEFISH_RECORDER_TASK_THREAD_H
-#define CUTEFISH_RECORDER_TASK_THREAD_H
+#ifndef LINGMO_RECORDER_TASK_THREAD_H
+#define LINGMO_RECORDER_TASK_THREAD_H
 
 #include <condition_variable>
 #include <deque>
@@ -76,4 +76,4 @@ private:
     bool m_quit = false;
 };
 
-#endif // CUTEFISH_RECORDER_TASK_THREAD_H
+#endif // LINGMO_RECORDER_TASK_THREAD_H

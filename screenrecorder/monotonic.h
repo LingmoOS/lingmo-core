@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: 2026 LingmoOS Contributors
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#ifndef CUTEFISH_RECORDER_MONOTONIC_H
-#define CUTEFISH_RECORDER_MONOTONIC_H
+#ifndef LINGMO_RECORDER_MONOTONIC_H
+#define LINGMO_RECORDER_MONOTONIC_H
 
 #include <cstdint>
 #include <ctime>
@@ -16,4 +16,4 @@ inline int64_t monotonicNs()
     return int64_t(now.tv_sec) * 1000000000 + now.tv_nsec;
 }
 
-#endif // CUTEFISH_RECORDER_MONOTONIC_H
+#endif // LINGMO_RECORDER_MONOTONIC_H

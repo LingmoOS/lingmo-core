@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: 2026 LingmoOS Contributors
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#ifndef CUTEFISH_RECORDER_CAPTURE_CLIENT_H
-#define CUTEFISH_RECORDER_CAPTURE_CLIENT_H
+#ifndef LINGMO_RECORDER_CAPTURE_CLIENT_H
+#define LINGMO_RECORDER_CAPTURE_CLIENT_H
 
 #include "base/geometry.h"
 
@@ -92,4 +92,4 @@ private:
     std::vector<std::unique_ptr<Toplevel>> m_toplevels;
 };
 
-#endif // CUTEFISH_RECORDER_CAPTURE_CLIENT_H
+#endif // LINGMO_RECORDER_CAPTURE_CLIENT_H

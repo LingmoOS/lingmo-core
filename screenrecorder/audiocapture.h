@@ -1,5 +1,5 @@
-#ifndef CUTEFISH_RECORDER_AUDIOCAPTURE_H
-#define CUTEFISH_RECORDER_AUDIOCAPTURE_H
+#ifndef LINGMO_RECORDER_AUDIOCAPTURE_H
+#define LINGMO_RECORDER_AUDIOCAPTURE_H
 
 #include <cstdint>
 #include <functional>
@@ -35,4 +35,4 @@ private:
     pw_stream *m_stream = nullptr;
 };
 
-#endif // CUTEFISH_RECORDER_AUDIOCAPTURE_H
+#endif // LINGMO_RECORDER_AUDIOCAPTURE_H

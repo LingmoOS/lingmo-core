@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: 2026 LingmoOS Contributors
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#ifndef CUTEFISH_RECORDER_CAPTURE_SESSION_H
-#define CUTEFISH_RECORDER_CAPTURE_SESSION_H
+#ifndef LINGMO_RECORDER_CAPTURE_SESSION_H
+#define LINGMO_RECORDER_CAPTURE_SESSION_H
 
 #include "image.h"
 
@@ -129,4 +129,4 @@ private:
     int64_t m_framePresentedNs = 0;
 };
 
-#endif // CUTEFISH_RECORDER_CAPTURE_SESSION_H
+#endif // LINGMO_RECORDER_CAPTURE_SESSION_H
