@@ -1,0 +1,101 @@
+/* libadwaita pushes the bar 1px past each window edge; the padding makes up for it */
+headerbar {
+  min-height: 40px;
+  padding: 0;
+  margin-left: -1px;
+  margin-right: -1px;
+}
+
+headerbar > windowhandle > box {
+  padding: 6px 6px;
+}
+
+headerbar entry,
+headerbar spinbutton,
+headerbar separator:not(.sidebar),
+headerbar button,
+headerbar menubutton,
+headerbar switch {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* Only direct header bar buttons; a descendant selector would reach into popovers */
+headerbar box.start > button,
+headerbar box.end > button,
+headerbar box.start > menubutton > button,
+headerbar box.end > menubutton > button,
+headerbar box.start > splitbutton > button,
+headerbar box.end > splitbutton > button,
+headerbar box.start > splitbutton > menubutton > button,
+headerbar box.end > splitbutton > menubutton > button,
+headerbar box.start > box > button,
+headerbar box.end > box > button,
+headerbar box.start > box > menubutton > button,
+headerbar box.end > box > menubutton > button,
+headerbar box.start > .linked > button,
+headerbar box.end > .linked > button,
+headerbar box.start > dropdown > button,
+headerbar box.end > dropdown > button,
+headerbar stackswitcher > button {
+  min-height: 18px;
+}
+
+headerbar entry,
+headerbar spinbutton:not(.vertical) {
+  min-height: 26px;
+}
+
+headerbar windowcontrols.start,
+headerbar windowcontrols.end {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* A 26px circle, 7px from the next one and centred 20px from the top and right edges */
+headerbar windowcontrols > button {
+  min-width: 26px;
+  min-height: 26px;
+  padding: 2px;
+  margin: -1px 0;
+}
+
+headerbar windowcontrols > button > image {
+  min-width: 16px;
+  min-height: 16px;
+  padding: 5px;
+  background-color: transparent;
+  transition: none;
+}
+
+/* Restated because the transparent rest state above outranks libadwaita's state rules too */
+headerbar windowcontrols > button:hover > image {
+  background-color: color-mix(in srgb, currentColor 15%, transparent);
+}
+
+headerbar windowcontrols > button:active > image {
+  background-color: color-mix(in srgb, currentColor 30%, transparent);
+}
+
+headerbar viewswitcher:not(.narrow) {
+  min-height: 28px;
+}
+
+headerbar viewswitcher:not(.narrow) button.toggle > stack > box.narrow {
+  margin-top: -4px;
+  margin-bottom: -4px;
+}
+
+headerbar windowcontrols > .icon {
+  margin: 6px 7px;
+}
+
+/* With the bar's own 3px above and below, a stacked header bar still totals 40px */
+toolbarview > .top-bar .collapse-spacing headerbar {
+  min-height: 34px;
+}
+
+toolbarview > .top-bar .collapse-spacing headerbar > windowhandle > box {
+  padding-top: 3px;
+  padding-bottom: 3px;
+}

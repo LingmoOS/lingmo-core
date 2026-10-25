@@ -1,0 +1,39 @@
+Source: lingmo-core
+Section: devel
+Priority: optional
+Maintainer: Lingmo OS Team <team@lingmo.org>
+Build-Depends: cmake (>= 3.22),
+               debhelper-compat (= 14),
+               lingmo-toolkit,
+               lingmo-framework,
+               pkg-config,
+               libwayland-bin,
+               libwayland-dev,
+               wayland-protocols (>= 1.39),
+               libavcodec-dev,
+               libavformat-dev,
+               libavutil-dev,
+               libswscale-dev,
+               libva-dev,
+               libdrm-dev,
+               libgbm-dev,
+               libsystemd-dev,
+               libfontconfig-dev,
+               libicu-dev,
+               libpipewire-0.3-dev,
+               libspa-0.2-dev
+Standards-Version: 4.7.2
+Homepage: https://github.com/lingmoos/lingmo-core
+
+Package: lingmo-core
+Architecture: any
+Depends: accountsservice,
+         polkitd,
+         gsettings-desktop-schemas,
+         lingmo-toolkit,
+         lingmo-framework,
+         ${misc:Depends},
+         ${shlibs:Depends}
+Recommends: va-driver-all | va-driver,
+            systemd-coredump
+Description: Lingmo OS System Components

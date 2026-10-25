@@ -1,0 +1,55 @@
+headerbar,
+.titlebar:not(headerbar) {
+  min-height: 40px;
+}
+
+headerbar entry,
+headerbar spinbutton,
+headerbar separator:not(.sidebar),
+headerbar button {
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+
+/* User CSS outranks theme specificity, so undo the margin on nested spin buttons */
+headerbar spinbutton button {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+headerbar button:not(.titlebutton) {
+  min-height: 18px;
+}
+
+headerbar button.image-button:not(.titlebutton) {
+  min-width: 16px;
+}
+
+headerbar entry,
+headerbar spinbutton:not(.vertical) {
+  min-height: 26px;
+}
+
+headerbar switch {
+  margin-top: 7px;
+  margin-bottom: 7px;
+}
+
+/* A 26px circle, 7px from the next one and centred 20px from the top and right edges */
+headerbar button.titlebutton:not(.appmenu),
+.titlebar button.titlebutton:not(.appmenu) {
+  padding: 4px;
+  margin: 7px 1px 7px 0;
+  transition: none;
+}
+
+headerbar.default-decoration,
+.default-decoration.titlebar:not(headerbar) {
+  padding: 0 6px;
+}
+
+headerbar.default-decoration button.titlebutton,
+.default-decoration.titlebar:not(headerbar) button.titlebutton {
+  min-height: 0;
+  min-width: 0;
+}
