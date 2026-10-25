@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     project(lingmo-idle LANGUAGES C CXX)
-    find_package(LingmoToolkit REQUIRED)
+    find_package(LingmoSDK REQUIRED)
     include(CTest)
 endif()
 find_package(PkgConfig REQUIRED)
@@ -19,7 +19,7 @@ add_custom_command(OUTPUT ${header} ${code}
 add_library(lingmo-idle-backend STATIC waylandidle.cpp waylandidle.h ${header} ${code})
 set_target_properties(lingmo-idle-backend PROPERTIES CXX_STANDARD 20 CXX_STANDARD_REQUIRED ON)
 target_include_directories(lingmo-idle-backend PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(lingmo-idle-backend PUBLIC Lingmo::ToolkitBase PRIVATE PkgConfig::IdleWayland)
+target_link_libraries(lingmo-idle-backend PUBLIC Lingmo::SDKBase PRIVATE PkgConfig::IdleWayland)
 
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND BUILD_TESTING)
     find_package(GTest REQUIRED)

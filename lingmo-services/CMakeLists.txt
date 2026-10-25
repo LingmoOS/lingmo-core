@@ -1,7 +1,7 @@
 project(lingmo-services)
 set(TARGET lingmo-services)
 
-find_package(LingmoToolkit REQUIRED)
+find_package(LingmoSDK REQUIRED)
 find_package(LingmoClients REQUIRED COMPONENTS display)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(ServicesSystemd REQUIRED IMPORTED_TARGET libsystemd)
@@ -83,7 +83,7 @@ target_compile_definitions(${TARGET} PRIVATE
 )
 
 target_link_libraries(${TARGET} PRIVATE
-        Lingmo::Toolkit
+        Lingmo::SDK
         Lingmo::DisplayClient
         lingmo-core-common
         lingmo-clipboard-backend

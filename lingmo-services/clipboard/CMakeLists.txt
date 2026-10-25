@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     project(lingmo-clipboard LANGUAGES C CXX)
-    find_package(LingmoToolkit REQUIRED)
+    find_package(LingmoSDK REQUIRED)
 endif()
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(ClipboardWayland REQUIRED IMPORTED_TARGET wayland-client)
@@ -21,7 +21,7 @@ add_library(lingmo-clipboard-backend STATIC
     clipboard.cpp clipboard.h waylandclipboard.cpp waylandclipboard.h ${header} ${code})
 set_target_properties(lingmo-clipboard-backend PROPERTIES CXX_STANDARD 20 CXX_STANDARD_REQUIRED ON)
 target_include_directories(lingmo-clipboard-backend PRIVATE ${CLIPBOARD_GENERATED_DIR})
-target_link_libraries(lingmo-clipboard-backend PUBLIC Lingmo::ToolkitBase
+target_link_libraries(lingmo-clipboard-backend PUBLIC Lingmo::SDKBase
     PRIVATE PkgConfig::ClipboardWayland)
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     add_executable(clipboard-service-test-helper tests/service_helper.cpp)

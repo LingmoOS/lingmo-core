@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 project(language_service_test LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-find_package(LingmoToolkit REQUIRED)
+find_package(LingmoSDK REQUIRED)
 find_package(GTest REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(Systemd REQUIRED IMPORTED_TARGET libsystemd)
@@ -20,7 +20,7 @@ add_executable(language_service_test language_service_test.cpp
     ${SERVICE_DIR}/notification.cpp)
 target_include_directories(language_service_test PRIVATE ${SERVICE_DIR} ${CORE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/..)
-target_link_libraries(language_service_test PRIVATE lingmo-core-common Lingmo::ToolkitBase GTest::gtest_main
+target_link_libraries(language_service_test PRIVATE lingmo-core-common Lingmo::SDKBase GTest::gtest_main
     PkgConfig::Systemd PkgConfig::Icu PkgConfig::Fontconfig)
 enable_testing()
 add_test(NAME language_service_test COMMAND ${DBUS_RUN_SESSION} -- $<TARGET_FILE:language_service_test>)

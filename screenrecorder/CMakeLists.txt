@@ -46,7 +46,7 @@ endforeach()
 
 target_include_directories(lingmo-screenrecorder PRIVATE ${protocol_dir})
 target_link_libraries(lingmo-screenrecorder PRIVATE
-    Lingmo::ToolkitBase
+    Lingmo::SDKBase
     PkgConfig::WaylandClient
     PkgConfig::Gbm
     PkgConfig::FFmpeg

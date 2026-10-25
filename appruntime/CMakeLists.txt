@@ -20,7 +20,7 @@ set(SOURCES
 add_executable(${TARGET} ${SOURCES})
 target_link_libraries(${TARGET}
     lingmo-core-common
-    Lingmo::ToolkitBase
+    Lingmo::SDKBase
     Qt6::Core
     PkgConfig::Systemd
 )

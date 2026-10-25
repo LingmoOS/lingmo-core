@@ -22,6 +22,6 @@ add_library(lingmo-core-common STATIC
 )
 target_include_directories(lingmo-core-common PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 target_link_libraries(lingmo-core-common
-    PUBLIC Lingmo::ToolkitBase
+    PUBLIC Lingmo::SDKBase
     PRIVATE PkgConfig::ICU PkgConfig::CommonSystemd
 )

@@ -13,7 +13,7 @@ set(SOURCES
 
 add_executable(${TARGET} ${SOURCES})
 target_link_libraries(${TARGET}
-    Lingmo::ToolkitBase
+    Lingmo::SDKBase
     lingmo-core-common
 )
 
