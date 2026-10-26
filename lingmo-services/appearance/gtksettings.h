@@ -24,4 +24,3 @@ void writeGtkSettings(const GtkSettings &settings);
 // the rest of the file. It is re-added at every login, even after the user removed it.
 void ensureGtkCssImports();
 
-#endif

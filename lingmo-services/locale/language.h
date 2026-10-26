@@ -69,4 +69,3 @@ private:
     Lingmo::Base::DBus::PendingCall m_localeCall;
 };
 
-#endif

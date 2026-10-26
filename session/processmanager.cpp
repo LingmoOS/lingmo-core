@@ -191,8 +191,8 @@ void SessionProcessManager::publishXwaylandEnvironment(bool startDesktop)
     if (!raw->process.start(
             "dbus-update-activation-environment",
             {"--systemd",
-             "DISPLAY="    + environmentValue("DISPLAY"),
-             "XAUTHORITY=" + environmentValue("XAUTHORITY")})) {
+             "DISPLAY="    + environmentValue("DISPLAY").toStdString(),
+             "XAUTHORITY=" + environmentValue("XAUTHORITY").toStdString()})) {
         LM_WARNING(sessionLog()) << "dbus-update-activation-environment is unavailable";
         finish();
         return;
@@ -217,8 +217,8 @@ void SessionProcessManager::startAfterCompositorReady()
     // Application autostart waits for the external services daemon.
     if (dbus::Connection *bus = dbus::Connection::session()) {
         m_servicesWatch = bus->watchName(
-            "org.lingmo.Services", [this](const QString &owner) {
-                if (owner.isEmpty())
+            "org.lingmo.Services", [this](const std::string &owner) {
+                if (owner.empty())
                     return;
                 m_servicesWatch = {};
                 startDesktopProcess();

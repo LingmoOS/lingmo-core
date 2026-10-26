@@ -56,7 +56,7 @@ bool startWithOwnJournalStream(Lingmo::Base::Process &process,
         std::filesystem::path(program.toStdString()).filename().string());
     const int stream = openStream(name);
     if (stream < 0)
-        return process.start(program, arguments);
+        return process.start(program.toStdString(), toStdStrings(arguments));
 
     const int output = ::fcntl(STDOUT_FILENO, F_DUPFD_CLOEXEC, 10);
     const int errors = ::fcntl(STDERR_FILENO, F_DUPFD_CLOEXEC, 10);
@@ -66,7 +66,7 @@ bool startWithOwnJournalStream(Lingmo::Base::Process &process,
         if (errors >= 0)
             ::close(errors);
         ::close(stream);
-        return process.start(program, arguments);
+        return process.start(program.toStdString(), toStdStrings(arguments));
     }
 
     // The program inherits this process's output and errors as it starts,
@@ -74,7 +74,7 @@ bool startWithOwnJournalStream(Lingmo::Base::Process &process,
     std::fflush(stdout);
     ::dup2(stream, STDOUT_FILENO);
     ::dup2(stream, STDERR_FILENO);
-    const bool started = process.start(program, arguments);
+    const bool started = process.start(program.toStdString(), toStdStrings(arguments));
     ::dup2(output, STDOUT_FILENO);
     ::dup2(errors, STDERR_FILENO);
 

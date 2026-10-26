@@ -30,4 +30,3 @@ private:
     bool m_environmentPublished = false;
 };
 
-#endif

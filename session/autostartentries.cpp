@@ -67,7 +67,6 @@ QStringList autostartEntries(const QStringList &directories,
             // QSettings parses INI-style files natively, with the [Desktop Entry]
             // group handled automatically as "Desktop Entry/".
             QSettings desktop(QDir(directory).filePath(name), QSettings::IniFormat);
-            desktop.setIniCodec("UTF-8");
             desktop.beginGroup(QStringLiteral("Desktop Entry"));
 
             const QString type = desktop.value(QStringLiteral("Type")).toString();

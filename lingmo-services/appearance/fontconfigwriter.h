@@ -25,4 +25,3 @@ QString fontForLocale(const QString &code);
 // that carries no language of its own.
 QString cjkFontForLanguages(const QStringList &languages);
 
-#endif

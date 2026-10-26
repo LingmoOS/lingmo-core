@@ -38,8 +38,8 @@ bool ShellProcess::startForSession(const QString &program, const QString &socket
         return false;
 
     Lingmo::Core::Environment environment = Lingmo::Core::processEnvironment();
-    environment[QStringLiteral("WAYLAND_DISPLAY")] = socket;
-    environment.remove(QStringLiteral("WAYLAND_SOCKET"));
+    environment["WAYLAND_DISPLAY"] = socket.toStdString();
+    environment.erase("WAYLAND_SOCKET");
 
     QStringList arguments{QStringLiteral("--daemon")};
     int shellFd = -1;

@@ -112,4 +112,3 @@ private:
     QString m_iconTheme;
 };
 
-#endif

@@ -300,7 +300,7 @@ int SessionApplication::runSync(const QString &program, const QStringList &args)
     int exitCode = 0;
     p.onFinished = [&exitCode](int code, bool) { exitCode = code; };
 
-    if (!p.start(program, args)) {
+    if (!p.start(program.toStdString(), toStdStrings(args))) {
         LM_WARNING(sessionLog()) << program << "could not be started";
         return 255;
     }

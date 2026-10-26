@@ -82,4 +82,3 @@ private:
     QList<Display> m_displays;
 };
 
-#endif

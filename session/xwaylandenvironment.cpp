@@ -28,7 +28,7 @@ static bool isLocalDisplay(const QString &display)
 
 XwaylandEnvironment::XwaylandEnvironment()
     : m_directory(Lingmo::Base::paths::runtimeDirectory(),
-                  QStringLiteral("lingmo-session-x11-"))
+                  QStringLiteral("lingmo-session-x11-").toStdString())
 {
     m_timeout.setSingleShot(true);
     m_timeout.onTimeout = [this] {
@@ -38,7 +38,7 @@ XwaylandEnvironment::XwaylandEnvironment()
             onResolved(false);
     };
     if (m_directory.isValid())
-        m_watch = Lingmo::Base::FileWatch::directory(m_directory.path(), [this](const QString &) {
+        m_watch = Lingmo::Base::FileWatch::directory(m_directory.path(), [this](const std::string &) {
             check();
         });
 }
@@ -46,7 +46,7 @@ XwaylandEnvironment::XwaylandEnvironment()
 QString XwaylandEnvironment::readinessFile() const
 {
     return m_directory.isValid()
-        ? m_directory.path() + QStringLiteral("/ready.json")
+        ? QString::fromStdString(m_directory.path() + "/ready.json")
         : QString();
 }
 

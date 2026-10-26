@@ -33,18 +33,19 @@ static int handleShortForms(sd_bus_message *message, void *userdata, sd_bus_erro
     uint32_t pid = 0;
 
     if (std::strcmp(member, "launchApplication") == 0 && call.signature() == "sas") {
-        QString appId;
-        QStringList arguments;
+        std::string appId;
+        std::vector<std::string> arguments;
         if (!call.read(appId, arguments))
             return 0;
-        pid = runtime->launchApplication(appId, arguments);
+        pid = runtime->launchApplication(QString::fromStdString(appId), toQStringList(arguments));
     } else if (std::strcmp(member, "launchCommand") == 0 && call.signature() == "sass") {
-        QString appId;
-        QStringList command;
-        QString workingDirectory;
+        std::string appId;
+        std::vector<std::string> command;
+        std::string workingDirectory;
         if (!call.read(appId, command, workingDirectory))
             return 0;
-        pid = runtime->launchCommand(appId, command, workingDirectory);
+        pid = runtime->launchCommand(QString::fromStdString(appId), toQStringList(command),
+                                     QString::fromStdString(workingDirectory));
     } else {
         return 0;
     }
@@ -72,21 +73,26 @@ int main(int argc, char *argv[])
     dbus::Object object(bus, kPath, kService);
     object.addMethod(
         "launchApplication",
-        [&runtime](const QString &appId, const QStringList &arguments,
-                   const QString &activationToken) {
-            return runtime.launchApplication(appId, arguments, activationToken);
+        [&runtime](const std::string &appId, const std::vector<std::string> &arguments,
+                   const std::string &activationToken) {
+            return runtime.launchApplication(QString::fromStdString(appId), toQStringList(arguments),
+                                             QString::fromStdString(activationToken));
         },
         {{"appId", "arguments", "activationToken"}, {"pid"}});
     object.addMethod(
         "launchCommand",
-        [&runtime](const QString &appId, const QStringList &command,
-                   const QString &workingDirectory, const QString &activationToken) {
-            return runtime.launchCommand(appId, command, workingDirectory, activationToken);
+        [&runtime](const std::string &appId, const std::vector<std::string> &command,
+                   const std::string &workingDirectory, const std::string &activationToken) {
+            return runtime.launchCommand(QString::fromStdString(appId), toQStringList(command),
+                                         QString::fromStdString(workingDirectory),
+                                         QString::fromStdString(activationToken));
         },
         {{"appId", "command", "workingDirectory", "activationToken"}, {"pid"}});
     object.addMethod(
         "quitApplication",
-        [&runtime](const QString &appId) { return runtime.quitApplication(appId); },
+        [&runtime](const std::string &appId) {
+            return runtime.quitApplication(QString::fromStdString(appId));
+        },
         {{"appId"}, {"result"}});
     object.addMethod("quitAll", [&runtime] { return runtime.quitAll(); }, {{}, {"result"}});
     object.addMethod(
@@ -99,15 +105,19 @@ int main(int argc, char *argv[])
         {{"pid"}, {"result"}});
     object.addMethod(
         "isRunning",
-        [&runtime](const QString &appId) { return runtime.isRunning(appId); },
+        [&runtime](const std::string &appId) {
+            return runtime.isRunning(QString::fromStdString(appId));
+        },
         {{"appId"}, {"result"}});
     object.addMethod(
         "runningApplications",
-        [&runtime] { return runtime.runningApplications(); },
+        [&runtime] { return toStdStrings(runtime.runningApplications()); },
         {{}, {"appIds"}});
     object.addMethod(
         "pidsForApplication",
-        [&runtime](const QString &appId) { return runtime.pidsForApplication(appId); },
+        [&runtime](const std::string &appId) {
+            return toStdVector(runtime.pidsForApplication(QString::fromStdString(appId)));
+        },
         {{"appId"}, {"pids"}});
     object.addSignal("applicationLaunched", "su", {"appId", "pid"});
     object.addSignal("applicationQuit",     "su", {"appId", "pid"});
@@ -119,11 +129,11 @@ int main(int argc, char *argv[])
 
     const auto launched = runtime.applicationLaunched.connect(
         [&object](const QString &appId, uint32_t pid) {
-            object.emitSignal("applicationLaunched", appId, pid);
+            object.emitSignal("applicationLaunched", appId.toStdString(), pid);
         });
     const auto quit = runtime.applicationQuit.connect(
         [&object](const QString &appId, uint32_t pid) {
-            object.emitSignal("applicationQuit", appId, pid);
+            object.emitSignal("applicationQuit", appId.toStdString(), pid);
         });
 
     if (!bus->requestName(kService)) {

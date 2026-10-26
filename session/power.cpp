@@ -9,7 +9,7 @@
 
 namespace dbus = Lingmo::Base::DBus;
 
-static bool callLogind(const QString &method)
+static bool callLogind(const std::string &method)
 {
     dbus::Connection *bus = dbus::Connection::system();
     if (!bus) {

@@ -19,6 +19,11 @@ set(SOURCES
 )
 
 add_executable(${TARGET} ${SOURCES})
+# The sources name their Qt objects with QString; qt_interop.h converts at the
+# toolkit's std::string boundary. Force-included so it is in scope everywhere.
+target_compile_options(${TARGET} PRIVATE
+    -include ${CMAKE_SOURCE_DIR}/qt_interop.h
+)
 target_link_libraries(${TARGET}
     lingmo-core-common
     Lingmo::SDKBase

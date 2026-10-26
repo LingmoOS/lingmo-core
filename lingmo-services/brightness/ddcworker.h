@@ -56,4 +56,3 @@ private:
     std::thread m_thread;
 };
 
-#endif
