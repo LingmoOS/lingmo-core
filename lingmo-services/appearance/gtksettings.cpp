@@ -15,31 +15,31 @@ using namespace Lingmo::Base::strings;
 namespace gsettings = Lingmo::Core::gsettings;
 namespace fs = std::filesystem;
 
-static QString gtk3SettingsIniPath()
+static std::string gtk3SettingsIniPath()
 {
     return paths::configHome() + "/gtk-3.0/settings.ini";
 }
 
 void writeGtkSettings(const GtkSettings &gtk)
 {
-    const QString fontName = gtk.fontFamily + ' ' + number(gtk.fontPointSize, 'g', -1);
+    const std::string fontName = gtk.fontFamily + ' ' + number(gtk.fontPointSize, 'g', -1);
     // No Lingmo GTK theme ships; Adwaita's dark variant is what gtk-theme can switch to.
-    const QString gtkTheme = gtk.darkMode ? "Adwaita-dark" : "Adwaita";
+    const std::string gtkTheme = gtk.darkMode ? "Adwaita-dark" : "Adwaita";
     const bool subpixel = gtk.fontAntialias && gtk.fontRgba != "none";
 
     // Only GTK clients on Xwayland still read this, for every key the compositor's XSETTINGS
     // leaves out. On Wayland the keyfile below overrides every key the schema covers.
     {
         Settings settings(gtk3SettingsIniPath());
-        for (const QString &key : settings.childKeys())
+        for (const std::string &key : settings.childKeys())
             settings.remove(key);
-        for (const QString &group : settings.childGroups())
+        for (const std::string &group : settings.childGroups())
             settings.remove(group);
         settings.setValue("Settings/gtk-font-name", fontName);
         settings.setValue("Settings/gtk-xft-antialias", gtk.fontAntialias ? 1 : 0);
         settings.setValue("Settings/gtk-xft-hinting", gtk.fontHintStyle != "hintnone" ? 1 : 0);
         settings.setValue("Settings/gtk-xft-hintstyle", gtk.fontHintStyle);
-        settings.setValue("Settings/gtk-xft-rgba", subpixel ? gtk.fontRgba : QString("none"));
+        settings.setValue("Settings/gtk-xft-rgba", subpixel ? gtk.fontRgba : std::string("none"));
         settings.setValue("Settings/gtk-application-prefer-dark-theme", gtk.darkMode);
         settings.setValue("Settings/gtk-icon-theme-name", gtk.iconTheme);
         settings.setValue("Settings/gtk-cursor-theme-name", gtk.cursorTheme);
@@ -54,30 +54,30 @@ void writeGtkSettings(const GtkSettings &gtk)
     gsettings::writeGroup("org/gnome/desktop/interface", {
             {"font-name", fontName},
             {"font-antialiasing",
-             QString(!gtk.fontAntialias ? "none" : subpixel ? "rgba" : "grayscale")},
+             std::string(!gtk.fontAntialias ? "none" : subpixel ? "rgba" : "grayscale")},
             // The schema's nicks are fontconfig's hintstyle constants without "hint".
-            {"font-hinting", gtk.fontHintStyle.size() > 4 ? gtk.fontHintStyle.substr(4) : QString()},
-            {"font-rgba-order", subpixel ? gtk.fontRgba : QString("rgb")},
+            {"font-hinting", gtk.fontHintStyle.size() > 4 ? gtk.fontHintStyle.substr(4) : std::string()},
+            {"font-rgba-order", subpixel ? gtk.fontRgba : std::string("rgb")},
             // "automatic" makes GTK 4 ignore the three keys above.
-            {"font-rendering", QString("manual")},
+            {"font-rendering", std::string("manual")},
             {"gtk-theme", gtkTheme},
-            {"color-scheme", QString(gtk.darkMode ? "prefer-dark" : "default")},
+            {"color-scheme", std::string(gtk.darkMode ? "prefer-dark" : "default")},
             {"icon-theme", gtk.iconTheme},
             {"cursor-theme", gtk.cursorTheme},
             {"cursor-size", gtk.cursorSize},
             {"enable-animations", false},
     });
     gsettings::writeGroup("org/gnome/desktop/wm/preferences", {
-            {"button-layout", QString("menu:minimize,maximize,close")},
+            {"button-layout", std::string("menu:minimize,maximize,close")},
     });
 }
 
-static void ensureGtkCssImport(const QString &gtkDir)
+static void ensureGtkCssImport(const std::string &gtkDir)
 {
-    const QString importLine =
+    const std::string importLine =
             "@import url(\"" + url::fromLocalFile(LINGMO_GTK_CSS_DIR "/" + gtkDir + ".css") + "\");";
 
-    QString path = paths::configHome() + '/' + gtkDir + "/gtk.css";
+    std::string path = paths::configHome() + '/' + gtkDir + "/gtk.css";
     // Write through a symlinked gtk.css (dotfile managers) instead of replacing the link.
     std::error_code error;
     if (fs::is_symlink(path, error) && fs::exists(path, error)) {
@@ -86,7 +86,7 @@ static void ensureGtkCssImport(const QString &gtkDir)
             path = target.string();
     }
 
-    QStringList lines;
+    std::vector<std::string> lines;
     if (const auto contents = file::read(path))
         lines = split(*contents, '\n');
     while (!lines.empty() && lines.back().empty())

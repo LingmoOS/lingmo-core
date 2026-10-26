@@ -19,31 +19,31 @@ using namespace Lingmo::Base;
 using namespace Lingmo::Base::strings;
 namespace fs = std::filesystem;
 
-static const QString BacklightDir = "/sys/class/backlight/";
-static const QString DrmDir = "/sys/class/drm/";
+static const std::string BacklightDir = "/sys/class/backlight/";
+static const std::string DrmDir = "/sys/class/drm/";
 
 // Writers that replace the file drop the watch; IN_IGNORED says so.
 static constexpr uint32_t kWatchMask = IN_MODIFY | IN_CLOSE_WRITE | IN_ATTRIB | IN_MOVE_SELF | IN_DELETE_SELF;
 
-static QString readSysfs(const QString &path)
+static std::string readSysfs(const std::string &path)
 {
-    return QString(trimmed(file::read(path).value_or(QString())));
+    return std::string(trimmed(file::read(path).value_or(std::string())));
 }
 
-static int toInt(const QString &text)
+static int toInt(const std::string &text)
 {
     return toNumber<int>(text).value_or(0);
 }
 
-static QString brightnessFile(const QString &backlight)
+static std::string brightnessFile(const std::string &backlight)
 {
     return BacklightDir + backlight + "/brightness";
 }
 
 // The entries of a directory that are directories or links to them, sorted by name.
-static QStringList subdirectories(const QString &directory)
+static std::vector<std::string> subdirectories(const std::string &directory)
 {
-    QStringList names;
+    std::vector<std::string> names;
     std::error_code error;
     for (const fs::directory_entry &entry : fs::directory_iterator(directory, error)) {
         std::error_code typeError;
@@ -55,25 +55,25 @@ static QStringList subdirectories(const QString &directory)
 }
 
 // The name of what the link at the path resolves to; empty when it does not.
-static QString canonicalName(const QString &path)
+static std::string canonicalName(const std::string &path)
 {
     std::error_code error;
     const fs::path target = fs::canonical(path, error);
-    return error ? QString() : target.filename().string();
+    return error ? std::string() : target.filename().string();
 }
 
-static bool exists(const QString &path)
+static bool exists(const std::string &path)
 {
     std::error_code error;
     return fs::exists(path, error);
 }
 
 // Connected DRM connectors, e.g. "card0-eDP-1".
-static QStringList connectedConnectors()
+static std::vector<std::string> connectedConnectors()
 {
-    QStringList result;
-    for (const QString &entry : subdirectories(DrmDir)) {
-        if (!startsWith(entry, "card") || entry.find('-', 4) == QString::npos)
+    std::vector<std::string> result;
+    for (const std::string &entry : subdirectories(DrmDir)) {
+        if (!startsWith(entry, "card") || entry.find('-', 4) == std::string::npos)
             continue;
         if (readSysfs(DrmDir + entry + "/status") == "connected")
             result.push_back(entry);
@@ -81,13 +81,13 @@ static QStringList connectedConnectors()
     return result;
 }
 
-static bool isInternalConnector(const QString &connector)
+static bool isInternalConnector(const std::string &connector)
 {
-    const QStringView type = section(connector, '-', 1, 1);
+    const std::string_view type = section(connector, '-', 1, 1);
     return type == "eDP" || type == "LVDS" || type == "DSI";
 }
 
-static int typeRank(const QString &type)
+static int typeRank(const std::string &type)
 {
     if (type == "firmware")
         return 0;
@@ -96,7 +96,7 @@ static int typeRank(const QString &type)
     return 2;
 }
 
-static bool contains(const QStringList &list, const QString &value)
+static bool contains(const std::vector<std::string> &list, const std::string &value)
 {
     return std::find(list.begin(), list.end(), value) != list.end();
 }
@@ -104,7 +104,7 @@ static bool contains(const QStringList &list, const QString &value)
 BrightnessManager::BrightnessManager(dbus::Connection *session, dbus::Connection *system)
     : m_session(session)
     , m_system(system)
-    , m_ddcWorker([this](uint64_t generation, const QList<DdcDisplay> &displays) {
+    , m_ddcWorker([this](uint64_t generation, const std::vector<DdcDisplay> &displays) {
         handleDdcProbed(generation, displays);
     })
 {
@@ -152,10 +152,10 @@ bool BrightnessManager::publish()
     object.addMethod("setValue", [this](int32_t value) { setValue(value); }, {{"value"}, {}});
     object.addMethod("displays", [this] { return displays(); });
     object.addMethod("displayBrightness",
-                     [this](const QString &display) { return int32_t(displayBrightness(display)); },
+                     [this](const std::string &display) { return int32_t(displayBrightness(display)); },
                      {{"display"}, {"value"}});
     object.addMethod("setDisplayBrightness",
-                     [this](const QString &display, int32_t value) { setDisplayBrightness(display, value); },
+                     [this](const std::string &display, int32_t value) { setDisplayBrightness(display, value); },
                      {{"display", "value"}, {}});
     object.addProperty("maxBrightness", [this] { return int32_t(maxBrightness()); });
     object.addProperty("brightness", [this] { return int32_t(brightness()); });
@@ -187,21 +187,21 @@ void BrightnessManager::setValue(int value)
         setDisplayBrightness(m_displays.front().connector, value);
 }
 
-QStringList BrightnessManager::displays() const
+std::vector<std::string> BrightnessManager::displays() const
 {
-    QStringList result;
+    std::vector<std::string> result;
     for (const Display &display : m_displays)
         result.push_back(display.connector);
     return result;
 }
 
-int BrightnessManager::displayBrightness(const QString &display) const
+int BrightnessManager::displayBrightness(const std::string &display) const
 {
     const Display *entry = find(display);
     return entry ? percent(*entry) : -1;
 }
 
-void BrightnessManager::setDisplayBrightness(const QString &connector, int value)
+void BrightnessManager::setDisplayBrightness(const std::string &connector, int value)
 {
     Display *display = find(connector);
     if (!display)
@@ -229,7 +229,7 @@ void BrightnessManager::setDisplayBrightness(const QString &connector, int value
                             LM_WARNING(services::log())
                                     << "Setting backlight brightness failed:" << reply.error().message;
                     },
-                    QString("backlight"), display->device, uint32_t(raw));
+                    std::string("backlight"), display->device, uint32_t(raw));
         }
     } else {
         m_ddcWorker.requestValue(display->device, raw);
@@ -241,13 +241,13 @@ void BrightnessManager::setDisplayBrightness(const QString &connector, int value
 void BrightnessManager::rescan()
 {
     ++m_generation;
-    const QStringList connected = connectedConnectors();
-    const QList<Display> backlights = scanBacklights(connected);
+    const std::vector<std::string> connected = connectedConnectors();
+    const std::vector<Display> backlights = scanBacklights(connected);
 
-    QList<DdcDisplay> candidates = ddcCandidates(connected, backlights);
+    std::vector<DdcDisplay> candidates = ddcCandidates(connected, backlights);
 
     // Keep known DDC displays until the probe answers so sliders do not flicker.
-    QList<Display> displays = backlights;
+    std::vector<Display> displays = backlights;
     for (const Display &display : m_displays) {
         if (display.kind != Kind::Ddc)
             continue;
@@ -262,19 +262,19 @@ void BrightnessManager::rescan()
         m_ddcWorker.probe(m_generation, std::move(candidates));
 }
 
-QList<BrightnessManager::Display>
-BrightnessManager::scanBacklights(const QStringList &connected) const
+std::vector<BrightnessManager::Display>
+BrightnessManager::scanBacklights(const std::vector<std::string> &connected) const
 {
-    QStringList internal;
-    for (const QString &connector : connected) {
+    std::vector<std::string> internal;
+    for (const std::string &connector : connected) {
         if (isInternalConnector(connector))
             internal.push_back(connector);
     }
 
     // Firmware and platform interfaces carry no connector link; they drive the internal panel.
-    std::map<QString, std::pair<int, Display>> best;
-    for (const QString &name : subdirectories(BacklightDir)) {
-        const QString path = BacklightDir + name;
+    std::map<std::string, std::pair<int, Display>> best;
+    for (const std::string &name : subdirectories(BacklightDir)) {
+        const std::string path = BacklightDir + name;
         Display display;
         display.kind = Kind::Backlight;
         display.device = name;
@@ -282,7 +282,7 @@ BrightnessManager::scanBacklights(const QStringList &connected) const
         if (display.maximum <= 0)
             continue;
 
-        const QString parent = canonicalName(path + "/device");
+        const std::string parent = canonicalName(path + "/device");
         const bool attached = !parent.empty() && exists(DrmDir + parent) && startsWith(parent, "card");
         if (attached)
             display.connector = parent;
@@ -299,19 +299,19 @@ BrightnessManager::scanBacklights(const QStringList &connected) const
         }
     }
 
-    QList<Display> result;
-    for (const QString &connector : connected) {
+    std::vector<Display> result;
+    for (const std::string &connector : connected) {
         if (const auto it = best.find(connector); it != best.end())
             result.push_back(it->second.second);
     }
     return result;
 }
 
-QList<DdcDisplay> BrightnessManager::ddcCandidates(const QStringList &connected,
-                                                         const QList<Display> &backlights) const
+std::vector<DdcDisplay> BrightnessManager::ddcCandidates(const std::vector<std::string> &connected,
+                                                         const std::vector<Display> &backlights) const
 {
-    QList<DdcDisplay> result;
-    for (const QString &connector : connected) {
+    std::vector<DdcDisplay> result;
+    for (const std::string &connector : connected) {
         if (isInternalConnector(connector))
             continue;
         const bool hasBacklight = std::any_of(backlights.cbegin(), backlights.cend(),
@@ -322,11 +322,11 @@ QList<DdcDisplay> BrightnessManager::ddcCandidates(const QStringList &connected,
             continue;
 
         // HDMI/DVI/VGA link their DDC adapter; DP exposes an AUX-backed i2c child.
-        const QString path = DrmDir + connector;
-        QString bus = canonicalName(path + "/ddc");
+        const std::string path = DrmDir + connector;
+        std::string bus = canonicalName(path + "/ddc");
         if (!startsWith(bus, "i2c-")) {
             bus.clear();
-            for (const QString &child : subdirectories(path)) {
+            for (const std::string &child : subdirectories(path)) {
                 if (startsWith(child, "i2c-")) {
                     bus = child;
                     break;
@@ -344,13 +344,13 @@ QList<DdcDisplay> BrightnessManager::ddcCandidates(const QStringList &connected,
     return result;
 }
 
-void BrightnessManager::handleDdcProbed(uint64_t generation, const QList<DdcDisplay> &probed)
+void BrightnessManager::handleDdcProbed(uint64_t generation, const std::vector<DdcDisplay> &probed)
 {
     if (generation != m_generation)
         return;
 
     // Backlight values may have changed since the scan; m_displays holds the latest.
-    QList<Display> displays;
+    std::vector<Display> displays;
     for (const Display &display : m_displays) {
         if (display.kind == Kind::Backlight)
             displays.push_back(display);
@@ -370,11 +370,11 @@ void BrightnessManager::handleDdcProbed(uint64_t generation, const QList<DdcDisp
     publish(std::move(displays));
 }
 
-void BrightnessManager::publish(QList<Display> displays)
+void BrightnessManager::publish(std::vector<Display> displays)
 {
-    const QStringList oldConnectors = this->displays();
+    const std::vector<std::string> oldConnectors = this->displays();
     const int oldDefault = brightness();
-    const QList<Display> old = m_displays;
+    const std::vector<Display> old = m_displays;
     m_displays = std::move(displays);
 
     watchFiles();
@@ -399,11 +399,11 @@ void BrightnessManager::watchFiles()
     if (m_inotify < 0)
         return;
 
-    std::map<QString, int> watches;
+    std::map<std::string, int> watches;
     for (const Display &display : m_displays) {
         if (display.kind != Kind::Backlight)
             continue;
-        const QString path = brightnessFile(display.device);
+        const std::string path = brightnessFile(display.device);
         if (const auto it = m_watches.find(path); it != m_watches.end()) {
             watches.insert(*it);
             m_watches.erase(it);
@@ -421,7 +421,7 @@ void BrightnessManager::watchFiles()
 void BrightnessManager::readInotify()
 {
     alignas(inotify_event) char buffer[4096];
-    QStringList changed;
+    std::vector<std::string> changed;
     for (;;) {
         const ssize_t length = ::read(m_inotify, buffer, sizeof(buffer));
         if (length <= 0)
@@ -444,7 +444,7 @@ void BrightnessManager::readInotify()
             }
         }
     }
-    for (const QString &path : changed)
+    for (const std::string &path : changed)
         handleFileChanged(path);
 }
 
@@ -453,7 +453,7 @@ void BrightnessManager::readBacklight(Display &display) const
     display.raw = toInt(readSysfs(brightnessFile(display.device)));
 }
 
-BrightnessManager::Display *BrightnessManager::find(const QString &display)
+BrightnessManager::Display *BrightnessManager::find(const std::string &display)
 {
     for (Display &entry : m_displays) {
         if (entry.connector == display)
@@ -462,7 +462,7 @@ BrightnessManager::Display *BrightnessManager::find(const QString &display)
     return nullptr;
 }
 
-const BrightnessManager::Display *BrightnessManager::find(const QString &display) const
+const BrightnessManager::Display *BrightnessManager::find(const std::string &display) const
 {
     return const_cast<BrightnessManager *>(this)->find(display);
 }
@@ -489,13 +489,13 @@ void BrightnessManager::emitBrightnessChanged()
         m_object->emitSignal("brightnessChanged");
 }
 
-void BrightnessManager::emitDisplayBrightnessChanged(const QString &display, int value)
+void BrightnessManager::emitDisplayBrightnessChanged(const std::string &display, int value)
 {
     if (m_object)
         m_object->emitSignal("displayBrightnessChanged", display, int32_t(value));
 }
 
-void BrightnessManager::handleFileChanged(const QString &path)
+void BrightnessManager::handleFileChanged(const std::string &path)
 {
     for (Display &display : m_displays) {
         if (display.kind != Kind::Backlight || brightnessFile(display.device) != path)

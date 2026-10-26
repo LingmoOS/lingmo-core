@@ -14,7 +14,7 @@ static int normalizedTimeout(int timeout)
     return timeout < 0 ? -1 : std::max(1, timeout);
 }
 
-static int readTimeout(const Settings &settings, const QString &key, int fallback)
+static int readTimeout(const Settings &settings, const std::string &key, int fallback)
 {
     return settings.contains(key) ? normalizedTimeout(int(settings.intValue(key))) : fallback;
 }
@@ -66,7 +66,7 @@ bool PowerManager::publish()
 
 void PowerManager::loadSettings()
 {
-    const QString group = s_powerGroup;
+    const std::string group = s_powerGroup;
     m_batteryScreenOff = readTimeout(m_settings, group + "BatteryScreenOff", 300);
     m_acScreenOff = readTimeout(m_settings, group + "ACScreenOff", 1200);
     m_acPreventSleep = m_settings.boolValue(group + "ACPreventSleep", false);
@@ -82,7 +82,7 @@ void PowerManager::applyPolicy()
 }
 
 template<typename T>
-void PowerManager::writePowerSetting(const QString &key, const T &value)
+void PowerManager::writePowerSetting(const std::string &key, const T &value)
 {
     m_settings.setValue(s_powerGroup + key, value);
     m_settings.sync();

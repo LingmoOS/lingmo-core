@@ -30,7 +30,7 @@ private:
     void readNewEntries();
     void scheduleTimeout();
     Coredump currentEntry() const;
-    QString field(const char *name) const;
+    std::string field(const char *name) const;
 
     std::function<void(const Coredump &dump)> m_coredump;
     sd_journal *m_journal = nullptr;

@@ -34,7 +34,7 @@ PowerSupply::PowerSupply(dbus::Connection *system, dbus::Connection *session, Se
             removeBattery(path->path);
     }));
     m_matches.push_back(m_upower.onPropertiesChanged(
-            [this](const dbus::VariantMap &changed, const QStringList &invalidated) {
+            [this](const dbus::VariantMap &changed, const std::vector<std::string> &invalidated) {
                 if (!invalidated.empty()) {
                     readFlags(m_upower.getAll().value<dbus::VariantMap>().value_or(changed));
                     return;
@@ -52,7 +52,7 @@ PowerSupply::PowerSupply(dbus::Connection *system, dbus::Connection *session, Se
     m_lidClosed = flag(values, "LidIsClosed", false);
 
     const dbus::Reply devices = m_upower.call("EnumerateDevices");
-    const auto paths = devices.value<QList<dbus::ObjectPath>>();
+    const auto paths = devices.value<std::vector<dbus::ObjectPath>>();
     if (!paths) {
         LM_WARNING(services::log()) << "Cannot list UPower devices:" << devices.error().name;
         return;
@@ -78,7 +78,7 @@ void PowerSupply::readFlags(const dbus::VariantMap &values)
     }
 }
 
-void PowerSupply::addBattery(const QString &path)
+void PowerSupply::addBattery(const std::string &path)
 {
     if (m_batteries.contains(path))
         return;
@@ -91,7 +91,7 @@ void PowerSupply::addBattery(const QString &path)
     publishBattery();
 }
 
-void PowerSupply::removeBattery(const QString &path)
+void PowerSupply::removeBattery(const std::string &path)
 {
     const auto it = m_batteries.find(path);
     if (it == m_batteries.end())

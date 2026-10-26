@@ -29,17 +29,17 @@ class CrashDialog
 public:
     enum class Kind { Application, SessionProcess };
 
-    CrashDialog(Kind kind, const QString &id, std::function<QString()> name, const QString &icon,
-                const QString &fixedFont);
+    CrashDialog(Kind kind, const std::string &id, std::function<std::string()> name, const std::string &icon,
+                const std::string &fixedFont);
     ~CrashDialog();
 
     CrashDialog(const CrashDialog &) = delete;
     CrashDialog &operator=(const CrashDialog &) = delete;
 
     bool sessionProcess() const { return m_kind == Kind::SessionProcess; }
-    const QString &name() const { return m_name; }
-    QString reason() const;
-    QString report() const;
+    const std::string &name() const { return m_name; }
+    std::string reason() const;
+    std::string report() const;
 
     void setDump(const Coredump &dump);
     void show();
@@ -62,11 +62,11 @@ private:
     void accept();
 
     Kind m_kind;
-    QString m_id;
-    std::function<QString()> m_nameLookup;
-    QString m_name;
-    QString m_icon;
-    QString m_fixedFont;
+    std::string m_id;
+    std::function<std::string()> m_nameLookup;
+    std::string m_name;
+    std::string m_icon;
+    std::string m_fixedFont;
     Coredump m_dump;
     bool m_hasDump = false;
     bool m_finished = false;

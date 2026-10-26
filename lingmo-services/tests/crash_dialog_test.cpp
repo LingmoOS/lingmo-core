@@ -45,7 +45,7 @@ TEST(CrashDialogTest, LanguageChangeKeepsTheDetailsShown)
     int lookups = 0;
     CrashDialog dialog(CrashDialog::Kind::Application, "org.example.Editor", [&lookups] {
         ++lookups;
-        return QString("Editor");
+        return std::string("Editor");
     }, "", "monospace");
     bool finished = false;
     dialog.onFinished = [&finished] {

@@ -92,8 +92,8 @@ private:
     View *m_content;
 };
 
-CrashDialog::CrashDialog(Kind kind, const QString &id, std::function<QString()> name,
-                         const QString &icon, const QString &fixedFont)
+CrashDialog::CrashDialog(Kind kind, const std::string &id, std::function<std::string()> name,
+                         const std::string &icon, const std::string &fixedFont)
     : m_kind(kind)
     , m_id(id)
     , m_nameLookup(std::move(name))
@@ -105,14 +105,14 @@ CrashDialog::CrashDialog(Kind kind, const QString &id, std::function<QString()> 
 
 CrashDialog::~CrashDialog() = default;
 
-QString CrashDialog::reason() const
+std::string CrashDialog::reason() const
 {
-    return m_hasDump ? m_dump.signalDescription() : QString();
+    return m_hasDump ? m_dump.signalDescription() : std::string();
 }
 
-QString CrashDialog::report() const
+std::string CrashDialog::report() const
 {
-    return m_hasDump && !m_dump.threads.empty() ? m_dump.report(m_name) : QString();
+    return m_hasDump && !m_dump.threads.empty() ? m_dump.report(m_name) : std::string();
 }
 
 void CrashDialog::setDump(const Coredump &dump)
@@ -163,7 +163,7 @@ void CrashDialog::retranslate()
 void CrashDialog::buildContent()
 {
     const bool canReopen = !sessionProcess();
-    const QString title = format(tr("“{name}” quit unexpectedly"), {{"name", m_name}});
+    const std::string title = format(tr("“{name}” quit unexpectedly"), {{"name", m_name}});
     m_window->setTitle(title);
 
     auto content = std::make_unique<Content>();
@@ -230,15 +230,15 @@ void CrashDialog::update()
     if (!m_window)
         return;
 
-    QString text = reason().empty() ? QString() : format(tr("Reason: {reason}"), {{"reason", reason()}});
+    std::string text = reason().empty() ? std::string() : format(tr("Reason: {reason}"), {{"reason", reason()}});
     if (sessionProcess()) {
-        const QString state = tr("It is restarted automatically.");
+        const std::string state = tr("It is restarted automatically.");
         text = text.empty() ? state : state + "\n" + text;
     }
     m_text->setText(text);
     m_text->setVisible(!text.empty());
 
-    const QString details = report();
+    const std::string details = report();
     if (m_report->text() != details)
         m_report->setText(details);
     m_detailsButton->setVisible(!details.empty());
@@ -278,11 +278,11 @@ void CrashDialog::reopen()
     // which can then be activated on another desk. The connection keeps the
     // callback, and the dialog may be closed and gone before the token comes.
     const std::weak_ptr<bool> alive = m_alive;
-    m_window->requestActivationToken([this, id = m_id, alive](const QString &token) {
+    m_window->requestActivationToken([this, id = m_id, alive](const std::string &token) {
         if (base::dbus::Connection *bus = base::dbus::Connection::session()) {
             const base::dbus::Proxy runtime(bus, "org.lingmo.AppRuntime", "/AppRuntime",
                                             "org.lingmo.AppRuntime");
-            runtime.send("launchApplication", id, QStringList(), token);
+            runtime.send("launchApplication", id, std::vector<std::string>(), token);
         }
         if (alive.lock())
             close();

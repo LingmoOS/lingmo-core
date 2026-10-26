@@ -32,6 +32,6 @@ private:
     Lingmo::Base::DBus::Connection *m_system;
     // A wallpaper, its type and its colour often change together: one send.
     Lingmo::Base::Timer m_pending;
-    QList<Lingmo::Base::Subscription> m_subscriptions;
+    std::vector<Lingmo::Base::Subscription> m_subscriptions;
 };
 

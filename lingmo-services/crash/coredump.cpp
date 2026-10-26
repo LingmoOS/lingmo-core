@@ -16,11 +16,11 @@
 using namespace Lingmo::Base;
 using namespace Lingmo::Base::strings;
 
-static const QString s_scopePrefix = "app-lingmo-";
-static const QString s_scopeSuffix = ".scope";
+static const std::string s_scopePrefix = "app-lingmo-";
+static const std::string s_scopeSuffix = ".scope";
 
 // The scope name without its prefix and suffix: <escaped id>-<pid>.
-static QString scopeInstance(const QString &unit)
+static std::string scopeInstance(const std::string &unit)
 {
     if (!startsWith(unit, s_scopePrefix) || !endsWith(unit, s_scopeSuffix)
         || unit.size() < s_scopePrefix.size() + s_scopeSuffix.size())
@@ -29,12 +29,12 @@ static QString scopeInstance(const QString &unit)
 }
 
 // Reverses systemd's unit name escaping, \xNN for each byte of UTF-8.
-static QString unescape(const QString &text)
+static std::string unescape(const std::string &text)
 {
-    QString result;
+    std::string result;
     for (size_t i = 0; i < text.size(); ++i) {
         if (text[i] == '\\' && i + 3 < text.size() && text[i + 1] == 'x') {
-            const auto byte = toNumber<int>(QStringView(text).substr(i + 2, 2), 16);
+            const auto byte = toNumber<int>(std::string_view(text).substr(i + 2, 2), 16);
             if (byte) {
                 result += char(*byte);
                 i += 3;
@@ -46,27 +46,27 @@ static QString unescape(const QString &text)
     return result;
 }
 
-QString Coredump::applicationId() const
+std::string Coredump::applicationId() const
 {
-    const QString instance = scopeInstance(userUnit);
+    const std::string instance = scopeInstance(userUnit);
     const size_t dash = instance.rfind('-');
-    if (dash == QString::npos || dash == 0)
+    if (dash == std::string::npos || dash == 0)
         return {};
     return unescape(instance.substr(0, dash));
 }
 
 uint32_t Coredump::applicationPid() const
 {
-    const QString instance = scopeInstance(userUnit);
+    const std::string instance = scopeInstance(userUnit);
     const size_t dash = instance.rfind('-');
-    if (dash == QString::npos || dash == 0)
+    if (dash == std::string::npos || dash == 0)
         return 0;
-    return toNumber<uint32_t>(QStringView(instance).substr(dash + 1)).value_or(0);
+    return toNumber<uint32_t>(std::string_view(instance).substr(dash + 1)).value_or(0);
 }
 
-QString Coredump::signalDescription() const
+std::string Coredump::signalDescription() const
 {
-    const QString description = signal > 0 ? QString(::strsignal(signal)) : QString();
+    const std::string description = signal > 0 ? std::string(::strsignal(signal)) : std::string();
     if (signalName.empty())
         return description;
     if (description.empty())
@@ -75,7 +75,7 @@ QString Coredump::signalDescription() const
 }
 
 // The local time as ISO 8601 writes it without a zone: 2026-10-06T12:34:56.
-static QString isoTime(int64_t milliseconds)
+static std::string isoTime(int64_t milliseconds)
 {
     const time_t seconds = time_t(milliseconds / 1000);
     struct tm local {};
@@ -85,9 +85,9 @@ static QString isoTime(int64_t milliseconds)
     return text;
 }
 
-QString Coredump::report(const QString &name) const
+std::string Coredump::report(const std::string &name) const
 {
-    QString text;
+    std::string text;
     text += std::format("{} quit unexpectedly\n", name);
     text += std::format("Executable: {}\n", executable);
     if (!commandLine.empty())
@@ -99,23 +99,23 @@ QString Coredump::report(const QString &name) const
         text += std::format("\nThread {}:\n", thread.id);
         for (size_t i = 0; i < thread.frames.size(); ++i) {
             const CoredumpFrame &frame = thread.frames[i];
-            text += std::format("#{} {} ({})\n", i, frame.function.empty() ? QString("??") : frame.function,
+            text += std::format("#{} {} ({})\n", i, frame.function.empty() ? std::string("??") : frame.function,
                                 frame.module);
         }
     }
     return text;
 }
 
-QList<CoredumpThread> Coredump::parseStackTrace(const QString &message)
+std::vector<CoredumpThread> Coredump::parseStackTrace(const std::string &message)
 {
     static const std::regex threadLine("^Stack trace of thread (\\d+):$");
     // #3  0x00007fe7198dbede name (module + 0xdbede); the module part is
     // missing for an address no mapping covers.
     static const std::regex frameLine("^#\\d+\\s+0x[0-9a-fA-F]+\\s+(\\S+)(?:\\s+\\((.*?)(?: \\+ 0x[0-9a-fA-F]+)?\\))?$");
 
-    QList<CoredumpThread> threads;
-    for (const QStringView rawLine : splitViews(message, '\n')) {
-        const QString line(trimmed(rawLine));
+    std::vector<CoredumpThread> threads;
+    for (const std::string_view rawLine : splitViews(message, '\n')) {
+        const std::string line(trimmed(rawLine));
         std::smatch match;
         if (std::regex_match(line, match, threadLine)) {
             threads.push_back({match[1].str(), {}});
@@ -125,16 +125,16 @@ QList<CoredumpThread> Coredump::parseStackTrace(const QString &message)
             continue;
         if (!std::regex_match(line, match, frameLine))
             continue;
-        const QString symbol = match[1].str();
-        QString module = match[2].matched ? match[2].str() : QString();
+        const std::string symbol = match[1].str();
+        std::string module = match[2].matched ? match[2].str() : std::string();
         if (module == "n/a")
             module.clear();
-        threads.back().frames.push_back({symbol == "n/a" ? QString() : demangle(symbol), module});
+        threads.back().frames.push_back({symbol == "n/a" ? std::string() : demangle(symbol), module});
     }
     return threads;
 }
 
-QString Coredump::demangle(const QString &symbol)
+std::string Coredump::demangle(const std::string &symbol)
 {
     if (!startsWith(symbol, "_Z"))
         return symbol;
@@ -142,7 +142,7 @@ QString Coredump::demangle(const QString &symbol)
     char *name = abi::__cxa_demangle(symbol.c_str(), nullptr, nullptr, &status);
     if (status != 0 || !name)
         return symbol;
-    QString result = name;
+    std::string result = name;
     std::free(name);
     return result;
 }

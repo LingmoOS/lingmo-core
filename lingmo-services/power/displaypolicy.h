@@ -28,7 +28,7 @@ public:
     // Without `idle`, as in tests, the caller reports idleness itself.
     DisplayPolicy(WaylandIdle *idle, BrightnessManager *brightness,
                   Lingmo::Base::DBus::Connection *session, Lingmo::Base::DBus::Connection *system,
-                  const QString &displayService = "org.lingmo.DisplayConfig");
+                  const std::string &displayService = "org.lingmo.DisplayConfig");
     ~DisplayPolicy();
 
     DisplayPolicy(const DisplayPolicy &) = delete;
@@ -51,7 +51,7 @@ private:
     void onPrepareForSleep(bool sleeping);
     void onScreenSaverActiveChanged(bool active);
     void onLogindPropertiesChanged(const Lingmo::Base::DBus::VariantMap &changedProperties,
-                                   const QStringList &invalidatedProperties);
+                                   const std::vector<std::string> &invalidatedProperties);
     void onSuspendTimerTimeout();
     void onDisplayStateChanged();
 
@@ -78,8 +78,8 @@ private:
     Lingmo::Base::DBus::Proxy m_screenSaver;
     Lingmo::Base::DBus::Proxy m_logind;
     Lingmo::Display::DisplayClient m_display;
-    QList<Lingmo::Base::DBus::Match> m_matches;
-    QList<Lingmo::Base::Subscription> m_idleSubscriptions;
+    std::vector<Lingmo::Base::DBus::Match> m_matches;
+    std::vector<Lingmo::Base::Subscription> m_idleSubscriptions;
     Lingmo::Base::Subscription m_displayStateChanged;
     Lingmo::Base::DBus::PendingCall m_suspendCall;
     Lingmo::Base::DBus::PendingCall m_inhibitCall;
@@ -105,14 +105,14 @@ private:
     // The user has been away for the locked timeout since their last input.
     bool m_lockedIdle = false;
     int m_lockedIdleTimeout = -1;
-    QList<int> m_policyIdleTimeouts;
+    std::vector<int> m_policyIdleTimeouts;
     bool m_dockedLidPending = false;
     bool m_dockedLidActive = false;
     bool m_dockedLidRecheck = false;
     int m_dockedLidRetries = 0;
     uint64_t m_dockedLidSerial = 0;
     Lingmo::Base::Timer m_dockedLidRetryTimer;
-    std::tuple<QString, uint64_t, uint64_t> m_displayTopology;
+    std::tuple<std::string, uint64_t, uint64_t> m_displayTopology;
 
     Lingmo::Base::DBus::UnixFd m_lidSwitchInhibitor;
     bool m_lidSwitchInhibiting = false;

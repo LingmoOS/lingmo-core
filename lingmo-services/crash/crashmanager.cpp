@@ -26,7 +26,7 @@ static const char *const s_sessionPrograms[] = {
         "lingmo-polkit-agent",
 };
 
-static bool isSessionProgram(const QString &program)
+static bool isSessionProgram(const std::string &program)
 {
     for (const char *name : s_sessionPrograms) {
         if (program == name)
@@ -35,21 +35,21 @@ static bool isSessionProgram(const QString &program)
     return false;
 }
 
-static std::optional<DesktopEntry> lookupEntry(const QString &id)
+static std::optional<DesktopEntry> lookupEntry(const std::string &id)
 {
-    for (const QString &directory : ApplicationRegistry::desktopPaths()) {
-        const QString path = directory + '/' + id + ".desktop";
+    for (const std::string &directory : ApplicationRegistry::desktopPaths()) {
+        const std::string path = directory + '/' + id + ".desktop";
         if (const auto contents = file::read(path))
             return DesktopEntry::parse(id, path, *contents);
     }
     return std::nullopt;
 }
 
-static QString nameOf(const QString &id)
+static std::string nameOf(const std::string &id)
 {
     if (const auto entry = lookupEntry(id))
         return entry->name.empty() ? id : entry->name;
-    return id == "lingmo-appruntime" ? QString(tr("Application Runtime")) : id;
+    return id == "lingmo-appruntime" ? std::string(tr("Application Runtime")) : id;
 }
 
 // A helper process of the application may crash while its windows live on.
@@ -63,7 +63,7 @@ static bool applicationEnded(const Coredump &dump)
     return trimmed(*procs).empty();
 }
 
-CrashManager::CrashManager(std::function<QString()> fixedFont)
+CrashManager::CrashManager(std::function<std::string()> fixedFont)
     : m_fixedFont(std::move(fixedFont))
     , m_journal(std::make_unique<CoredumpJournal>([this](const Coredump &dump) {
         onCoredump(dump);
@@ -75,7 +75,7 @@ CrashManager::~CrashManager() = default;
 
 void CrashManager::onCoredump(const Coredump &dump)
 {
-    const QString appId = dump.applicationId();
+    const std::string appId = dump.applicationId();
     if (!appId.empty()) {
         if (!applicationEnded(dump))
             return;
@@ -85,19 +85,19 @@ void CrashManager::onCoredump(const Coredump &dump)
     }
 
     // Outside an application scope, only what the session restarts gets a dialog.
-    const QString program = std::filesystem::path(dump.executable).filename().string();
+    const std::string program = std::filesystem::path(dump.executable).filename().string();
     if (!isSessionProgram(program))
         return;
     if (CrashDialog *dialog = dialogFor("process:" + program, false, program))
         dialog->setDump(dump);
 }
 
-CrashDialog *CrashManager::dialogFor(const QString &key, bool application, const QString &id)
+CrashDialog *CrashManager::dialogFor(const std::string &key, bool application, const std::string &id)
 {
     if (const auto it = m_dialogs.find(key); it != m_dialogs.end())
         return it->second.get();
 
-    QString icon = "application-x-executable";
+    std::string icon = "application-x-executable";
     if (const auto entry = lookupEntry(id)) {
         if (!entry->icon.empty())
             icon = entry->icon;

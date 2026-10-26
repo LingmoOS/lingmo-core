@@ -25,45 +25,45 @@ public:
     WallpaperManager(const WallpaperManager &) = delete;
     WallpaperManager &operator=(const WallpaperManager &) = delete;
 
-    QString wallpaper() const;
-    void setWallpaper(const QString &path);
+    std::string wallpaper() const;
+    void setWallpaper(const std::string &path);
 
-    QStringList userWallpapers() const;
-    void removeUserWallpaper(const QString &path);
+    std::vector<std::string> userWallpapers() const;
+    void removeUserWallpaper(const std::string &path);
 
-    QStringList wallpaperFolders() const;
-    void addWallpaperFolder(const QString &path);
-    void removeWallpaperFolder(const QString &path);
-    QStringList wallpaperFolderImages(const QString &path);
+    std::vector<std::string> wallpaperFolders() const;
+    void addWallpaperFolder(const std::string &path);
+    void removeWallpaperFolder(const std::string &path);
+    std::vector<std::string> wallpaperFolderImages(const std::string &path);
 
     int backgroundType() const;
     void setBackgroundType(int type);
 
-    QString backgroundColor() const;
-    void setBackgroundColor(const QString &color);
+    std::string backgroundColor() const;
+    void setBackgroundColor(const std::string &color);
 
-    Lingmo::Base::Signal<QString> wallpaperChanged;
+    Lingmo::Base::Signal<std::string> wallpaperChanged;
     Lingmo::Base::Signal<> userWallpapersChanged;
     Lingmo::Base::Signal<> wallpaperFoldersChanged;
-    Lingmo::Base::Signal<QString> wallpaperFolderImagesChanged;
+    Lingmo::Base::Signal<std::string> wallpaperFolderImagesChanged;
     Lingmo::Base::Signal<> backgroundTypeChanged;
     Lingmo::Base::Signal<> backgroundColorChanged;
 
 private:
     template<typename T>
-    void write(const QString &key, const T &value);
-    void syncWallpaperFolder(const QString &folder);
-    void onWallpaperFolderSynced(const QString &folder, bool copied);
+    void write(const std::string &key, const T &value);
+    void syncWallpaperFolder(const std::string &folder);
+    void onWallpaperFolderSynced(const std::string &folder, bool copied);
 
     Lingmo::Base::Settings &m_settings;
 
-    QString m_wallpaperPath;
-    QStringList m_userWallpapers;
-    QStringList m_wallpaperFolders;
+    std::string m_wallpaperPath;
+    std::vector<std::string> m_userWallpapers;
+    std::vector<std::string> m_wallpaperFolders;
     // The copies being made, by folder.
-    std::map<QString, Lingmo::Base::Job> m_syncingFolders;
+    std::map<std::string, Lingmo::Base::Job> m_syncingFolders;
 
     int m_backgroundType = 0;
-    QString m_backgroundColor;
+    std::string m_backgroundColor;
 };
 

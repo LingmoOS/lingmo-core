@@ -33,14 +33,14 @@ static T property(const dbus::VariantMap &properties, const char *name)
     return it == properties.end() ? T() : it->second.get<T>().value_or(T());
 }
 
-Battery::Battery(dbus::Connection *system, const QString &path, Settings &settings)
+Battery::Battery(dbus::Connection *system, const std::string &path, Settings &settings)
     : m_path(path)
     , m_settings(settings)
     , m_device(system, upower::service, path, upower::deviceInterface)
 {
     if (system) {
         m_propertiesChanged = m_device.onPropertiesChanged(
-                [this](const dbus::VariantMap &, const QStringList &) {
+                [this](const dbus::VariantMap &, const std::vector<std::string> &) {
                     update();
                 });
 
@@ -108,7 +108,7 @@ int64_t Battery::Reading::remainingTime() const
     }
 }
 
-QString Battery::Reading::status() const
+std::string Battery::Reading::status() const
 {
     switch (chargeState()) {
     case Charging:
@@ -130,13 +130,13 @@ QString Battery::Reading::status() const
 
     // Plugged in, but a charge limit holds the battery where it is.
     if (upower::State(state) == upower::State::PendingCharge)
-        return thresholdEnabled ? format(tr("Charging paused at {percent}%"), {{"percent", QString::number(percent)}})
+        return thresholdEnabled ? format(tr("Charging paused at {percent}%"), {{"percent", std::to_string(percent)}})
                                 : tr("Not charging");
 
     return {};
 }
 
-QString Battery::formatDuration(int64_t seconds)
+std::string Battery::formatDuration(int64_t seconds)
 {
     if (seconds < 60)
         return {};
@@ -154,18 +154,18 @@ QString Battery::formatDuration(int64_t seconds)
             {minutes % 60, trNoop("{n}m")},
     };
 
-    QString text;
+    std::string text;
     for (const auto &part : parts) {
         if (part.value == 0)
             continue;
         if (!text.empty())
             text += ' ';
-        text += format(tr(part.pattern), {{"n", QString::number(part.value)}});
+        text += format(tr(part.pattern), {{"n", std::to_string(part.value)}});
     }
     return text;
 }
 
-QString Battery::lastChargedTime() const
+std::string Battery::lastChargedTime() const
 {
     // A clock set back also lands under a minute.
     const int64_t elapsed = secondsSinceEpoch() - int64_t(m_lastChargedSecs);

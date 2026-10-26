@@ -3,7 +3,6 @@ set(TARGET lingmo-services)
 
 find_package(LingmoSDK REQUIRED)
 find_package(LingmoClients REQUIRED COMPONENTS display)
-find_package(Qt6 REQUIRED COMPONENTS Core)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(ServicesSystemd REQUIRED IMPORTED_TARGET libsystemd)
 pkg_check_modules(ServicesFontconfig REQUIRED IMPORTED_TARGET fontconfig)
@@ -83,19 +82,12 @@ target_compile_definitions(${TARGET} PRIVATE
         LINGMO_GTK_CSS_DIR="${CMAKE_INSTALL_FULL_DATAROOTDIR}/${TARGET}/gtk"
 )
 
-# The sources name their Qt objects with QString; qt_interop.h converts at the
-# toolkit's std::string boundary. Force-included so it is in scope everywhere.
-target_compile_options(${TARGET} PRIVATE
-    -include ${CMAKE_SOURCE_DIR}/qt_interop.h
-)
-
 target_link_libraries(${TARGET} PRIVATE
         Lingmo::SDK
         Lingmo::DisplayClient
         lingmo-core-common
         lingmo-clipboard-backend
         lingmo-idle-backend
-        Qt6::Core
         PkgConfig::ServicesSystemd
         PkgConfig::ServicesFontconfig
         PkgConfig::ServicesIcu

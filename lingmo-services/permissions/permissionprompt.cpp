@@ -31,13 +31,13 @@ static constexpr double kMargin = 20;
 // A drag this far from the press moves the window.
 static constexpr double kDragDistance = 10;
 
-static QString stringOf(const dbus::VariantMap &map, const QString &key)
+static std::string stringOf(const dbus::VariantMap &map, const std::string &key)
 {
     const auto it = map.find(key);
-    return it == map.end() ? QString() : it->second.value<QString>();
+    return it == map.end() ? std::string() : it->second.value<std::string>();
 }
 
-static int64_t integerOf(const dbus::VariantMap &map, const QString &key)
+static int64_t integerOf(const dbus::VariantMap &map, const std::string &key)
 {
     const auto it = map.find(key);
     if (it == map.end())
@@ -57,12 +57,12 @@ static int64_t integerOf(const dbus::VariantMap &map, const QString &key)
 }
 
 // The dictionaries of an `aa{sv}` option; nothing for any other shape.
-static QList<dbus::VariantMap> listOf(const dbus::VariantMap &map, const QString &key)
+static std::vector<dbus::VariantMap> listOf(const dbus::VariantMap &map, const std::string &key)
 {
     const auto it = map.find(key);
     if (it == map.end())
         return {};
-    return it->second.value<QList<dbus::VariantMap>>();
+    return it->second.value<std::vector<dbus::VariantMap>>();
 }
 
 namespace {
@@ -85,7 +85,7 @@ protected:
 class ChoiceRow final : public View
 {
 public:
-    ChoiceRow(const QString &icon, const QString &label, const QString &detail)
+    ChoiceRow(const std::string &icon, const std::string &label, const std::string &detail)
     {
         m_background = addChild<RowBackground>();
         m_row = addChild<RowLayout>();
@@ -187,7 +187,7 @@ private:
 class SectionHeading final : public View
 {
 public:
-    explicit SectionHeading(const QString &text)
+    explicit SectionHeading(const std::string &text)
         : m_label(addChild<Label>(text))
     {
         m_label->setFontSize(11);
@@ -195,7 +195,7 @@ public:
         m_label->setVerticallyCentered(true);
     }
 
-    void setText(const QString &text) { m_label->setText(text); }
+    void setText(const std::string &text) { m_label->setText(text); }
 
 protected:
     void layout() override
@@ -221,7 +221,7 @@ public:
         ChoiceRow *row = nullptr;
     };
 
-    QList<Entry> entries;
+    std::vector<Entry> entries;
 
     double contentHeight() const
     {
@@ -266,7 +266,7 @@ public:
             Choice choice;
             choice.window = false;
             choice.name = stringOf(monitor, "name");
-            const QString description = stringOf(monitor, "description");
+            const std::string description = stringOf(monitor, "description");
             choice.label = !description.empty() ? description : choice.name;
             if (!choice.name.empty())
                 choice.detail = std::format("{}  ·  {} × {}", choice.name, integerOf(monitor, "width"),
@@ -278,12 +278,12 @@ public:
             Choice choice;
             choice.window = true;
             choice.name = stringOf(window, "identifier");
-            const QString title = stringOf(window, "title");
-            const QString appId = stringOf(window, "app_id");
+            const std::string title = stringOf(window, "title");
+            const std::string appId = stringOf(window, "app_id");
             choice.label = !title.empty() ? title : appId;
             choice.detail = appId;
-            const QString icon = PermissionPrompt::describeApplication(appId).icon;
-            choice.icon = !icon.empty() ? icon : QString("window");
+            const std::string icon = PermissionPrompt::describeApplication(appId).icon;
+            choice.icon = !icon.empty() ? icon : std::string("window");
             m_choices.push_back(choice);
         }
         m_hasMonitors = std::any_of(m_choices.begin(), m_choices.end(), [](const Choice &c) { return !c.window; });
@@ -310,12 +310,12 @@ public:
         select(0);
     }
 
-    QString title() const override
+    std::string title() const override
     {
         return format(tr("Share your screen with “{name}”"), {{"name", m_application.name}});
     }
 
-    QString description() const override
+    std::string description() const override
     {
         if (m_hasMonitors && m_hasWindows)
             return tr("Choose a display or a window. What is shown on it will be visible to the application until it stops sharing.");
@@ -324,14 +324,14 @@ public:
         return tr("Choose a display. Everything shown on it, including other windows, will be visible to the application until it stops sharing.");
     }
 
-    QString accept() const override { return tr("Share"); }
+    std::string accept() const override { return tr("Share"); }
 
     bool ready() const override { return m_current >= 0 && m_current < int(m_choices.size()); }
 
     dbus::VariantMap details() const override
     {
         const Choice &choice = m_choices[size_t(m_current)];
-        return {{choice.window ? "windows" : "monitors", dbus::Variant(QStringList {choice.name})}};
+        return {{choice.window ? "windows" : "monitors", dbus::Variant(std::vector<std::string> {choice.name})}};
     }
 
     void retranslate() override
@@ -358,13 +358,13 @@ protected:
 private:
     struct Choice {
         bool window = false;
-        QString name;
-        QString label;
-        QString detail;
-        QString icon;
+        std::string name;
+        std::string label;
+        std::string detail;
+        std::string icon;
     };
 
-    static QString sectionTitle(bool window) { return window ? tr("Windows") : tr("Displays"); }
+    static std::string sectionTitle(bool window) { return window ? tr("Windows") : tr("Displays"); }
 
     double height() const
     {
@@ -373,7 +373,7 @@ private:
     }
 
     PermissionPrompt::Application m_application;
-    QList<Choice> m_choices;
+    std::vector<Choice> m_choices;
     bool m_hasMonitors = false;
     bool m_hasWindows = false;
     ScrollView *m_scroll;
@@ -408,19 +408,19 @@ public:
         m_remember = addChild<InsetCheckBox>(tr("Always allow this app"));
     }
 
-    QString title() const override
+    std::string title() const override
     {
         if (m_agentName.empty())
             return tr("Let “An app” control this computer?");
         return format(tr("Let “{name}” control this computer?"), {{"name", m_agentName}});
     }
 
-    QString description() const override
+    std::string description() const override
     {
         return tr("It will see your screen and use the pointer and keyboard until you stop it with the Stop button in the status bar. Using the pointer or keyboard yourself pauses it, and it cannot answer system dialogs like this one.");
     }
 
-    QString accept() const override { return tr("Allow"); }
+    std::string accept() const override { return tr("Allow"); }
     bool ready() const override { return true; }
 
     dbus::VariantMap details() const override
@@ -452,7 +452,7 @@ protected:
 private:
     static constexpr double kTextInset = 48 + 14;
 
-    QString m_agentName;
+    std::string m_agentName;
     InsetCheckBox *m_remember = nullptr;
 };
 
@@ -498,7 +498,7 @@ const Kind kinds[] = {
         {"computer-control", "computer"},
 };
 
-const Kind *findKind(const QString &name)
+const Kind *findKind(const std::string &name)
 {
     for (const Kind &kind : kinds) {
         if (name == kind.name)
@@ -509,20 +509,20 @@ const Kind *findKind(const QString &name)
 
 } // namespace
 
-bool PermissionPrompt::supports(const QString &kind)
+bool PermissionPrompt::supports(const std::string &kind)
 {
     return findKind(kind) != nullptr;
 }
 
 // The application shown to the user comes from the caller's app id; an app
 // without a desktop file is still named, just by its id.
-PermissionPrompt::Application PermissionPrompt::describeApplication(const QString &appId)
+PermissionPrompt::Application PermissionPrompt::describeApplication(const std::string &appId)
 {
     Application result {appId, appId, {}};
     if (appId.empty())
         return result;
-    for (const QString &directory : base::ApplicationRegistry::desktopPaths()) {
-        const QString path = directory + '/' + appId + ".desktop";
+    for (const std::string &directory : base::ApplicationRegistry::desktopPaths()) {
+        const std::string path = directory + '/' + appId + ".desktop";
         const auto contents = base::file::read(path);
         if (!contents)
             continue;
@@ -537,8 +537,8 @@ PermissionPrompt::Application PermissionPrompt::describeApplication(const QStrin
     return result;
 }
 
-PermissionPrompt::PermissionPrompt(const QString &kind, const QString &appId,
-                                   const QString &parentWindow, const dbus::VariantMap &options,
+PermissionPrompt::PermissionPrompt(const std::string &kind, const std::string &appId,
+                                   const std::string &parentWindow, const dbus::VariantMap &options,
                                    dbus::MethodCall call)
     : m_call(std::move(call))
     , m_parentWindow(parentWindow)
@@ -565,7 +565,7 @@ void PermissionPrompt::watchCaller(dbus::Connection *bus)
 {
     if (!bus)
         return;
-    m_callerWatch = bus->watchName(caller(), [this](const QString &owner) {
+    m_callerWatch = bus->watchName(caller(), [this](const std::string &owner) {
         if (owner.empty())
             dismiss();
     });

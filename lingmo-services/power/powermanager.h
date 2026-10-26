@@ -38,14 +38,14 @@ private:
     void loadSettings();
     void applyPolicy();
     template<typename T>
-    void writePowerSetting(const QString &key, const T &value);
+    void writePowerSetting(const std::string &key, const T &value);
 
     Lingmo::Base::Settings &m_settings;
     Lingmo::Base::DBus::Connection *m_session;
     PowerSupply *m_powerSupply;
     std::unique_ptr<DisplayPolicy> m_displayPolicy;
     std::unique_ptr<Lingmo::Base::DBus::Object> m_object;
-    QList<Lingmo::Base::Subscription> m_subscriptions;
+    std::vector<Lingmo::Base::Subscription> m_subscriptions;
 
     int m_batteryScreenOff = 300;
     int m_acScreenOff = 1200;

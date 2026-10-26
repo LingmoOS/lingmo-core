@@ -14,9 +14,9 @@ using namespace Lingmo::Base;
 using namespace Lingmo::Base::strings;
 
 // Every family name fontconfig knows, localized names included.
-static std::set<QString> fontFamilies()
+static std::set<std::string> fontFamilies()
 {
-    std::set<QString> families;
+    std::set<std::string> families;
     FcPattern *pattern = FcPatternCreate();
     FcObjectSet *objects = FcObjectSetBuild(FC_FAMILY, nullptr);
     FcFontSet *fonts = FcFontList(nullptr, pattern, objects);
@@ -33,9 +33,9 @@ static std::set<QString> fontFamilies()
     return families;
 }
 
-static QString htmlEscaped(const QString &text)
+static std::string htmlEscaped(const std::string &text)
 {
-    QString result;
+    std::string result;
     for (char c : text) {
         switch (c) {
         case '<': result += "&lt;"; break;
@@ -49,9 +49,9 @@ static QString htmlEscaped(const QString &text)
 }
 
 // Puts the arguments in place of %1 to %9, in one pass.
-static QString arguments(QStringView text, const QStringList &values)
+static std::string arguments(std::string_view text, const std::vector<std::string> &values)
 {
-    QString result;
+    std::string result;
     for (size_t i = 0; i < text.size(); ++i) {
         if (text[i] == '%' && i + 1 < text.size() && text[i + 1] >= '1'
             && size_t(text[i + 1] - '1') < values.size()) {
@@ -66,15 +66,15 @@ static QString arguments(QStringView text, const QStringList &values)
 
 void writeFontConfig(const FontConfig &config)
 {
-    const std::set<QString> families = fontFamilies();
-    const QString familyFont = families.contains(config.family) ? config.family
-            : families.contains("Noto Sans")                       ? QString("Noto Sans")
-                                                                   : QString("DejaVu Sans");
-    const QString fixedFont = families.contains(config.fixedFamily) ? config.fixedFamily
-            : families.contains("Noto Sans Mono")                       ? QString("Noto Sans Mono")
-                                                                        : QString("DejaVu Sans Mono");
+    const std::set<std::string> families = fontFamilies();
+    const std::string familyFont = families.contains(config.family) ? config.family
+            : families.contains("Noto Sans")                       ? std::string("Noto Sans")
+                                                                   : std::string("DejaVu Sans");
+    const std::string fixedFont = families.contains(config.fixedFamily) ? config.fixedFamily
+            : families.contains("Noto Sans Mono")                       ? std::string("Noto Sans Mono")
+                                                                        : std::string("DejaVu Sans Mono");
 
-    const QString content = arguments(kFontConfigTemplate,
+    const std::string content = arguments(kFontConfigTemplate,
                                           {htmlEscaped(familyFont), htmlEscaped(fixedFont),
                                            config.antialias ? "true" : "false",
                                            htmlEscaped(config.hintStyle), htmlEscaped(config.rgba),
@@ -84,7 +84,7 @@ void writeFontConfig(const FontConfig &config)
     file::writeAtomically(paths::configHome() + "/fontconfig/conf.d/99-lingmo.conf", content);
 }
 
-QString fontForLocale(const QString &code)
+std::string fontForLocale(const std::string &code)
 {
     char likely[ULOC_FULLNAME_CAPACITY] = {};
     UErrorCode status = U_ZERO_ERROR;
@@ -95,7 +95,7 @@ QString fontForLocale(const QString &code)
     uloc_getCountry(likely, country, sizeof(country), &status);
     if (U_FAILURE(status))
         return {};
-    const QString localeName = QString(language) + '_' + country;
+    const std::string localeName = std::string(language) + '_' + country;
 
     if (localeName == "zh_CN")
         return "Noto Sans CJK SC";
@@ -110,9 +110,9 @@ QString fontForLocale(const QString &code)
     return {};
 }
 
-QString cjkFontForLanguages(const QStringList &languages)
+std::string cjkFontForLanguages(const std::vector<std::string> &languages)
 {
-    for (const QString &code : languages) {
+    for (const std::string &code : languages) {
         char likely[ULOC_FULLNAME_CAPACITY] = {};
         UErrorCode status = U_ZERO_ERROR;
         uloc_addLikelySubtags(code.c_str(), likely, sizeof(likely), &status);
@@ -124,16 +124,16 @@ QString cjkFontForLanguages(const QStringList &languages)
         uloc_getCountry(likely, country, sizeof(country), &status);
         if (U_FAILURE(status))
             continue;
-        const QStringView name = language;
+        const std::string_view name = language;
         if (name == "ja")
             return "Noto Sans CJK JP";
         if (name == "ko")
             return "Noto Sans CJK KR";
         if (name == "zh") {
-            const QStringView territory = country;
+            const std::string_view territory = country;
             if (territory == "HK" || territory == "MO")
                 return "Noto Sans CJK HK";
-            if (QStringView(script) == "Hant")
+            if (std::string_view(script) == "Hant")
                 return "Noto Sans CJK TC";
             return "Noto Sans CJK SC";
         }

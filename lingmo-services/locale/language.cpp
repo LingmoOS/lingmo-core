@@ -22,15 +22,15 @@ using namespace Lingmo::Base::strings;
 using Lingmo::I18n::tr;
 namespace language = Lingmo::Core::language;
 
-static void removeAll(QStringList &list, const QString &value)
+static void removeAll(std::vector<std::string> &list, const std::string &value)
 {
     list.erase(std::remove(list.begin(), list.end(), value), list.end());
 }
 
-static void removeDuplicates(QStringList &list)
+static void removeDuplicates(std::vector<std::string> &list)
 {
-    QStringList unique;
-    for (const QString &entry : list) {
+    std::vector<std::string> unique;
+    for (const std::string &entry : list) {
         if (std::find(unique.begin(), unique.end(), entry) == unique.end())
             unique.push_back(entry);
     }
@@ -52,10 +52,10 @@ bool Language::publish()
         return false;
     m_object = std::make_unique<dbus::Object>(m_session, "/org/lingmo/Services/Language",
                                               "org.lingmo.Services.Language");
-    m_object->addMethod("setLanguage", [this](const QString &value) { setLanguage(value); },
+    m_object->addMethod("setLanguage", [this](const std::string &value) { setLanguage(value); },
                         {{"value"}, {}});
     m_object->addMethod("setPreferredLanguages",
-                        [this](const QStringList &value) { setPreferredLanguages(value); },
+                        [this](const std::vector<std::string> &value) { setPreferredLanguages(value); },
                         {{"value"}, {}});
     m_object->addProperty("preferredLanguages", [this] { return preferredLanguages(); });
     m_object->addProperty("languageCode", [this] { return languageCode(); });
@@ -68,45 +68,45 @@ bool Language::publish()
     return true;
 }
 
-QString Language::languageCode() const
+std::string Language::languageCode() const
 {
-    const QString code = m_settings.stringValue("Language/language");
+    const std::string code = m_settings.stringValue("Language/language");
     return code.empty() ? language::systemLanguage() : code;
 }
 
-QStringList Language::preferredLanguages() const
+std::vector<std::string> Language::preferredLanguages() const
 {
-    const QString primary = languageCode();
-    QStringList codes = m_settings.stringListValue("Language/preferredLanguages");
+    const std::string primary = languageCode();
+    std::vector<std::string> codes = m_settings.stringListValue("Language/preferredLanguages");
     removeAll(codes, primary);
     codes.insert(codes.begin(), primary);
     removeDuplicates(codes);
     return codes;
 }
 
-std::map<QString, QString> Language::environment() const
+std::map<std::string, std::string> Language::environment() const
 {
     Lingmo::Core::Environment environment = Lingmo::Core::processEnvironment();
     language::apply(environment, preferredLanguages());
-    std::map<QString, QString> variables;
+    std::map<std::string, std::string> variables;
     for (const auto &[name, value] : environment) {
         if (name == "LANG" || name == "LANGUAGE" || startsWith(name, "LC_"))
             variables[name] = value;
     }
     // D-Bus cannot remove variables; an empty LC_ALL lets individual categories take effect.
-    variables["LC_ALL"] = QString();
+    variables["LC_ALL"] = std::string();
     return variables;
 }
 
-void Language::setLanguage(const QString &code)
+void Language::setLanguage(const std::string &code)
 {
-    QStringList codes = preferredLanguages();
+    std::vector<std::string> codes = preferredLanguages();
     removeAll(codes, code);
     codes.insert(codes.begin(), code);
     setPreferredLanguages(codes);
 }
 
-QString Language::localeName(const QString &code)
+std::string Language::localeName(const std::string &code)
 {
     char likely[ULOC_FULLNAME_CAPACITY] = {};
     UErrorCode status = U_ZERO_ERROR;
@@ -117,25 +117,25 @@ QString Language::localeName(const QString &code)
     char country[ULOC_COUNTRY_CAPACITY] = {};
     uloc_getLanguage(likely, languageCode, sizeof(languageCode), &status);
     uloc_getCountry(likely, country, sizeof(country), &status);
-    if (U_FAILURE(status) || !*languageCode || QStringView(languageCode) == "c")
+    if (U_FAILURE(status) || !*languageCode || std::string_view(languageCode) == "c")
         return "C";
-    return *country ? QString(languageCode) + '_' + country : QString(languageCode);
+    return *country ? std::string(languageCode) + '_' + country : std::string(languageCode);
 }
 
-void Language::setPreferredLanguages(const QStringList &languages)
+void Language::setPreferredLanguages(const std::vector<std::string> &languages)
 {
-    QStringList codes = languages;
-    removeAll(codes, QString());
+    std::vector<std::string> codes = languages;
+    removeAll(codes, std::string());
     removeDuplicates(codes);
     if (codes.empty() || codes == preferredLanguages())
         return;
 
-    const QString code = codes.front();
+    const std::string code = codes.front();
     const bool primaryChanged = code != languageCode();
     m_settings.setValue("Language/preferredLanguages", codes);
 
     if (primaryChanged) {
-        const QString font = fontForLocale(localeName(code));
+        const std::string font = fontForLocale(localeName(code));
         if (!font.empty() && m_appearance.setSystemFont)
             m_appearance.setSystemFont(font);
     }
@@ -162,8 +162,8 @@ void Language::setPreferredLanguages(const QStringList &languages)
 
 void Language::publishEnvironment()
 {
-    const std::map<QString, QString> activationEnvironment = environment();
-    QStringList systemdEnvironment;
+    const std::map<std::string, std::string> activationEnvironment = environment();
+    std::vector<std::string> systemdEnvironment;
     for (const auto &[name, value] : activationEnvironment) {
         if (name != "LC_ALL")
             systemdEnvironment.push_back(name + '=' + value);
@@ -177,7 +177,7 @@ void Language::publishEnvironment()
                                                          "org.freedesktop.systemd1.Manager",
                                                          "UnsetAndSetEnvironment");
         sd_bus_message_set_auto_start(systemd.get(), 0);
-        systemd.append(QStringList {"LC_ALL"}, systemdEnvironment);
+        systemd.append(std::vector<std::string> {"LC_ALL"}, systemdEnvironment);
         m_session->send(systemd);
     }
     // This process takes the new language itself, before its own text below;
@@ -191,8 +191,8 @@ void Language::publishEnvironment()
 
 void Language::prepareLocale()
 {
-    const QString code = languageCode();
-    const QString locale = language::localeFor(code);
+    const std::string code = languageCode();
+    const std::string locale = language::localeFor(code);
     if (!generateLocale || language::isAvailable(locale))
         return;
     m_localeCall = generateLocale(locale, [this, code](bool generated) {

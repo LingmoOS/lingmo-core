@@ -14,8 +14,8 @@
 #include "base/event_loop.h"
 
 struct DdcDisplay {
-    QString connector;
-    QString device;
+    std::string connector;
+    std::string device;
     int value = 0;
     int maximum = 0;
 };
@@ -24,7 +24,7 @@ struct DdcDisplay {
 class DdcWorker
 {
 public:
-    using Probed = std::function<void(uint64_t generation, const QList<DdcDisplay> &displays)>;
+    using Probed = std::function<void(uint64_t generation, const std::vector<DdcDisplay> &displays)>;
 
     // `probed` runs on the loop of the thread that made the worker.
     explicit DdcWorker(Probed probed);
@@ -35,8 +35,8 @@ public:
     DdcWorker &operator=(const DdcWorker &) = delete;
 
     // Only the latest value per device is written.
-    void requestValue(const QString &device, int value);
-    void probe(uint64_t generation, QList<DdcDisplay> candidates);
+    void requestValue(const std::string &device, int value);
+    void probe(uint64_t generation, std::vector<DdcDisplay> candidates);
 
 private:
     void run();
@@ -50,7 +50,7 @@ private:
     std::mutex m_mutex;
     std::condition_variable m_wake;
     std::deque<std::function<void()>> m_tasks;
-    std::map<QString, int> m_pending;
+    std::map<std::string, int> m_pending;
     bool m_flushQueued = false;
     bool m_stopping = false;
     std::thread m_thread;

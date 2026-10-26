@@ -42,46 +42,46 @@ public:
     bool continuousCorners() const;
     void setContinuousCorners(bool value);
 
-    QString systemFont();
-    void setSystemFont(const QString &fontFamily);
+    std::string systemFont();
+    void setSystemFont(const std::string &fontFamily);
 
-    QString systemFixedFont();
-    void setSystemFixedFont(const QString &fontFamily);
+    std::string systemFixedFont();
+    void setSystemFixedFont(const std::string &fontFamily);
 
     double systemFontPointSize();
     void setSystemFontPointSize(double fontSize);
 
-    QString wallpaper();
-    void setWallpaper(const QString &path);
-    QStringList userWallpapers() const;
-    void removeUserWallpaper(const QString &path);
+    std::string wallpaper();
+    void setWallpaper(const std::string &path);
+    std::vector<std::string> userWallpapers() const;
+    void removeUserWallpaper(const std::string &path);
 
-    QStringList wallpaperFolders() const;
-    void addWallpaperFolder(const QString &path);
-    void removeWallpaperFolder(const QString &path);
-    QStringList wallpaperFolderImages(const QString &path);
+    std::vector<std::string> wallpaperFolders() const;
+    void addWallpaperFolder(const std::string &path);
+    void removeWallpaperFolder(const std::string &path);
+    std::vector<std::string> wallpaperFolderImages(const std::string &path);
 
     int backgroundType();
     void setBackgroundType(int type);
 
-    QString backgroundColor();
-    void setBackgroundColor(const QString &color);
+    std::string backgroundColor();
+    void setBackgroundColor(const std::string &color);
 
     int accentColor();
     void setAccentColor(int accentColor);
 
-    QString cursorTheme() const;
-    void setCursorTheme(const QString &theme);
+    std::string cursorTheme() const;
+    void setCursorTheme(const std::string &theme);
 
     int cursorSize() const;
     void setCursorSize(int size);
 
     void updateGtk3Config();
-    void setFontRendering(bool antialias, const QString &hintStyle);
+    void setFontRendering(bool antialias, const std::string &hintStyle);
     void applyCursorSettings();
 
-    QString iconTheme() const;
-    void setIconTheme(const QString &iconTheme);
+    std::string iconTheme() const;
+    void setIconTheme(const std::string &iconTheme);
 
     void updateFontConfig();
 
@@ -91,9 +91,9 @@ public:
 private:
     FontConfig fontConfig();
     template<typename... Args>
-    void emitSignal(const QString &name, const Args &...args);
+    void emitSignal(const std::string &name, const Args &...args);
     template<typename T>
-    void write(const QString &key, const T &value);
+    void write(const std::string &key, const T &value);
 
     Lingmo::Base::Settings &m_settings;
     Lingmo::Base::DBus::Connection *m_session;
@@ -101,14 +101,14 @@ private:
     std::unique_ptr<LoginBackground> m_loginBackground;
     std::unique_ptr<ScheduledFeature> m_darkMode;
     std::unique_ptr<Lingmo::Base::DBus::Object> m_object;
-    QList<Lingmo::Base::Subscription> m_subscriptions;
+    std::vector<Lingmo::Base::Subscription> m_subscriptions;
 
     bool m_continuousCorners = true;
     int m_accentColor = 0;
 
-    QString m_cursorTheme;
+    std::string m_cursorTheme;
     int m_cursorSize = 24;
 
-    QString m_iconTheme;
+    std::string m_iconTheme;
 };
 

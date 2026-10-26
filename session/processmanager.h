@@ -81,7 +81,7 @@ private:
     Lingmo::Base::Subscription m_registryChanged;
     Lingmo::Base::Timer m_autostartTimer;
     Lingmo::Base::Timer m_exitTimer;
-    QList<std::unique_ptr<Publisher>> m_publishers;
+    std::vector<std::unique_ptr<Publisher>> m_publishers;
     bool m_started = false;
     bool m_compositorReady = false;
     bool m_desktopStarted = false;

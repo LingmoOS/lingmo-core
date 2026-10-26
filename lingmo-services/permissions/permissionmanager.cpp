@@ -36,7 +36,7 @@ bool PermissionManager::publish()
     return m_object->publish();
 }
 
-PermissionPrompt *PermissionManager::prompt(const QString &token) const
+PermissionPrompt *PermissionManager::prompt(const std::string &token) const
 {
     const auto it = m_prompts.find(token);
     return it == m_prompts.end() ? nullptr : it->second.get();
@@ -44,10 +44,10 @@ PermissionPrompt *PermissionManager::prompt(const QString &token) const
 
 void PermissionManager::prompt(dbus::MethodCall &call)
 {
-    QString token;
-    QString kind;
-    QString appId;
-    QString parentWindow;
+    std::string token;
+    std::string kind;
+    std::string appId;
+    std::string parentWindow;
     dbus::VariantMap options;
     if (!call.read(token, kind, appId, parentWindow, options)) {
         call.replyError("org.freedesktop.DBus.Error.InvalidArgs", "Unexpected arguments");
@@ -74,7 +74,7 @@ void PermissionManager::prompt(dbus::MethodCall &call)
 
 void PermissionManager::dismiss(dbus::MethodCall &call)
 {
-    QString token;
+    std::string token;
     if (!call.read(token)) {
         call.replyError("org.freedesktop.DBus.Error.InvalidArgs", "Unexpected arguments");
         return;
@@ -88,7 +88,7 @@ void PermissionManager::dismiss(dbus::MethodCall &call)
     prompt->dismiss();
 }
 
-void PermissionManager::remove(const QString &token)
+void PermissionManager::remove(const std::string &token)
 {
     const auto it = m_prompts.find(token);
     if (it == m_prompts.end())

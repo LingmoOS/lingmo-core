@@ -17,7 +17,7 @@ static constexpr std::chrono::milliseconds kPreviewDuration = 100ms;
 
 static constexpr double kDefaultTemperature = 0.5;
 
-NightLight::NightLight(Settings &settings, Clock clock, const QString &displayService)
+NightLight::NightLight(Settings &settings, Clock clock, const std::string &displayService)
     : ScheduledFeature({"NightLight", "Enabled", "Schedule", "HoldUntil", "CustomStart", "CustomEnd"},
                        settings, std::move(clock))
     , m_display(displayService)
@@ -122,7 +122,7 @@ void NightLight::setTemperature(double temperature)
     temperatureChanged.emit(temperature);
 }
 
-void NightLight::setPreview(bool preview, const QString &caller)
+void NightLight::setPreview(bool preview, const std::string &caller)
 {
     if (!preview) {
         endPreview();
@@ -130,7 +130,7 @@ void NightLight::setPreview(bool preview, const QString &caller)
     }
     // A caller that crashes mid-drag must not leave the screen tinted.
     if (!caller.empty() && m_bus) {
-        m_previewWatch = m_bus->watchName(caller, [this](const QString &owner) {
+        m_previewWatch = m_bus->watchName(caller, [this](const std::string &owner) {
             if (owner.empty())
                 endPreview();
         });

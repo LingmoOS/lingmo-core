@@ -22,6 +22,6 @@ private:
     void onDataChanged();
 
     std::unique_ptr<WaylandClipboard> m_waylandClipboard;
-    QList<Lingmo::Base::Subscription> m_subscriptions;
+    std::vector<Lingmo::Base::Subscription> m_subscriptions;
 };
 

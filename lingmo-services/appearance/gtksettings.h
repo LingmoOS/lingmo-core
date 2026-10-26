@@ -4,15 +4,15 @@
 #pragma once
 struct GtkSettings
 {
-    QString fontFamily;
+    std::string fontFamily;
     double fontPointSize = 9;
     // fontconfig's values, as written by writeFontConfig().
     bool fontAntialias = true;
-    QString fontHintStyle = "hintfull";
-    QString fontRgba = "rgb";
+    std::string fontHintStyle = "hintfull";
+    std::string fontRgba = "rgb";
     bool darkMode = false;
-    QString iconTheme;
-    QString cursorTheme;
+    std::string iconTheme;
+    std::string cursorTheme;
     int cursorSize = 24;
 };
 

@@ -15,7 +15,7 @@ namespace Lingmo::Services {
 // Calls without keeping the pending call: `done` runs once the answer came,
 // however long the caller lives. Capture only what outlives the call.
 template<typename... Args>
-void callDetached(const Lingmo::Base::DBus::Proxy &proxy, const QString &method,
+void callDetached(const Lingmo::Base::DBus::Proxy &proxy, const std::string &method,
                   std::function<void(const Lingmo::Base::DBus::Reply &)> done, const Args &...args)
 {
     Lingmo::Base::DBus::Connection *connection = proxy.connection();

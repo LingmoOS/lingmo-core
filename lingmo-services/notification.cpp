@@ -69,7 +69,7 @@ void Notification::send()
     dbus::Message call = m_bus->newMethodCall(kService, kPath, kService, "Notify");
     // Only a running notification server shows it; none is started for it.
     sd_bus_message_set_auto_start(call.get(), 0);
-    call.append(QString(), m_id, m_iconName, m_summary, m_body, QStringList(), hints,
+    call.append(std::string(), m_id, m_iconName, m_summary, m_body, std::vector<std::string>(), hints,
                 int32_t(m_timeout));
 
     m_pending = true;

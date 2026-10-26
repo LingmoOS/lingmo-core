@@ -24,9 +24,9 @@ public:
     class Content : public Lingmo::UI::View
     {
     public:
-        virtual QString title() const = 0;
-        virtual QString description() const = 0;
-        virtual QString accept() const = 0;
+        virtual std::string title() const = 0;
+        virtual std::string description() const = 0;
+        virtual std::string accept() const = 0;
         virtual bool ready() const = 0;
         virtual Lingmo::Base::DBus::VariantMap details() const = 0;
         // Sets its own text again, in the session's new language.
@@ -37,9 +37,9 @@ public:
     };
 
     // Known kinds have a content; an unknown kind is refused.
-    static bool supports(const QString &kind);
+    static bool supports(const std::string &kind);
 
-    PermissionPrompt(const QString &kind, const QString &appId, const QString &parentWindow,
+    PermissionPrompt(const std::string &kind, const std::string &appId, const std::string &parentWindow,
                      const Lingmo::Base::DBus::VariantMap &options, Lingmo::Base::DBus::MethodCall call);
     // Replies "failed" when nothing answered yet.
     ~PermissionPrompt();
@@ -47,7 +47,7 @@ public:
     PermissionPrompt(const PermissionPrompt &) = delete;
     PermissionPrompt &operator=(const PermissionPrompt &) = delete;
 
-    QString caller() const { return m_call.message().sender(); }
+    std::string caller() const { return m_call.message().sender(); }
     // Dismisses the prompt once the caller leaves the bus.
     void watchCaller(Lingmo::Base::DBus::Connection *bus);
     void show();
@@ -65,19 +65,19 @@ public:
     // The name and icon of a desktop entry; the id itself and no icon for an
     // application without one.
     struct Application {
-        QString id;
-        QString name;
-        QString icon;
+        std::string id;
+        std::string name;
+        std::string icon;
     };
-    static Application describeApplication(const QString &appId);
+    static Application describeApplication(const std::string &appId);
 
 private:
     void retranslate();
     void reply(uint32_t response, const Lingmo::Base::DBus::VariantMap &results);
 
     Lingmo::Base::DBus::MethodCall m_call;
-    QString m_kindIcon;
-    QString m_parentWindow;
+    std::string m_kindIcon;
+    std::string m_parentWindow;
     Application m_application;
     bool m_finished = false;
     Lingmo::Base::DBus::NameWatch m_callerWatch;

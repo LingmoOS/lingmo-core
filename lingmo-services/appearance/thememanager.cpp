@@ -15,9 +15,9 @@
 
 using namespace Lingmo::Base;
 
-static const QString s_systemFontName = "Appearance/Font";
-static const QString s_systemFixedFontName = "Appearance/FixedFont";
-static const QString s_systemPointFontSize = "Appearance/FontSize";
+static const std::string s_systemFontName = "Appearance/Font";
+static const std::string s_systemFixedFontName = "Appearance/FixedFont";
+static const std::string s_systemPointFontSize = "Appearance/FontSize";
 
 ThemeManager::ThemeManager(Settings &settings, dbus::Connection *session, dbus::Connection *system)
     : m_settings(settings)
@@ -26,7 +26,7 @@ ThemeManager::ThemeManager(Settings &settings, dbus::Connection *session, dbus::
     , m_loginBackground(std::make_unique<LoginBackground>(*m_wallpaperManager, system))
 {
     WallpaperManager &wallpapers = *m_wallpaperManager;
-    m_subscriptions.push_back(wallpapers.wallpaperChanged.connect([this](const QString &path) {
+    m_subscriptions.push_back(wallpapers.wallpaperChanged.connect([this](const std::string &path) {
         emitSignal("wallpaperChanged", path);
     }));
     m_subscriptions.push_back(wallpapers.userWallpapersChanged.connect([this] {
@@ -35,7 +35,7 @@ ThemeManager::ThemeManager(Settings &settings, dbus::Connection *session, dbus::
     m_subscriptions.push_back(wallpapers.wallpaperFoldersChanged.connect([this] {
         emitSignal("wallpaperFoldersChanged");
     }));
-    m_subscriptions.push_back(wallpapers.wallpaperFolderImagesChanged.connect([this](const QString &folder) {
+    m_subscriptions.push_back(wallpapers.wallpaperFolderImagesChanged.connect([this](const std::string &folder) {
         emitSignal("wallpaperFolderImagesChanged", folder);
     }));
     m_subscriptions.push_back(wallpapers.backgroundTypeChanged.connect([this] {
@@ -57,8 +57,8 @@ ThemeManager::ThemeManager(Settings &settings, dbus::Connection *session, dbus::
         m_settings.setValue(s_systemFixedFontName, "Noto Mono");
 
     if (!m_settings.contains(s_systemFontName)) {
-        const QString fontName = fontForLocale(Lingmo::Core::language::preferredLanguages().front());
-        m_settings.setValue(s_systemFontName, fontName.empty() ? QString("Noto Sans") : fontName);
+        const std::string fontName = fontForLocale(Lingmo::Core::language::preferredLanguages().front());
+        m_settings.setValue(s_systemFontName, fontName.empty() ? std::string("Noto Sans") : fontName);
     }
     m_settings.sync();
 
@@ -97,29 +97,29 @@ bool ThemeManager::publish()
     o.addMethod("setDarkModeSchedule", [this](int32_t value) { setDarkModeSchedule(value); }, {{"schedule"}, {}});
     o.addMethod("setContinuousCorners", [this](bool value) { setContinuousCorners(value); },
                 {{"continuousCorners"}, {}});
-    o.addMethod("setSystemFont", [this](const QString &value) { setSystemFont(value); }, {{"fontFamily"}, {}});
-    o.addMethod("setSystemFixedFont", [this](const QString &value) { setSystemFixedFont(value); },
+    o.addMethod("setSystemFont", [this](const std::string &value) { setSystemFont(value); }, {{"fontFamily"}, {}});
+    o.addMethod("setSystemFixedFont", [this](const std::string &value) { setSystemFixedFont(value); },
                 {{"fontFamily"}, {}});
     o.addMethod("setSystemFontPointSize", [this](double value) { setSystemFontPointSize(value); },
                 {{"fontSize"}, {}});
-    o.addMethod("setWallpaper", [this](const QString &value) { setWallpaper(value); }, {{"path"}, {}});
-    o.addMethod("removeUserWallpaper", [this](const QString &value) { removeUserWallpaper(value); },
+    o.addMethod("setWallpaper", [this](const std::string &value) { setWallpaper(value); }, {{"path"}, {}});
+    o.addMethod("removeUserWallpaper", [this](const std::string &value) { removeUserWallpaper(value); },
                 {{"path"}, {}});
-    o.addMethod("addWallpaperFolder", [this](const QString &value) { addWallpaperFolder(value); },
+    o.addMethod("addWallpaperFolder", [this](const std::string &value) { addWallpaperFolder(value); },
                 {{"path"}, {}});
-    o.addMethod("removeWallpaperFolder", [this](const QString &value) { removeWallpaperFolder(value); },
+    o.addMethod("removeWallpaperFolder", [this](const std::string &value) { removeWallpaperFolder(value); },
                 {{"path"}, {}});
-    o.addMethod("wallpaperFolderImages", [this](const QString &value) { return wallpaperFolderImages(value); },
+    o.addMethod("wallpaperFolderImages", [this](const std::string &value) { return wallpaperFolderImages(value); },
                 {{"path"}, {"images"}});
     o.addMethod("setAccentColor", [this](int32_t value) { setAccentColor(value); }, {{"accentColor"}, {}});
-    o.addMethod("setBackgroundColor", [this](const QString &value) { setBackgroundColor(value); },
+    o.addMethod("setBackgroundColor", [this](const std::string &value) { setBackgroundColor(value); },
                 {{"color"}, {}});
     o.addMethod("setBackgroundType", [this](int32_t value) { setBackgroundType(value); }, {{"type"}, {}});
-    o.addMethod("setCursorTheme", [this](const QString &value) { setCursorTheme(value); }, {{"type"}, {}});
+    o.addMethod("setCursorTheme", [this](const std::string &value) { setCursorTheme(value); }, {{"type"}, {}});
     o.addMethod("setCursorSize", [this](int32_t value) { setCursorSize(value); }, {{"type"}, {}});
-    o.addMethod("setIconTheme", [this](const QString &value) { setIconTheme(value); }, {{"type"}, {}});
+    o.addMethod("setIconTheme", [this](const std::string &value) { setIconTheme(value); }, {{"type"}, {}});
     o.addMethod("setFontRendering",
-                [this](bool antialias, const QString &hintStyle) { setFontRendering(antialias, hintStyle); },
+                [this](bool antialias, const std::string &hintStyle) { setFontRendering(antialias, hintStyle); },
                 {{"antialias", "hintStyle"}, {}});
     o.addMethod("updateFontConfig", [this] { updateFontConfig(); });
 
@@ -158,7 +158,7 @@ bool ThemeManager::publish()
 }
 
 template<typename... Args>
-void ThemeManager::emitSignal(const QString &name, const Args &...args)
+void ThemeManager::emitSignal(const std::string &name, const Args &...args)
 {
     if (m_object)
         m_object->emitSignal(name, args...);
@@ -166,7 +166,7 @@ void ThemeManager::emitSignal(const QString &name, const Args &...args)
 }
 
 template<typename T>
-void ThemeManager::write(const QString &key, const T &value)
+void ThemeManager::write(const std::string &key, const T &value)
 {
     m_settings.setValue("Appearance/" + key, value);
     m_settings.sync();
@@ -224,15 +224,15 @@ void ThemeManager::setAccentColor(int accentColor)
     emitSignal("accentColorChanged", int32_t(m_accentColor));
 }
 
-QString ThemeManager::cursorTheme() const
+std::string ThemeManager::cursorTheme() const
 {
     return m_cursorTheme;
 }
 
-void ThemeManager::setCursorTheme(const QString &theme)
+void ThemeManager::setCursorTheme(const std::string &theme)
 {
     if (theme.empty() || theme.size() > 255 || theme == "." || theme == ".."
-        || theme.find_first_of(QStringView("/\\\0", 3)) != QString::npos)
+        || theme.find_first_of(std::string_view("/\\\0", 3)) != std::string::npos)
         return;
     if (m_cursorTheme != theme) {
         m_cursorTheme = theme;
@@ -258,12 +258,12 @@ void ThemeManager::setCursorSize(int size)
     }
 }
 
-QString ThemeManager::systemFont()
+std::string ThemeManager::systemFont()
 {
     return m_settings.stringValue(s_systemFontName, "Noto Sans");
 }
 
-void ThemeManager::setSystemFont(const QString &fontFamily)
+void ThemeManager::setSystemFont(const std::string &fontFamily)
 {
     m_settings.setValue(s_systemFontName, fontFamily);
     m_settings.sync();
@@ -273,12 +273,12 @@ void ThemeManager::setSystemFont(const QString &fontFamily)
     emitSignal("systemFontChanged");
 }
 
-QString ThemeManager::systemFixedFont()
+std::string ThemeManager::systemFixedFont()
 {
     return m_settings.stringValue(s_systemFixedFontName, "Noto Mono");
 }
 
-void ThemeManager::setSystemFixedFont(const QString &fontFamily)
+void ThemeManager::setSystemFixedFont(const std::string &fontFamily)
 {
     m_settings.setValue(s_systemFixedFontName, fontFamily);
     m_settings.sync();
@@ -299,42 +299,42 @@ void ThemeManager::setSystemFontPointSize(double fontSize)
     emitSignal("systemFontPointSizeChanged");
 }
 
-QString ThemeManager::wallpaper()
+std::string ThemeManager::wallpaper()
 {
     return m_wallpaperManager->wallpaper();
 }
 
-void ThemeManager::setWallpaper(const QString &path)
+void ThemeManager::setWallpaper(const std::string &path)
 {
     m_wallpaperManager->setWallpaper(path);
 }
 
-QStringList ThemeManager::userWallpapers() const
+std::vector<std::string> ThemeManager::userWallpapers() const
 {
     return m_wallpaperManager->userWallpapers();
 }
 
-void ThemeManager::removeUserWallpaper(const QString &path)
+void ThemeManager::removeUserWallpaper(const std::string &path)
 {
     m_wallpaperManager->removeUserWallpaper(path);
 }
 
-QStringList ThemeManager::wallpaperFolders() const
+std::vector<std::string> ThemeManager::wallpaperFolders() const
 {
     return m_wallpaperManager->wallpaperFolders();
 }
 
-void ThemeManager::addWallpaperFolder(const QString &path)
+void ThemeManager::addWallpaperFolder(const std::string &path)
 {
     m_wallpaperManager->addWallpaperFolder(path);
 }
 
-void ThemeManager::removeWallpaperFolder(const QString &path)
+void ThemeManager::removeWallpaperFolder(const std::string &path)
 {
     m_wallpaperManager->removeWallpaperFolder(path);
 }
 
-QStringList ThemeManager::wallpaperFolderImages(const QString &path)
+std::vector<std::string> ThemeManager::wallpaperFolderImages(const std::string &path)
 {
     return m_wallpaperManager->wallpaperFolderImages(path);
 }
@@ -349,12 +349,12 @@ void ThemeManager::setBackgroundType(int type)
     m_wallpaperManager->setBackgroundType(type);
 }
 
-QString ThemeManager::backgroundColor()
+std::string ThemeManager::backgroundColor()
 {
     return m_wallpaperManager->backgroundColor();
 }
 
-void ThemeManager::setBackgroundColor(const QString &color)
+void ThemeManager::setBackgroundColor(const std::string &color)
 {
     m_wallpaperManager->setBackgroundColor(color);
 }
@@ -371,13 +371,13 @@ void ThemeManager::updateGtk3Config()
     gtk.fontRgba = font.rgba;
 
     gtk.darkMode = isDarkMode();
-    gtk.iconTheme = m_iconTheme.empty() ? QString("Lingmo") : m_iconTheme;
+    gtk.iconTheme = m_iconTheme.empty() ? std::string("Lingmo") : m_iconTheme;
     gtk.cursorTheme = m_cursorTheme;
     gtk.cursorSize = m_cursorSize;
     writeGtkSettings(gtk);
 }
 
-void ThemeManager::setFontRendering(bool antialias, const QString &hintStyle)
+void ThemeManager::setFontRendering(bool antialias, const std::string &hintStyle)
 {
     m_settings.setValue("Appearance/FontAntialias", antialias);
     m_settings.setValue("Appearance/FontHintStyle", hintStyle);
@@ -409,12 +409,12 @@ FontConfig ThemeManager::fontConfig()
     return config;
 }
 
-QString ThemeManager::iconTheme() const
+std::string ThemeManager::iconTheme() const
 {
     return m_iconTheme;
 }
 
-void ThemeManager::setIconTheme(const QString &iconTheme)
+void ThemeManager::setIconTheme(const std::string &iconTheme)
 {
     if (m_iconTheme == iconTheme)
         return;

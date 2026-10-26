@@ -25,7 +25,7 @@ LoginBackground::LoginBackground(WallpaperManager &wallpapers, dbus::Connection 
     m_pending.onTimeout = [this] { send(); };
 
     const auto schedule = [this] { m_pending.start(std::chrono::nanoseconds(0)); };
-    m_subscriptions.push_back(m_wallpapers.wallpaperChanged.connect([schedule](const QString &) { schedule(); }));
+    m_subscriptions.push_back(m_wallpapers.wallpaperChanged.connect([schedule](const std::string &) { schedule(); }));
     m_subscriptions.push_back(m_wallpapers.backgroundTypeChanged.connect(schedule));
     m_subscriptions.push_back(m_wallpapers.backgroundColorChanged.connect(schedule));
     schedule();
@@ -42,9 +42,9 @@ void LoginBackground::send()
                                         << reply.error().message;
     };
 
-    const QString wallpaper = m_wallpapers.wallpaper();
+    const std::string wallpaper = m_wallpapers.wallpaper();
     if (m_wallpapers.backgroundType() == 0 && !wallpaper.empty()) {
-        const QString path = url::toLocalFile(wallpaper).value_or(wallpaper);
+        const std::string path = url::toLocalFile(wallpaper).value_or(wallpaper);
         const dbus::UnixFd file = dbus::UnixFd::adopt(open(path.c_str(), O_RDONLY | O_CLOEXEC));
         if (file.isValid())
             services::callDetached(manager, "SetBackgroundPicture", done, file);

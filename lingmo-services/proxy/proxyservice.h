@@ -26,7 +26,7 @@ private:
     Lingmo::Base::DBus::Connection *m_session;
     Lingmo::Base::FileWatch m_watch;
     Lingmo::Base::Timer m_reloadTimer;
-    std::map<QString, QString> m_environment;
+    std::map<std::string, std::string> m_environment;
     bool m_environmentPublished = false;
 };
 

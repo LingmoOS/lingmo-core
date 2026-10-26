@@ -36,17 +36,17 @@ public:
 
 private:
     void readFlags(const Lingmo::Base::DBus::VariantMap &values);
-    void addBattery(const QString &path);
-    void removeBattery(const QString &path);
+    void addBattery(const std::string &path);
+    void removeBattery(const std::string &path);
     void publishBattery();
 
     Lingmo::Base::DBus::Connection *m_system;
     Lingmo::Base::DBus::Connection *m_session;
     Lingmo::Base::Settings &m_settings;
     Lingmo::Base::DBus::Proxy m_upower;
-    QList<Lingmo::Base::DBus::Match> m_matches;
+    std::vector<Lingmo::Base::DBus::Match> m_matches;
     // By UPower device path.
-    std::map<QString, std::unique_ptr<Battery>> m_batteries;
+    std::map<std::string, std::unique_ptr<Battery>> m_batteries;
     Battery *m_published = nullptr;
     bool m_onBattery = false;
     bool m_hasLid = false;

@@ -27,12 +27,12 @@ public:
 
 private:
     void onPropertiesChanged(const Lingmo::Base::DBus::VariantMap &changed,
-                             const QStringList &invalidated);
+                             const std::vector<std::string> &invalidated);
     void fetchProperties();
     void fetchCriticalAction();
     void update();
     void notify(uint32_t level);
-    QString body(uint32_t level) const;
+    std::string body(uint32_t level) const;
 
     Lingmo::Base::DBus::Proxy m_upower;
     Lingmo::Base::DBus::Proxy m_device;
@@ -42,7 +42,7 @@ private:
     Notification m_notification;
     Lingmo::Base::Subscription m_failed;
     Lingmo::Base::DBus::VariantMap m_properties;
-    QString m_criticalAction;
+    std::string m_criticalAction;
     bool m_criticalActionKnown = false;
     // GetCriticalAction is in flight; its reply runs update() again.
     bool m_fetchingAction = false;

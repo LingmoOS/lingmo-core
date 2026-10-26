@@ -28,10 +28,10 @@ public:
     Notification &operator=(const Notification &) = delete;
 
     // The application it is from.
-    void setDesktopEntry(QString id) { m_desktopEntry = std::move(id); }
-    void setIconName(QString name) { m_iconName = std::move(name); }
-    void setSummary(QString summary) { m_summary = std::move(summary); }
-    void setBody(QString body) { m_body = std::move(body); }
+    void setDesktopEntry(std::string id) { m_desktopEntry = std::move(id); }
+    void setIconName(std::string name) { m_iconName = std::move(name); }
+    void setSummary(std::string summary) { m_summary = std::move(summary); }
+    void setBody(std::string body) { m_body = std::move(body); }
     void setUrgency(Urgency urgency) { m_urgency = urgency; }
     // Notify's expire_timeout; -1 leaves it to the server.
     void setTimeout(int timeout) { m_timeout = timeout; }
@@ -52,10 +52,10 @@ private:
     Lingmo::Base::DBus::Proxy m_proxy;
     Lingmo::Base::DBus::Match m_closedMatch;
     Lingmo::Base::DBus::PendingCall m_call;
-    QString m_desktopEntry;
-    QString m_iconName;
-    QString m_summary;
-    QString m_body;
+    std::string m_desktopEntry;
+    std::string m_iconName;
+    std::string m_summary;
+    std::string m_body;
     Urgency m_urgency = Normal;
     int m_timeout = -1;
     uint32_t m_id = 0;

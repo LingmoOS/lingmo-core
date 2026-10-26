@@ -18,7 +18,7 @@ public:
     // The chargeState values of org.lingmo.Services.Battery.
     enum ChargeState { NoCharge, Charging, Discharging, FullyCharged };
 
-    Battery(Lingmo::Base::DBus::Connection *system, const QString &path,
+    Battery(Lingmo::Base::DBus::Connection *system, const std::string &path,
             Lingmo::Base::Settings &settings);
     ~Battery();
 
@@ -33,7 +33,7 @@ public:
     bool publish(Lingmo::Base::DBus::Connection *session);
 
     // "2h 5m"; empty under a minute.
-    static QString formatDuration(int64_t seconds);
+    static std::string formatDuration(int64_t seconds);
 
 private:
     struct Reading {
@@ -49,15 +49,15 @@ private:
         ChargeState chargeState() const;
         // Seconds to full while charging, to empty while discharging, else -1.
         int64_t remainingTime() const;
-        QString status() const;
+        std::string status() const;
         bool operator==(const Reading &) const = default;
     };
 
     Reading read() const;
     void update();
-    QString lastChargedTime() const;
+    std::string lastChargedTime() const;
 
-    QString m_path;
+    std::string m_path;
     Lingmo::Base::Settings &m_settings;
     Lingmo::Base::DBus::Proxy m_device;
     Lingmo::Base::DBus::Match m_propertiesChanged;

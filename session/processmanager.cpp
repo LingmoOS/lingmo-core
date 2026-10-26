@@ -279,15 +279,16 @@ void SessionProcessManager::endAfterApplications(Ending ending,
     m_quitAllCall = bus->callAsync(
         quitAll,
         [this, ending, then](const dbus::Reply &reply) {
-            QString outcome;
-            QString applicationId;
+            std::string outcome;
+            std::string applicationId;
             const bool answered = reply.read(outcome, applicationId);
-            if (!answered || outcome == QLatin1String("quit")) {
+            if (!answered || outcome == "quit") {
                 m_ending = then();
                 return;
             }
             m_ending = false;
-            notifyEndingStopped(ending, outcome, applicationId);
+            notifyEndingStopped(ending, QString::fromStdString(outcome),
+                                QString::fromStdString(applicationId));
         },
         std::chrono::milliseconds(INT_MAX));
 }
@@ -344,7 +345,7 @@ void SessionProcessManager::notifyEndingStopped(Ending ending,
         std::string(tr("System")), uint32_t(0),
         entry && !entry->icon.empty() ? entry->icon : std::string("system-log-out"),
         summary.toStdString(), body.toStdString(),
-        QStringList(),
+        std::vector<std::string>(),
         dbus::VariantMap{{"urgency", dbus::Variant(uint8_t(1))}},
         int32_t(-1));
     bus->send(notify);

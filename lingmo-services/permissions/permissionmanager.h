@@ -24,16 +24,16 @@ public:
     bool publish();
 
     // The prompt a token opened, for tests; null when none is open.
-    PermissionPrompt *prompt(const QString &token) const;
+    PermissionPrompt *prompt(const std::string &token) const;
 
 private:
     // Replies (response, results): 0 allowed, 1 denied or dismissed, 2 failed.
     // results carries whatever the kind's content chose.
     void prompt(Lingmo::Base::DBus::MethodCall &call);
     void dismiss(Lingmo::Base::DBus::MethodCall &call);
-    void remove(const QString &token);
+    void remove(const std::string &token);
 
     Lingmo::Base::DBus::Connection *m_session;
     std::unique_ptr<Lingmo::Base::DBus::Object> m_object;
-    std::map<QString, std::unique_ptr<PermissionPrompt>> m_prompts;
+    std::map<std::string, std::unique_ptr<PermissionPrompt>> m_prompts;
 };

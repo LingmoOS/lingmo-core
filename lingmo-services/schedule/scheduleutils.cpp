@@ -22,11 +22,11 @@ static double radians(double degrees)
 
 // One ISO 6709 angle of zone.tab: a sign, the degrees in `degreeDigits`
 // digits, then minutes and optionally seconds.
-static std::optional<double> parseAngle(QStringView text, size_t degreeDigits)
+static std::optional<double> parseAngle(std::string_view text, size_t degreeDigits)
 {
     if (text.empty() || (text[0] != '+' && text[0] != '-'))
         return std::nullopt;
-    const QStringView digits = text.substr(1);
+    const std::string_view digits = text.substr(1);
     if (digits.size() != degreeDigits + 2 && digits.size() != degreeDigits + 4)
         return std::nullopt;
     const auto degrees = Lingmo::Base::strings::toNumber<int>(digits.substr(0, degreeDigits));
@@ -60,7 +60,7 @@ Zone systemZone()
     }
 }
 
-Zone zone(const QString &id)
+Zone zone(const std::string &id)
 {
     try {
         return locate_zone(id);
@@ -153,29 +153,29 @@ std::optional<SunTimes> sunTimes(Date date, double latitude, double longitude, Z
                      turnAt(720 - 4 * (longitude - hourAngle) - equationOfTime)};
 }
 
-QStringList zoneTables()
+std::vector<std::string> zoneTables()
 {
     return {"/usr/share/zoneinfo/zone1970.tab", "/usr/share/zoneinfo/zone.tab"};
 }
 
-std::optional<Coordinates> zoneCoordinates(const QString &zoneId,
-                                           const QStringList &tables)
+std::optional<Coordinates> zoneCoordinates(const std::string &zoneId,
+                                           const std::vector<std::string> &tables)
 {
     if (zoneId.empty())
         return std::nullopt;
-    for (const QString &path : tables) {
-        const std::optional<QString> contents = Lingmo::Base::file::read(path);
+    for (const std::string &path : tables) {
+        const std::optional<std::string> contents = Lingmo::Base::file::read(path);
         if (!contents)
             continue;
-        for (const QStringView rawLine : Lingmo::Base::strings::splitViews(*contents, '\n')) {
-            const QStringView line = Lingmo::Base::strings::trimmed(rawLine);
+        for (const std::string_view rawLine : Lingmo::Base::strings::splitViews(*contents, '\n')) {
+            const std::string_view line = Lingmo::Base::strings::trimmed(rawLine);
             if (line.empty() || line.front() == '#')
                 continue;
             // Country codes, coordinates, zone, comment.
-            const QList<QStringView> fields = Lingmo::Base::strings::splitViews(line, '\t');
+            const std::vector<std::string_view> fields = Lingmo::Base::strings::splitViews(line, '\t');
             if (fields.size() < 3 || fields[2] != zoneId)
                 continue;
-            const QStringView iso = fields[1];
+            const std::string_view iso = fields[1];
             size_t split = 1;
             while (split < iso.size() && iso[split] != '+' && iso[split] != '-')
                 ++split;

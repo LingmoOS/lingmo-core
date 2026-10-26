@@ -32,9 +32,9 @@ namespace {
 class PipeTransfer
 {
 public:
-    using Completion = std::function<void(bool, QString)>;
+    using Completion = std::function<void(bool, std::string)>;
 
-    PipeTransfer(int fd, bool writing, QString bytes, size_t limit, Completion completion)
+    PipeTransfer(int fd, bool writing, std::string bytes, size_t limit, Completion completion)
         : m_loop(*EventLoop::current())
         , m_fd(fd)
         , m_writing(writing)
@@ -139,7 +139,7 @@ private:
     int m_watch = 0;
     bool m_writing;
     bool m_valid = false;
-    QString m_bytes;
+    std::string m_bytes;
     size_t m_limit;
     size_t m_offset = 0;
     Completion m_completion;
@@ -178,7 +178,7 @@ public:
 
     struct Offer {
         wl_proxy *proxy = nullptr;
-        QStringList formats;
+        std::vector<std::string> formats;
         bool tooManyFormats = false;
 
         ~Offer() { destroyProxy(proxy, 1); }
@@ -186,7 +186,7 @@ public:
 
     struct Source {
         wl_proxy *proxy = nullptr;
-        std::map<QString, QString> bytes;
+        std::map<std::string, std::string> bytes;
         std::vector<std::unique_ptr<PipeTransfer>> writes;
 
         ~Source() { destroyProxy(proxy, 1); }
@@ -317,7 +317,7 @@ public:
                     static const ext_data_control_offer_v1_listener offerListener = {
                             [](void *data, ext_data_control_offer_v1 *, const char *mime) {
                                 auto *offer = static_cast<Offer *>(data);
-                                const QString format = mime;
+                                const std::string format = mime;
                                 // SAVE_TARGETS is a clipboard-manager handshake, not a payload.
                                 if (format == "SAVE_TARGETS")
                                     return;
@@ -392,7 +392,7 @@ public:
             q->dataChanged.emit();
             return;
         }
-        const QString format = selection->formats[formatIndex++];
+        const std::string format = selection->formats[formatIndex++];
         int fds[2];
         if (pipe2(fds, O_CLOEXEC | O_NONBLOCK) < 0) {
             collecting.reset();
@@ -402,8 +402,8 @@ public:
         close(fds[1]);
         const uint64_t expected = generation;
         reader = std::make_unique<PipeTransfer>(
-                fds[0], false, QString(), kMaxClipboardBytes - totalBytes,
-                [this, expected, format](bool complete, QString bytes) {
+                fds[0], false, std::string(), kMaxClipboardBytes - totalBytes,
+                [this, expected, format](bool complete, std::string bytes) {
                     // The finished reader goes on the next turn, outside its own call.
                     loop.post([finished = std::shared_ptr<PipeTransfer>(std::move(reader))] {});
                     if (expected != generation)

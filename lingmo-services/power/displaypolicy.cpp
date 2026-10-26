@@ -47,7 +47,7 @@ using Lingmo::Display::ErrorCode;
 
 DisplayPolicy::DisplayPolicy(WaylandIdle *idle, BrightnessManager *brightness,
                              dbus::Connection *session, dbus::Connection *system,
-                             const QString &displayService)
+                             const std::string &displayService)
     : m_idle(idle)
     , m_brightness(brightness)
     , m_screenSaver(session, s_screenSaverService, s_screenSaverPath, s_screenSaverInterface)
@@ -76,7 +76,7 @@ DisplayPolicy::DisplayPolicy(WaylandIdle *idle, BrightnessManager *brightness,
     }
     if (system) {
         m_matches.push_back(m_logind.onPropertiesChanged(
-                [this](const dbus::VariantMap &changed, const QStringList &invalidated) {
+                [this](const dbus::VariantMap &changed, const std::vector<std::string> &invalidated) {
                     onLogindPropertiesChanged(changed, invalidated);
                 }));
         m_matches.push_back(m_logind.onSignal("PrepareForSleep", [this](const dbus::Message &message) {
@@ -299,7 +299,7 @@ void DisplayPolicy::onScreenSaverActiveChanged(bool active)
 }
 
 void DisplayPolicy::onLogindPropertiesChanged(const dbus::VariantMap &changedProperties,
-                                              const QStringList &invalidatedProperties)
+                                              const std::vector<std::string> &invalidatedProperties)
 {
     static const char *const names[] = {"BlockInhibited", "BlockWeakInhibited", "DelayInhibited"};
     const bool inhibitorsChanged = std::any_of(std::begin(names), std::end(names), [&](const char *name) {
@@ -578,6 +578,6 @@ void DisplayPolicy::updateLidSwitchInhibitor()
                 if (m_lidPresent && !m_lidSleeping)
                     m_lidSwitchInhibitor = *inhibitor;
             },
-            QString("handle-lid-switch"), QString("Lingmo"),
-            QString("Lingmo manages lid power policy"), QString("block"));
+            std::string("handle-lid-switch"), std::string("Lingmo"),
+            std::string("Lingmo manages lid power policy"), std::string("block"));
 }

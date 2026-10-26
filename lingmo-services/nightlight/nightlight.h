@@ -23,7 +23,7 @@ public:
     // of their own.
     explicit NightLight(Lingmo::Base::Settings &settings,
                         Clock clock = ScheduleUtils::currentDateTime,
-                        const QString &displayService = "org.lingmo.DisplayConfig");
+                        const std::string &displayService = "org.lingmo.DisplayConfig");
     ~NightLight() override;
 
     // org.lingmo.Services.NightLight at /org/lingmo/Services/NightLight.
@@ -41,7 +41,7 @@ public:
 
     void setTemperature(double temperature);
     // Ends by itself when `caller`, a bus name, leaves the bus.
-    void setPreview(bool preview, const QString &caller = {});
+    void setPreview(bool preview, const std::string &caller = {});
 
     Lingmo::Base::Signal<double> temperatureChanged;
     Lingmo::Base::Signal<bool> availableChanged;
@@ -58,7 +58,7 @@ private:
     Lingmo::Base::DBus::Connection *m_bus = nullptr;
     Lingmo::Base::DBus::NameWatch m_previewWatch;
     std::unique_ptr<Lingmo::Base::DBus::Object> m_object;
-    QList<Lingmo::Base::Subscription> m_subscriptions;
+    std::vector<Lingmo::Base::Subscription> m_subscriptions;
     double m_temperature = 0.5;
     bool m_available = false;
     bool m_previewing = false;

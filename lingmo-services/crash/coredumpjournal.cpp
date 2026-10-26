@@ -44,7 +44,7 @@ CoredumpJournal::CoredumpJournal(std::function<void(const Coredump &dump)> cored
         m_journal = nullptr;
         return;
     }
-    const QString uid = "COREDUMP_UID=" + QString::number(::getuid());
+    const std::string uid = "COREDUMP_UID=" + std::to_string(::getuid());
     sd_journal_add_match(m_journal, s_coredumpMessageId, 0);
     sd_journal_add_match(m_journal, uid.c_str(), 0);
     // The stack trace of a process with many threads outgrows the 64 KiB default.
@@ -95,7 +95,7 @@ void CoredumpJournal::scheduleTimeout()
     m_timeout.start(std::chrono::milliseconds(std::min<int64_t>(delayMs, 60000)));
 }
 
-QString CoredumpJournal::field(const char *name) const
+std::string CoredumpJournal::field(const char *name) const
 {
     const void *data = nullptr;
     size_t length = 0;
@@ -104,7 +104,7 @@ QString CoredumpJournal::field(const char *name) const
     const size_t prefix = strlen(name) + 1;
     if (length < prefix)
         return {};
-    return QString(static_cast<const char *>(data) + prefix, length - prefix);
+    return std::string(static_cast<const char *>(data) + prefix, length - prefix);
 }
 
 Coredump CoredumpJournal::currentEntry() const

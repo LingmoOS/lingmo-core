@@ -45,16 +45,13 @@ ServicesApplication::ServicesApplication()
     m_batteryWarning = std::make_unique<BatteryWarning>(m_system, m_session);
     m_language = std::make_unique<Language>(
             m_settings, m_session,
-            Language::Appearance {[this](const QString &family) { m_themeManager->setSystemFont(family); },
+            Language::Appearance {[this](const std::string &family) { m_themeManager->setSystemFont(family); },
                                   [this] { m_themeManager->updateFontConfig(); }});
     // The crash dialogs and permission prompts in this process follow too.
-    m_language->applyEnvironment = [](const std::map<QString, QString> &variables) {
-        std::map<std::string, std::string> environment;
-        for (const auto &[name, value] : variables)
-            environment[toStdString(name)] = toStdString(value);
-        ui::Application::instance()->setLanguageEnvironment(environment);
+    m_language->applyEnvironment = [](const std::map<std::string, std::string> &variables) {
+        ui::Application::instance()->setLanguageEnvironment(variables);
     };
-    m_language->generateLocale = [this](const QString &locale, std::function<void(bool)> done) {
+    m_language->generateLocale = [this](const std::string &locale, std::function<void(bool)> done) {
         dbus::Proxy locales(m_system, "org.lingmo.Locales", "/org/lingmo/Locales", "org.lingmo.Locales");
         // Generating takes a second or two per locale.
         locales.setTimeout(std::chrono::minutes(2));
@@ -65,7 +62,7 @@ ServicesApplication::ServicesApplication()
                         LM_WARNING(services::log()) << "Cannot generate the locale:" << reply.error().message;
                     done(!reply.isError());
                 },
-                locale.toStdString());
+                locale);
     };
     m_clipboard = std::make_unique<Clipboard>();
     m_powerManager = std::make_unique<PowerManager>(m_powerSupply.get(), m_brightnessManager.get(),
@@ -130,7 +127,7 @@ void ServicesApplication::applyTheme()
 
 void ServicesApplication::initTrash()
 {
-    const QString trashDir = paths::dataHome() + "/Trash";
+    const std::string trashDir = paths::dataHome() + "/Trash";
 
     if (::mkdir(trashDir.c_str(), 0700) != 0)
         return;
@@ -144,8 +141,8 @@ void ServicesApplication::initTrash()
     if ((buff.st_uid == uid) && // must be owned by user
         ((buff.st_mode & 0777) == 0700)) {
         // check subdirs
-        const QString infoDir = trashDir + "/info";
-        const QString filesDir = trashDir + "/files";
+        const std::string infoDir = trashDir + "/info";
+        const std::string filesDir = trashDir + "/files";
 
         ::mkdir(infoDir.c_str(), 0777);
         ::mkdir(filesDir.c_str(), 0777);

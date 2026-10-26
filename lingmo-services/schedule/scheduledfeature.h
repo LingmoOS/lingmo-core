@@ -36,12 +36,12 @@ public:
     // Where the feature keeps its state in services.conf. A feature without
     // custom time keys offers no Custom schedule.
     struct Keys {
-        QString group;
-        QString enabled;
-        QString schedule;
-        QString holdUntil;
-        QString customStart;
-        QString customEnd;
+        std::string group;
+        std::string enabled;
+        std::string schedule;
+        std::string holdUntil;
+        std::string customStart;
+        std::string customEnd;
     };
 
     ScheduledFeature(const Keys &keys, Lingmo::Base::Settings &settings, Clock clock);
@@ -95,7 +95,7 @@ protected:
     virtual void showEnabled(std::chrono::milliseconds duration);
 
     template<typename T>
-    void write(const QString &key, const T &value)
+    void write(const std::string &key, const T &value)
     {
         m_settings.setValue(m_keys.group + '/' + key, value);
         m_settings.sync();
@@ -115,11 +115,11 @@ private:
     };
 
     bool hasCustomSchedule() const { return !m_keys.customStart.empty(); }
-    QString key(const QString &name) const { return m_keys.group + '/' + name; }
+    std::string key(const std::string &name) const { return m_keys.group + '/' + name; }
 
     void onPrepareForSleep(bool sleeping);
     void onTimeDateChanged(const Lingmo::Base::DBus::VariantMap &changed,
-                           const QStringList &invalidated);
+                           const std::vector<std::string> &invalidated);
     void refresh(Reason reason);
     // Applies the schedule once its next turn has come; until then a manual
     // toggle holds and the timer waits for the turn.
@@ -140,7 +140,7 @@ private:
     int m_customEnd = 6 * 60;
     int m_sunset = 18 * 60;
     int m_sunrise = 6 * 60;
-    QString m_zone;
+    std::string m_zone;
     std::optional<ScheduleUtils::Coordinates> m_coordinates;
     Lingmo::Base::DBus::Match m_prepareForSleep;
     Lingmo::Base::DBus::Match m_timeDateChanged;

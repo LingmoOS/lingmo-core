@@ -20,7 +20,7 @@ class CrashDialog;
 class CrashManager
 {
 public:
-    explicit CrashManager(std::function<QString()> fixedFont);
+    explicit CrashManager(std::function<std::string()> fixedFont);
     ~CrashManager();
 
     CrashManager(const CrashManager &) = delete;
@@ -28,9 +28,9 @@ public:
 
 private:
     void onCoredump(const Coredump &dump);
-    CrashDialog *dialogFor(const QString &key, bool application, const QString &id);
+    CrashDialog *dialogFor(const std::string &key, bool application, const std::string &id);
 
-    std::function<QString()> m_fixedFont;
+    std::function<std::string()> m_fixedFont;
     std::unique_ptr<CoredumpJournal> m_journal;
-    std::map<QString, std::unique_ptr<CrashDialog>> m_dialogs;
+    std::map<std::string, std::unique_ptr<CrashDialog>> m_dialogs;
 };

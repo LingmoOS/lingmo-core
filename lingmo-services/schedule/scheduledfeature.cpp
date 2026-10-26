@@ -65,7 +65,7 @@ ScheduledFeature::ScheduledFeature(const Keys &keys, Settings &settings, Clock c
         const dbus::Proxy timedate(bus, "org.freedesktop.timedate1", "/org/freedesktop/timedate1",
                                    "org.freedesktop.timedate1");
         m_timeDateChanged = timedate.onPropertiesChanged(
-                [this](const dbus::VariantMap &changed, const QStringList &invalidated) {
+                [this](const dbus::VariantMap &changed, const std::vector<std::string> &invalidated) {
                     onTimeDateChanged(changed, invalidated);
                 });
     }
@@ -77,7 +77,7 @@ void ScheduledFeature::start()
 {
     // The schedule decides how a session starts, unless a manual toggle from
     // an earlier session still waits for its turn.
-    const QString hold = key(m_keys.holdUntil);
+    const std::string hold = key(m_keys.holdUntil);
     if (m_schedule != Never && m_settings.contains(hold)
         && m_clock().toMSecsSinceEpoch() < m_settings.intValue(hold)) {
         updateSunTimes();
@@ -142,9 +142,9 @@ void ScheduledFeature::onPrepareForSleep(bool sleeping)
 }
 
 void ScheduledFeature::onTimeDateChanged(const dbus::VariantMap &changed,
-                                         const QStringList &invalidated)
+                                         const std::vector<std::string> &invalidated)
 {
-    const QString timezone = "Timezone";
+    const std::string timezone = "Timezone";
     if (!changed.contains(timezone)
         && std::find(invalidated.begin(), invalidated.end(), timezone) == invalidated.end())
         return;
@@ -156,7 +156,7 @@ void ScheduledFeature::onTimeDateChanged(const dbus::VariantMap &changed,
 // it wins; a change of settings takes a second to show, a scheduled turn a minute.
 void ScheduledFeature::refresh(Reason reason)
 {
-    const QString hold = key(m_keys.holdUntil);
+    const std::string hold = key(m_keys.holdUntil);
     if (m_settings.contains(hold)) {
         m_settings.remove(hold);
         m_settings.sync();
@@ -236,7 +236,7 @@ ScheduleUtils::Times ScheduledFeature::timesFor(ScheduleUtils::Date date)
 ScheduleUtils::Times ScheduledFeature::sunTimesFor(ScheduleUtils::Date date)
 {
     const ScheduleUtils::Zone zone = ScheduleUtils::systemZone();
-    const QString zoneId(zone->name());
+    const std::string zoneId(zone->name());
     if (zoneId != m_zone) {
         m_zone = zoneId;
         m_coordinates = ScheduleUtils::zoneCoordinates(zoneId);

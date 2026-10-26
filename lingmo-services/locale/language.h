@@ -20,7 +20,7 @@ public:
     // What a language change does to the appearance: a primary language with
     // a font of its own sets it, and the fallback families follow the order.
     struct Appearance {
-        std::function<void(const QString &family)> setSystemFont;
+        std::function<void(const std::string &family)> setSystemFont;
         std::function<void()> updateFontConfig;
     };
 
@@ -34,24 +34,24 @@ public:
     // org.lingmo.Services.Language at /org/lingmo/Services/Language.
     bool publish();
 
-    QString languageCode() const;
-    void setLanguage(const QString &code);
-    QStringList preferredLanguages() const;
-    void setPreferredLanguages(const QStringList &codes);
+    std::string languageCode() const;
+    void setLanguage(const std::string &code);
+    std::vector<std::string> preferredLanguages() const;
+    void setPreferredLanguages(const std::vector<std::string> &codes);
     // LANG, LANGUAGE and the LC_ variables for the preferred languages, as
     // programs started now get them; LC_ALL is empty.
-    std::map<QString, QString> environment() const;
+    std::map<std::string, std::string> environment() const;
 
     // A locale's language and territory, such as "en_US" for "en", as the
     // session names it.
-    static QString localeName(const QString &code);
+    static std::string localeName(const std::string &code);
 
     // Gives this process the new language variables, before its own text
     // follows; base::SessionLanguage::apply() unless set.
-    std::function<void(const std::map<QString, QString> &variables)> applyEnvironment;
+    std::function<void(const std::map<std::string, std::string> &variables)> applyEnvironment;
     // Asks lingmo-locales for a locale the system lacks; `done` tells
     // whether it is there now.
-    std::function<Lingmo::Base::DBus::PendingCall(const QString &locale, std::function<void(bool)> done)>
+    std::function<Lingmo::Base::DBus::PendingCall(const std::string &locale, std::function<void(bool)> done)>
             generateLocale;
 
 private:

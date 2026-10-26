@@ -23,7 +23,7 @@ namespace {
 class I2cDevice
 {
 public:
-    explicit I2cDevice(const QString &path)
+    explicit I2cDevice(const std::string &path)
         : m_fd(::open(path.c_str(), O_RDWR | O_CLOEXEC))
     {
         // EBUSY means a kernel ddcci driver owns the bus and exposes its own backlight.
@@ -41,9 +41,9 @@ public:
 
     bool isValid() const { return m_fd >= 0; }
 
-    bool write(const QString &payload)
+    bool write(const std::string &payload)
     {
-        QString message;
+        std::string message;
         message += char(HostAddress);
         message += char(0x80 | payload.size());
         message += payload;
@@ -57,7 +57,7 @@ public:
 
     bool getVcp(uint8_t code, int *value, int *maximum)
     {
-        if (!write(QString {'\x01', char(code)}))
+        if (!write(std::string {'\x01', char(code)}))
             return false;
         sleepFor(40);
 
@@ -78,7 +78,7 @@ public:
 
     bool setVcp(uint8_t code, int value)
     {
-        const bool ok = write(QString {'\x03', char(code), char((value >> 8) & 0xff), char(value & 0xff)});
+        const bool ok = write(std::string {'\x03', char(code), char((value >> 8) & 0xff), char(value & 0xff)});
         // DDC/CI requires a 50 ms gap before the next message.
         sleepFor(50);
         return ok;
@@ -133,7 +133,7 @@ void DdcWorker::post(std::function<void()> task)
     m_wake.notify_one();
 }
 
-void DdcWorker::requestValue(const QString &device, int value)
+void DdcWorker::requestValue(const std::string &device, int value)
 {
     bool queue = false;
     {
@@ -149,7 +149,7 @@ void DdcWorker::requestValue(const QString &device, int value)
 void DdcWorker::flush()
 {
     for (;;) {
-        QString device;
+        std::string device;
         int value = 0;
         {
             std::lock_guard locker(m_mutex);
@@ -169,10 +169,10 @@ void DdcWorker::flush()
     }
 }
 
-void DdcWorker::probe(uint64_t generation, QList<DdcDisplay> candidates)
+void DdcWorker::probe(uint64_t generation, std::vector<DdcDisplay> candidates)
 {
     post([this, generation, candidates = std::move(candidates)]() mutable {
-        QList<DdcDisplay> displays;
+        std::vector<DdcDisplay> displays;
         for (DdcDisplay display : candidates) {
             I2cDevice i2c(display.device);
             if (!i2c.isValid())

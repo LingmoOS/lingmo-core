@@ -40,7 +40,7 @@ struct DateTime {
 // The system's time zone, UTC when it cannot be read.
 Zone systemZone();
 // A zone by its IANA id; null when unknown.
-Zone zone(const QString &id);
+Zone zone(const std::string &id);
 DateTime currentDateTime();
 DateTime fromMSecsSinceEpoch(int64_t msecs, Zone zone);
 
@@ -86,12 +86,12 @@ struct Coordinates {
 };
 
 // tzdata's zone1970.tab and zone.tab.
-QStringList zoneTables();
+std::vector<std::string> zoneTables();
 
 // Where `tables` place `zoneId`'s principal city. Empty for a zone they do not
 // list, such as UTC.
-std::optional<Coordinates> zoneCoordinates(const QString &zoneId,
-                                           const QStringList &tables = zoneTables());
+std::optional<Coordinates> zoneCoordinates(const std::string &zoneId,
+                                           const std::vector<std::string> &tables = zoneTables());
 
 } // namespace ScheduleUtils
 

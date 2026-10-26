@@ -41,7 +41,7 @@ BatteryWarning::BatteryWarning(dbus::Connection *system, dbus::Connection *sessi
         return;
 
     m_changed = m_device.onPropertiesChanged(
-            [this](const dbus::VariantMap &changed, const QStringList &invalidated) {
+            [this](const dbus::VariantMap &changed, const std::vector<std::string> &invalidated) {
                 onPropertiesChanged(changed, invalidated);
             });
 
@@ -51,7 +51,7 @@ BatteryWarning::BatteryWarning(dbus::Connection *system, dbus::Connection *sessi
 BatteryWarning::~BatteryWarning() = default;
 
 void BatteryWarning::onPropertiesChanged(const dbus::VariantMap &changed,
-                                         const QStringList &invalidated)
+                                         const std::vector<std::string> &invalidated)
 {
     if (!invalidated.empty()) {
         fetchProperties();
@@ -80,7 +80,7 @@ void BatteryWarning::fetchCriticalAction()
     m_fetchingAction = true;
 
     m_actionCall = m_upower.callAsync("GetCriticalAction", [this](const dbus::Reply &reply) {
-        m_criticalAction = reply.value<QString>().value_or(QString());
+        m_criticalAction = reply.value<std::string>().value_or(std::string());
         m_criticalActionKnown = true;
         m_fetchingAction = false;
         update();
@@ -134,7 +134,7 @@ void BatteryWarning::notify(uint32_t level)
     m_notification.show();
 }
 
-QString BatteryWarning::body(uint32_t level) const
+std::string BatteryWarning::body(uint32_t level) const
 {
     if (level == Low) {
         const auto percentage = m_properties.find("Percentage");
@@ -147,9 +147,9 @@ QString BatteryWarning::body(uint32_t level) const
         // UPower reports 0 until it trusts the discharge rate.
         if (time >= 60)
             return format(tr("{percent}% of battery remaining ({time})."),
-                          {{"percent", QString::number(percent)}, {"time", Battery::formatDuration(time)}});
+                          {{"percent", std::to_string(percent)}, {"time", Battery::formatDuration(time)}});
 
-        return format(tr("{percent}% of battery remaining."), {{"percent", QString::number(percent)}});
+        return format(tr("{percent}% of battery remaining."), {{"percent", std::to_string(percent)}});
     }
 
     const bool powerOff = m_criticalAction == "PowerOff";

@@ -8,7 +8,7 @@
 #include "base/signal.h"
 
 // The selection's contents: each MIME type and its bytes, in the order offered.
-using ClipboardData = std::vector<std::pair<QString, QString>>;
+using ClipboardData = std::vector<std::pair<std::string, std::string>>;
 
 // The clipboard through ext-data-control, on a Wayland connection of its own.
 class WaylandClipboard
