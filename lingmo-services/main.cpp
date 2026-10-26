@@ -12,6 +12,6 @@ int main(int argc, char *argv[])
     Lingmo::UI::Application app(argc, argv);
     app.setApplicationId("lingmo-services");
     Lingmo::I18n::setDomain("lingmo-core");
-    Application services;
+    ServicesApplication services;
     return app.run();
 }

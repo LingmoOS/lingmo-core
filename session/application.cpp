@@ -36,7 +36,10 @@ static std::optional<QStringList> getSystemdEnvironment()
                         "org.freedesktop.systemd1",
                         "/org/freedesktop/systemd1",
                         "org.freedesktop.systemd1.Manager");
-    return manager.property<QStringList>("Environment");
+    const auto environment = manager.property<std::vector<std::string>>("Environment");
+    if (!environment)
+        return std::nullopt;
+    return toQStringList(*environment);
 }
 
 static bool isShellVariable(const QString &name)

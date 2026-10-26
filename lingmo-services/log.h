@@ -11,3 +11,6 @@ namespace Lingmo::Services {
 const Lingmo::Base::LogCategory &log();
 
 } // namespace Lingmo::Services
+
+// The service sources log through the shorter name.
+namespace services = Lingmo::Services;

@@ -306,7 +306,7 @@ void SessionProcessManager::notifyEndingStopped(Ending ending,
         return;
     }
 
-    const auto entry = registry.byId(applicationId);
+    const auto entry = registry.byId(applicationId.toStdString());
     QString name = entry ? QString::fromStdString(entry->name) : QString();
     if (name.isEmpty())
         name = applicationId;
@@ -324,9 +324,10 @@ void SessionProcessManager::notifyEndingStopped(Ending ending,
         body = cancelled ? tr("An application cancelled it.")
                          : tr("An application did not quit.");
     else
-        body = format(cancelled ? tr("{name} cancelled it.")
-                                : tr("{name} did not quit."),
-                      {{"name", name.toStdString()}});
+        body = QString::fromStdString(
+            format(cancelled ? tr("{name} cancelled it.")
+                             : tr("{name} did not quit."),
+                   {{"name", name.toStdString()}}));
 
     dbus::Connection *bus = dbus::Connection::session();
     if (!bus)
@@ -381,7 +382,7 @@ void SessionProcessManager::endSession(bool behindLoginScreen)
     stopRestarts();
 
     if (!runtime::quitAll()) {
-        for (const QString &appId : runtime::runningApplications())
+        for (const std::string &appId : runtime::runningApplications())
             runtime::quitApplication(appId);
     }
 
@@ -513,7 +514,7 @@ void SessionProcessManager::loadAutoStartProcess()
         if (isStartedBySession(exe))
             continue;
 
-        runtime::launchCommand(command);
+        runtime::launchCommand(toStdStrings(command));
     }
 }
 

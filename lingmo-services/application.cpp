@@ -49,7 +49,10 @@ ServicesApplication::ServicesApplication()
                                   [this] { m_themeManager->updateFontConfig(); }});
     // The crash dialogs and permission prompts in this process follow too.
     m_language->applyEnvironment = [](const std::map<QString, QString> &variables) {
-        ui::ServicesApplication::instance()->setLanguageEnvironment(variables);
+        std::map<std::string, std::string> environment;
+        for (const auto &[name, value] : variables)
+            environment[toStdString(name)] = toStdString(value);
+        ui::Application::instance()->setLanguageEnvironment(environment);
     };
     m_language->generateLocale = [this](const QString &locale, std::function<void(bool)> done) {
         dbus::Proxy locales(m_system, "org.lingmo.Locales", "/org/lingmo/Locales", "org.lingmo.Locales");
@@ -62,7 +65,7 @@ ServicesApplication::ServicesApplication()
                         LM_WARNING(services::log()) << "Cannot generate the locale:" << reply.error().message;
                     done(!reply.isError());
                 },
-                QStringList {locale});
+                locale.toStdString());
     };
     m_clipboard = std::make_unique<Clipboard>();
     m_powerManager = std::make_unique<PowerManager>(m_powerSupply.get(), m_brightnessManager.get(),

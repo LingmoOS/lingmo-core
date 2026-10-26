@@ -97,8 +97,8 @@ void XwaylandEnvironment::check()
     if (!document || !document->isObject())
         return;
 
-    const QString display = (*document)[QStringLiteral("DISPLAY")].toString();
-    const QString authority = (*document)[QStringLiteral("XAUTHORITY")].toString();
+    const QString display = QString::fromStdString((*document)["DISPLAY"].toString());
+    const QString authority = QString::fromStdString((*document)["XAUTHORITY"].toString());
 
     struct stat st {};
     const QByteArray authBytes = authority.toLocal8Bit();
