@@ -38,7 +38,7 @@ void LoginBackground::send()
     // Under another display manager there is no one to answer.
     const auto done = [](const dbus::Reply &reply) {
         if (reply.isError() && reply.error().name != "org.freedesktop.DBus.Error.ServiceUnknown")
-            CF_WARNING(services::log()) << "Cannot hand the background to the login screen:"
+            LM_WARNING(services::log()) << "Cannot hand the background to the login screen:"
                                         << reply.error().message;
     };
 

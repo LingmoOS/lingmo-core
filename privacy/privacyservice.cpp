@@ -126,7 +126,7 @@ void PrivacyService::authorize(dbus::MethodCall &call, std::function<void()> app
                 if (reply.read(result))
                     authorized = std::get<0>(result);
                 else
-                    CF_WARNING(kLog) << "lingmo-privacy: polkit check failed:" << reply.error().message;
+                    LM_WARNING(kLog) << "lingmo-privacy: polkit check failed:" << reply.error().message;
 
                 if (!authorized) {
                     request.replyError("org.freedesktop.DBus.Error.AccessDenied",
@@ -178,7 +178,7 @@ void PrivacyService::setFlag(const char *device, bool off)
 
     const int fd = ::open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0666);
     if (fd < 0) {
-        CF_WARNING(kLog) << "lingmo-privacy: cannot write" << path << std::strerror(errno);
+        LM_WARNING(kLog) << "lingmo-privacy: cannot write" << path << std::strerror(errno);
         return;
     }
     ::close(fd);

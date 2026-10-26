@@ -165,7 +165,7 @@ void DdcWorker::flush()
 
         I2cDevice i2c(device);
         if (!i2c.isValid() || !i2c.setVcp(BrightnessCode, value))
-            CF_WARNING(services::log()) << "DDC/CI brightness write failed on" << device;
+            LM_WARNING(services::log()) << "DDC/CI brightness write failed on" << device;
     }
 }
 

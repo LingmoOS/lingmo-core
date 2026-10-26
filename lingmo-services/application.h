@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2026 LingmoOS Contributors
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-n#pragma once
+#pragma once
 
 #include <memory>
 
@@ -22,7 +22,7 @@ class ProxyService;
 class ThemeManager;
 class WaylandIdle;
 
-namespace Lingmo::Base::dbus {
+namespace Lingmo::Base::DBus {
 class Connection;
 }
 
@@ -33,8 +33,8 @@ public:
     ServicesApplication();
     ~ServicesApplication();
 
-    Application(const Application &) = delete;
-    Application &operator=(const Application &) = delete;
+    ServicesApplication(const ServicesApplication &) = delete;
+    ServicesApplication &operator=(const ServicesApplication &) = delete;
 
     void initTrash();
 

@@ -148,14 +148,14 @@ bool LocalesService::enableInLocaleGen(const std::string &name) const
     const std::string temporary = m_paths.localeGen + ".lingmo-new";
     const int fd = ::open(temporary.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0644);
     if (fd < 0) {
-        CF_WARNING(kLog) << "lingmo-locales: cannot write" << temporary << std::strerror(errno);
+        LM_WARNING(kLog) << "lingmo-locales: cannot write" << temporary << std::strerror(errno);
         return false;
     }
     const std::string text = strings::join(lines, "\n") + '\n';
     const bool written = ::write(fd, text.data(), text.size()) == ssize_t(text.size()) && ::fsync(fd) == 0;
     ::close(fd);
     if (!written || ::rename(temporary.c_str(), m_paths.localeGen.c_str()) != 0) {
-        CF_WARNING(kLog) << "lingmo-locales: cannot replace" << m_paths.localeGen << std::strerror(errno);
+        LM_WARNING(kLog) << "lingmo-locales: cannot replace" << m_paths.localeGen << std::strerror(errno);
         ::unlink(temporary.c_str());
         return false;
     }
@@ -201,7 +201,7 @@ void LocalesService::generate(dbus::MethodCall &call)
                 if (reply.read(result))
                     authorized = std::get<0>(result);
                 else
-                    CF_WARNING(kLog) << "lingmo-locales: polkit check failed:" << reply.error().message;
+                    LM_WARNING(kLog) << "lingmo-locales: polkit check failed:" << reply.error().message;
 
                 if (!authorized) {
                     request.replyError("org.freedesktop.DBus.Error.AccessDenied", "Not authorized to generate locales");
@@ -245,7 +245,7 @@ void LocalesService::runNext()
         Lingmo::Base::EventLoop::current()->post([this, name] {
             m_localedef.reset();
             if (!isGenerated(name)) {
-                CF_WARNING(kLog) << "lingmo-locales: localedef did not generate" << name;
+                LM_WARNING(kLog) << "lingmo-locales: localedef did not generate" << name;
                 finishJob(false);
                 return;
             }

@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 
     Lingmo::Base::DBus::Connection *bus = Lingmo::Base::DBus::Connection::system(&loop);
     if (!bus || !service.exportTo(bus) || !bus->requestName("org.lingmo.Locales")) {
-        CF_WARNING(log) << "lingmo-locales: cannot register on the system bus";
+        LM_WARNING(log) << "lingmo-locales: cannot register on the system bus";
         return 1;
     }
 

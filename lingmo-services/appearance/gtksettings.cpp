@@ -100,7 +100,7 @@ static void ensureGtkCssImport(const QString &gtkDir)
     lines.insert(lines.begin(), importLine);
 
     if (!file::writeAtomically(path, join(lines, "\n") + "\n"))
-        CF_WARNING(services::log()) << "Cannot write" << path;
+        LM_WARNING(services::log()) << "Cannot write" << path;
 }
 
 void ensureGtkCssImports()

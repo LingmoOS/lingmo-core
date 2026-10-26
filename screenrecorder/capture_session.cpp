@@ -162,7 +162,7 @@ struct CaptureSessionListeners {
         if (auto it = self->m_buffers.find(id);
             it != self->m_buffers.end() && it->second->retired && !it->second->held)
             self->freeBuffer(id);
-        CF_DEBUG(cfCapture) << "frame failed, reason" << reason;
+        LM_DEBUG(cfCapture) << "frame failed, reason" << reason;
         if (reason == EXT_IMAGE_COPY_CAPTURE_FRAME_V1_FAILURE_REASON_STOPPED) {
             if (!self->m_stopped)
                 self->stop();
@@ -275,7 +275,7 @@ void CaptureSession::applyConstraints()
     if (m_memory == Memory::DmaBuf && !m_gbm && m_size.isEmpty() && !openDevice())
         m_memory = Memory::Shm;
     if (m_pendingSize.isEmpty() || (m_memory == Memory::Shm && !m_pendingArgb)) {
-        CF_WARNING(cfCapture) << "no shared memory format this client can read";
+        LM_WARNING(cfCapture) << "no shared memory format this client can read";
         stop();
         return;
     }
@@ -341,7 +341,7 @@ bool CaptureSession::fallBackToShm()
 {
     if (m_memory != Memory::DmaBuf || !m_pendingArgb)
         return false;
-    CF_WARNING(cfCapture).format("cannot allocate DMA-BUFs on {}, capturing into shared memory", m_renderNode);
+    LM_WARNING(cfCapture).format("cannot allocate DMA-BUFs on {}, capturing into shared memory", m_renderNode);
     // Only this size's buffers go; retired ones may still be held, and keep the device.
     m_memory = Memory::Shm;
     for (auto it = m_buffers.begin(); it != m_buffers.end();) {

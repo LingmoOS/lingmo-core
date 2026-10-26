@@ -36,7 +36,7 @@ static std::string loginSessionId(dbus::Connection *bus)
     const dbus::Reply session = manager.call("GetSessionByPID", uint32_t(::getpid()));
     const auto path = session.value<dbus::ObjectPath>();
     if (!path) {
-        CF_WARNING(log()) << "Cannot find the login session:" << session.error().message;
+        LM_WARNING(log()) << "Cannot find the login session:" << session.error().message;
         return {};
     }
 
@@ -99,7 +99,7 @@ bool PolKitAgentListener::registerAgent(const std::string &objectPath)
         cancelAuthentication(cookie);
     }, {{"cookie"}, {}});
     if (!m_object->publish()) {
-        CF_WARNING(log()) << "Cannot export the authentication agent on the system bus";
+        LM_WARNING(log()) << "Cannot export the authentication agent on the system bus";
         return false;
     }
 
@@ -138,7 +138,7 @@ bool PolKitAgentListener::sendRegistration()
                                               Locale::system().name() + ".UTF-8", m_objectPath);
 
     if (result.isError()) {
-        CF_WARNING(log()) << "Cannot register the authentication agent:" << result.error().message;
+        LM_WARNING(log()) << "Cannot register the authentication agent:" << result.error().message;
         return false;
     }
 

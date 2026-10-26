@@ -131,7 +131,7 @@ void Encoder::open(const std::string &path, bool audio)
     std::string error;
     if (audio && !openAudio(&error)) {
         // A recording without sound beats no recording.
-        CF_WARNING(cfRecorder) << "recording without audio:" << error;
+        LM_WARNING(cfRecorder) << "recording without audio:" << error;
     }
 }
 
@@ -375,7 +375,7 @@ bool Encoder::openVaapi(const Size &size, const std::string &node)
     m_swFormat = AV_PIX_FMT_NV12;
     const auto *hardware = reinterpret_cast<AVHWDeviceContext *>(m_hwDevice->data);
     m_display = static_cast<AVVAAPIDeviceContext *>(hardware->hwctx)->display;
-    CF_INFO(cfRecorder).format("encoding with h264_vaapi at {}x{}", size.width(), size.height());
+    LM_INFO(cfRecorder).format("encoding with h264_vaapi at {}x{}", size.width(), size.height());
     return true;
 }
 
@@ -394,7 +394,7 @@ bool Encoder::openVpp()
         m_vppContext = 0;
         return false;
     }
-    CF_INFO(cfRecorder) << "converting frames on the GPU";
+    LM_INFO(cfRecorder) << "converting frames on the GPU";
     return true;
 }
 
@@ -519,7 +519,7 @@ bool Encoder::openX264(const Size &size)
         return false;
     }
     m_swFormat = AV_PIX_FMT_YUV420P;
-    CF_INFO(cfRecorder).format("encoding with libx264 at {}x{}", size.width(), size.height());
+    LM_INFO(cfRecorder).format("encoding with libx264 at {}x{}", size.width(), size.height());
     return true;
 }
 
@@ -790,7 +790,7 @@ void Encoder::fail(const std::string &error)
     if (m_failed)
         return;
     m_failed = true;
-    CF_WARNING(cfRecorder) << error;
+    LM_WARNING(cfRecorder) << error;
     close();
     if (onFinished)
         onFinished(false, error);

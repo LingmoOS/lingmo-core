@@ -32,14 +32,14 @@ CoredumpJournal::CoredumpJournal(std::function<void(const Coredump &dump)> cored
     // Without a persistent journal, entries land in the system journal, which
     // only the adm and systemd-journal groups may read.
     if (sd_journal_open(&m_journal, SD_JOURNAL_LOCAL_ONLY) < 0) {
-        CF_WARNING(services::log()) << "Crash reports: cannot open the journal";
+        LM_WARNING(services::log()) << "Crash reports: cannot open the journal";
         m_journal = nullptr;
         return;
     }
     // Before anything else, so no change goes unwatched.
     const int fd = sd_journal_get_fd(m_journal);
     if (fd < 0) {
-        CF_WARNING(services::log()) << "Crash reports: cannot watch the journal";
+        LM_WARNING(services::log()) << "Crash reports: cannot watch the journal";
         sd_journal_close(m_journal);
         m_journal = nullptr;
         return;

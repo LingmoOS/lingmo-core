@@ -34,7 +34,7 @@ static bool writeAttribute(const std::string &path, const std::string &value)
     if (fd >= 0)
         ::close(fd);
     if (!written) {
-        CF_WARNING(kLog) << "lingmo-privacy: cannot write" << path << std::strerror(error);
+        LM_WARNING(kLog) << "lingmo-privacy: cannot write" << path << std::strerror(error);
         return false;
     }
 

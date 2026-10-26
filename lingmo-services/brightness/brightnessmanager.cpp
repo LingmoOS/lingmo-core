@@ -226,7 +226,7 @@ void BrightnessManager::setDisplayBrightness(const QString &connector, int value
                     session, "SetBrightness",
                     [](const dbus::Reply &reply) {
                         if (reply.isError())
-                            CF_WARNING(services::log())
+                            LM_WARNING(services::log())
                                     << "Setting backlight brightness failed:" << reply.error().message;
                     },
                     QString("backlight"), display->device, uint32_t(raw));

@@ -1,7 +1,7 @@
 
 #include <string>
 
-n#pragma once
+#pragma once
 struct GtkSettings
 {
     QString fontFamily;

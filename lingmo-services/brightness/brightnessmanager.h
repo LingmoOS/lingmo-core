@@ -1,7 +1,7 @@
 
 #include "ddcworker.h"
 
-n#pragma once
+#pragma once
 #include <cstdint>
 #include <map>
 #include <memory>

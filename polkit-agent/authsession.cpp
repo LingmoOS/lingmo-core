@@ -126,7 +126,7 @@ bool AuthSession::connectSocket(const std::string &user)
     m_socket = std::make_unique<LocalSocket>();
 
     if (!m_socket->connectToPath(s_helperSocketPath)) {
-        CF_WARNING(log()) << "Cannot connect to" << s_helperSocketPath << m_socket->errorText()
+        LM_WARNING(log()) << "Cannot connect to" << s_helperSocketPath << m_socket->errorText()
                           << "- falling back to" << s_helperPath;
         m_socket.reset();
         return false;
@@ -173,7 +173,7 @@ void AuthSession::startProcess(const std::string &user)
     };
 
     if (!m_process->start(s_helperPath, {user})) {
-        CF_WARNING(log()) << "Cannot start" << s_helperPath;
+        LM_WARNING(log()) << "Cannot start" << s_helperPath;
         EventLoop::current()->post([this, alive = std::weak_ptr<bool>(m_alive)] {
             if (alive.lock())
                 finish(false);
@@ -223,9 +223,9 @@ void AuthSession::processLine(const std::string &line)
         m_succeeded = false;
     } else if (startsWith(line, "polkit-agent-helper-1: ")) {
         // The socket-activated helper may send its stderr down the socket too.
-        CF_INFO(log()) << line;
+        LM_INFO(log()) << line;
     } else {
-        CF_WARNING(log()) << "Unknown line from the polkit helper" << line;
+        LM_WARNING(log()) << "Unknown line from the polkit helper" << line;
     }
 }
 

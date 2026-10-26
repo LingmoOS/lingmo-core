@@ -59,7 +59,7 @@ ServicesApplication::ServicesApplication()
                 "generate",
                 [done = std::move(done)](const dbus::Reply &reply) {
                     if (reply.isError())
-                        CF_WARNING(services::log()) << "Cannot generate the locale:" << reply.error().message;
+                        LM_WARNING(services::log()) << "Cannot generate the locale:" << reply.error().message;
                     done(!reply.isError());
                 },
                 QStringList {locale});
@@ -83,7 +83,7 @@ ServicesApplication::ServicesApplication()
     // sd-bus rejects a whole object over one malformed member, silently.
     const auto published = [](bool ok, const char *object) {
         if (!ok)
-            CF_WARNING(services::log()) << "Cannot publish" << object;
+            LM_WARNING(services::log()) << "Cannot publish" << object;
     };
     published(m_themeManager->publish(), "Appearance");
     published(m_brightnessManager->publish(), "Brightness");
@@ -93,7 +93,7 @@ ServicesApplication::ServicesApplication()
     published(m_permissionManager->publish(), "Permissions");
 
     if (!m_session || !m_session->requestName("org.lingmo.Services"))
-        CF_WARNING(services::log()) << "Cannot own org.lingmo.Services";
+        LM_WARNING(services::log()) << "Cannot own org.lingmo.Services";
 }
 
 ServicesApplication::~ServicesApplication()

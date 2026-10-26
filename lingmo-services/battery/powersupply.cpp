@@ -54,7 +54,7 @@ PowerSupply::PowerSupply(dbus::Connection *system, dbus::Connection *session, Se
     const dbus::Reply devices = m_upower.call("EnumerateDevices");
     const auto paths = devices.value<QList<dbus::ObjectPath>>();
     if (!paths) {
-        CF_WARNING(services::log()) << "Cannot list UPower devices:" << devices.error().name;
+        LM_WARNING(services::log()) << "Cannot list UPower devices:" << devices.error().name;
         return;
     }
     for (const dbus::ObjectPath &path : *paths)

@@ -78,7 +78,7 @@ void ApplicationScope::adopt(const QString &appId, uint32_t pid)
 
     Lingmo::Core::callDetached(bus, call, [appId, pid](const dbus::Reply &reply) {
         if (reply.isError())
-            CF_WARNING(kLog) << "AppRuntime: no systemd scope for"
+            LM_WARNING(kLog) << "AppRuntime: no systemd scope for"
                              << appId << pid << reply.error().message;
     });
 }

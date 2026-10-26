@@ -330,7 +330,7 @@ bool DisplayPolicy::lockSession()
     // Wait for the compositor to establish the lock before continuing.
     const dbus::Reply reply = m_screenSaver.call("Lock");
     if (reply.isError()) {
-        CF_WARNING(services::log()) << "Unable to lock the session:" << reply.error().message;
+        LM_WARNING(services::log()) << "Unable to lock the session:" << reply.error().message;
         return false;
     }
 
@@ -353,7 +353,7 @@ void DisplayPolicy::trySuspend()
                     return;
 
                 if (reply.isError()) {
-                    CF_INFO(services::log()) << "Suspend refused:" << reply.error().message;
+                    LM_INFO(services::log()) << "Suspend refused:" << reply.error().message;
                     m_suspendRequested = false;
                     return;
                 }
@@ -430,7 +430,7 @@ void DisplayPolicy::sleepWithLidClosed(bool waitForLock)
         // Suspend even without the lock: the compositor locks as the displays go
         // off and again before sleep.
         if (waitForLock && !lockSession())
-            CF_WARNING(services::log()) << "Suspending with the lid closed before the session is locked";
+            LM_WARNING(services::log()) << "Suspending with the lid closed before the session is locked";
 
         turnDisplayOff();
         m_dimmed = true;
@@ -569,7 +569,7 @@ void DisplayPolicy::updateLidSwitchInhibitor()
                 m_lidSwitchInhibiting = false;
                 const auto inhibitor = reply.value<dbus::UnixFd>();
                 if (!inhibitor) {
-                    CF_WARNING(services::log())
+                    LM_WARNING(services::log())
                             << "Unable to inhibit systemd lid handling:" << reply.error().message;
                     return;
                 }

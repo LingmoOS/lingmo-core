@@ -71,7 +71,7 @@ uint32_t AppRuntime::launchApplication(const QString &appId, const QStringList &
     }
 
     if (!entry) {
-        CF_WARNING(kLog) << "AppRuntime: no desktop entry for" << appId;
+        LM_WARNING(kLog) << "AppRuntime: no desktop entry for" << appId;
         return 0;
     }
 
@@ -89,7 +89,7 @@ uint32_t AppRuntime::launchApplication(const QString &appId, const QStringList &
         if (terminal.empty())
             terminal = base::paths::findExecutable("xterm");
         if (terminal.empty()) {
-            CF_WARNING(kLog) << "AppRuntime: no terminal emulator for" << appId;
+            LM_WARNING(kLog) << "AppRuntime: no terminal emulator for" << appId;
         } else {
             command.insert(command.begin(), {terminal, "-e"});
         }
@@ -131,7 +131,7 @@ uint32_t AppRuntime::startProcess(const QString &appId, const QStringList &comma
     const pid_t started = Lingmo::Core::startDetached(
         stdCommand, workingDirectory.toStdString(), environment);
     if (started <= 0) {
-        CF_WARNING(kLog) << "AppRuntime: failed to start" << command.join(QLatin1Char(' '));
+        LM_WARNING(kLog) << "AppRuntime: failed to start" << command.join(QLatin1Char(' '));
         return 0;
     }
     const uint32_t pid = static_cast<uint32_t>(started);

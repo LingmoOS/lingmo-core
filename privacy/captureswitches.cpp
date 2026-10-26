@@ -103,7 +103,7 @@ void CaptureSwitches::setLocked(bool locked)
                 readEvents();
             });
         } else {
-            CF_WARNING(kLog) << "lingmo-privacy: cannot watch" << m_deviceDirectory << ::strerror(errno);
+            LM_WARNING(kLog) << "lingmo-privacy: cannot watch" << m_deviceDirectory << ::strerror(errno);
         }
     }
 
@@ -129,13 +129,13 @@ void CaptureSwitches::lockCard(const std::string &name)
     const std::string path = m_deviceDirectory + '/' + name;
     const int fd = ::open(path.c_str(), O_RDWR | O_CLOEXEC);
     if (fd < 0) {
-        CF_WARNING(kLog) << "lingmo-privacy: cannot open" << path << ::strerror(errno);
+        LM_WARNING(kLog) << "lingmo-privacy: cannot open" << path << ::strerror(errno);
         return;
     }
 
     const std::vector<snd_ctl_elem_id> switches = captureSwitches(fd);
     if (switches.empty()) {
-        CF_INFO(kLog) << "lingmo-privacy:" << name << "has no capture switch";
+        LM_INFO(kLog) << "lingmo-privacy:" << name << "has no capture switch";
         ::close(fd);
         return;
     }
@@ -143,11 +143,11 @@ void CaptureSwitches::lockCard(const std::string &name)
     for (snd_ctl_elem_id id : switches) {
         // Locked before the write, so nothing turns it back on in between.
         if (::ioctl(fd, SNDRV_CTL_IOCTL_ELEM_LOCK, &id) < 0)
-            CF_WARNING(kLog) << "lingmo-privacy: cannot lock" << name << reinterpret_cast<const char *>(id.name)
+            LM_WARNING(kLog) << "lingmo-privacy: cannot lock" << name << reinterpret_cast<const char *>(id.name)
                              << ::strerror(errno);
 
         if (!writeSwitch(fd, id, false))
-            CF_WARNING(kLog) << "lingmo-privacy: cannot turn off" << name
+            LM_WARNING(kLog) << "lingmo-privacy: cannot turn off" << name
                              << reinterpret_cast<const char *>(id.name) << ::strerror(errno);
     }
 

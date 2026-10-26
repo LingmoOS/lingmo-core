@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2026 LingmoOS Contributors
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-n#pragma once
+#pragma once
 
 #include <cstdint>
 

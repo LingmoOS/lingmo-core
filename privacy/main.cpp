@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 
     Lingmo::Base::DBus::Connection *bus = Lingmo::Base::DBus::Connection::system(&loop);
     if (!bus || !service.exportTo(bus) || !bus->requestName("org.lingmo.Privacy")) {
-        CF_WARNING(log) << "lingmo-privacy: cannot register on the system bus";
+        LM_WARNING(log) << "lingmo-privacy: cannot register on the system bus";
         return 1;
     }
 

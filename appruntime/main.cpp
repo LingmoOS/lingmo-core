@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
 
     dbus::Connection *bus = dbus::Connection::session(&loop);
     if (!bus) {
-        CF_WARNING(log) << "Cannot connect to the session bus";
+        LM_WARNING(log) << "Cannot connect to the session bus";
         return 1;
     }
 
@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
         });
 
     if (!bus->requestName(kService)) {
-        CF_WARNING(log) << "Another application runtime is already running";
+        LM_WARNING(log) << "Another application runtime is already running";
         return 1;
     }
 

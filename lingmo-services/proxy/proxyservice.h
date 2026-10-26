@@ -1,7 +1,7 @@
 
 #include <map>
 #include <string>
-n#pragma once
+#pragma once
 
 #include "base/dbus.h"
 #include "base/file_watcher.h"

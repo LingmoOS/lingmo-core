@@ -1,7 +1,7 @@
 
 #include <memory>
 #include <string>
-n#pragma once
+#pragma once
 #include <vector>
 
 #include "base/dbus.h"
