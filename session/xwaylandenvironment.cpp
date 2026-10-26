@@ -6,6 +6,7 @@
 
 #include <cstdlib>
 #include <fcntl.h>
+#include <string_view>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -93,7 +94,8 @@ void XwaylandEnvironment::check()
         return;
     bytes.resize(length);
 
-    const auto document = Lingmo::Base::json::Value::parse(bytes);
+    const auto document = Lingmo::Base::json::Value::parse(
+        std::string_view(bytes.constData(), size_t(bytes.size())));
     if (!document || !document->isObject())
         return;
 
