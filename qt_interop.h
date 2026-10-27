@@ -25,23 +25,23 @@
 // The toolkit's log stream has no QString overload; log the UTF-8 text. The
 // LM_* macros build the stream as a temporary, so both value categories are
 // needed.
-inline Lingmo::Base::LogStream &operator<<(Lingmo::Base::LogStream &stream, const QString &value)
+inline Lingmo::base::LogStream &operator<<(Lingmo::base::LogStream &stream, const QString &value)
 {
     return stream << value.toStdString();
 }
 
-inline Lingmo::Base::LogStream &&operator<<(Lingmo::Base::LogStream &&stream, const QString &value)
+inline Lingmo::base::LogStream &&operator<<(Lingmo::base::LogStream &&stream, const QString &value)
 {
     stream << value.toStdString();
     return std::move(stream);
 }
 
-inline Lingmo::Base::LogStream &operator<<(Lingmo::Base::LogStream &stream, const QStringList &values)
+inline Lingmo::base::LogStream &operator<<(Lingmo::base::LogStream &stream, const QStringList &values)
 {
     return stream << values.join(QLatin1Char(' ')).toStdString();
 }
 
-inline Lingmo::Base::LogStream &&operator<<(Lingmo::Base::LogStream &&stream, const QStringList &values)
+inline Lingmo::base::LogStream &&operator<<(Lingmo::base::LogStream &&stream, const QStringList &values)
 {
     stream << values.join(QLatin1Char(' ')).toStdString();
     return std::move(stream);
