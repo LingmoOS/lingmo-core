@@ -13,7 +13,7 @@
 #include "base/dbus.h"
 #include "base/signal.h"
 
-namespace Lingmo::UI {
+namespace Lingmo::ui {
 class DialogButton;
 class Label;
 class TextArea;

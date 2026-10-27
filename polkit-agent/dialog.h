@@ -9,7 +9,7 @@
 #include <memory>
 #include <string>
 
-namespace Lingmo::UI {
+namespace Lingmo::ui {
 class DialogButton;
 class Label;
 class TextField;

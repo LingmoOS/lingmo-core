@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-namespace Lingmo::Base {
+namespace Lingmo::base {
 class EventLoop;
 }
 

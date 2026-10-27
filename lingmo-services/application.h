@@ -22,7 +22,7 @@ class ProxyService;
 class ThemeManager;
 class WaylandIdle;
 
-namespace Lingmo::Base::DBus {
+namespace Lingmo::base::dbus {
 class Connection;
 }
 
