@@ -21,6 +21,7 @@ struct GtkSettings
 void writeGtkSettings(const GtkSettings &settings);
 
 // Puts the Lingmo stylesheet import at the top of the user's gtk.css for GTK 3 and 4, keeping
-// the rest of the file. It is re-added at every login, even after the user removed it.
-void ensureGtkCssImports();
+// the rest of the file. It is re-added at every login, even after the user removed it. The
+// stylesheet carries the palette, so it follows the appearance's light or dark mode.
+void ensureGtkCssImports(bool darkMode);
 

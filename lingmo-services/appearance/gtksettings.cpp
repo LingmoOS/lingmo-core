@@ -1,5 +1,6 @@
 #include "gtksettings.h"
 
+#include <algorithm>
 #include <filesystem>
 
 #include "base/file.h"
@@ -23,7 +24,9 @@ static std::string gtk3SettingsIniPath()
 void writeGtkSettings(const GtkSettings &gtk)
 {
     const std::string fontName = gtk.fontFamily + ' ' + number(gtk.fontPointSize, 'g', -1);
-    // No Lingmo GTK theme ships; Adwaita's dark variant is what gtk-theme can switch to.
+    // Lingmo has no GTK theme of its own, only the stylesheet the user's gtk.css imports: it
+    // carries the palette and leaves the widgets to Adwaita. The theme name still picks the
+    // variant Adwaita draws the widgets in, which is the part the sheet does not restate.
     const std::string gtkTheme = gtk.darkMode ? "Adwaita-dark" : "Adwaita";
     const bool subpixel = gtk.fontAntialias && gtk.fontRgba != "none";
 
@@ -72,10 +75,10 @@ void writeGtkSettings(const GtkSettings &gtk)
     });
 }
 
-static void ensureGtkCssImport(const std::string &gtkDir)
+static void ensureGtkCssImport(const std::string &gtkDir, const std::string &sheet)
 {
     const std::string importLine =
-            "@import url(\"" + url::fromLocalFile(LINGMO_GTK_CSS_DIR "/" + gtkDir + ".css") + "\");";
+            "@import url(\"" + url::fromLocalFile(LINGMO_GTK_CSS_DIR "/" + sheet + ".css") + "\");";
 
     std::string path = paths::configHome() + '/' + gtkDir + "/gtk.css";
     // Write through a symlinked gtk.css (dotfile managers) instead of replacing the link.
@@ -96,15 +99,19 @@ static void ensureGtkCssImport(const std::string &gtkDir)
     // unchanged file would make every running GTK client reload its styles.
     if (!lines.empty() && lines.front() == importLine)
         return;
-    std::erase(lines, importLine);
+    // The other mode's sheet, when the appearance just switched: one import, not two.
+    std::erase_if(lines, [](const std::string &line) {
+        return line.rfind("@import url(\"", 0) == 0
+                && line.find(LINGMO_GTK_CSS_DIR) != std::string::npos;
+    });
     lines.insert(lines.begin(), importLine);
 
     if (!file::writeAtomically(path, join(lines, "\n") + "\n"))
         LM_WARNING(services::log()) << "Cannot write" << path;
 }
 
-void ensureGtkCssImports()
+void ensureGtkCssImports(bool darkMode)
 {
-    ensureGtkCssImport("gtk-3.0");
-    ensureGtkCssImport("gtk-4.0");
+    ensureGtkCssImport("gtk-3.0", darkMode ? "gtk-3.0-dark" : "gtk-3.0");
+    ensureGtkCssImport("gtk-4.0", darkMode ? "gtk-4.0-dark" : "gtk-4.0");
 }

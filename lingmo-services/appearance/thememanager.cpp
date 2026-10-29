@@ -69,6 +69,8 @@ ThemeManager::ThemeManager(Settings &settings, dbus::Connection *session, dbus::
             settings, ScheduleUtils::currentDateTime);
     m_subscriptions.push_back(m_darkMode->enabledChanged.connect([this](bool darkMode) {
         updateGtk3Config();
+        // The stylesheet carries the palette, so GTK clients follow the mode too.
+        ensureGtkCssImports(darkMode);
         emitSignal("darkModeChanged", darkMode);
     }));
     m_subscriptions.push_back(m_darkMode->scheduleChanged.connect([this](int schedule) {
@@ -81,7 +83,7 @@ ThemeManager::ThemeManager(Settings &settings, dbus::Connection *session, dbus::
 
     // GTK on Wayland takes these from gsettings, not settings.ini; sync them at login.
     updateGtk3Config();
-    ensureGtkCssImports();
+    ensureGtkCssImports(m_darkMode->enabled());
 }
 
 ThemeManager::~ThemeManager() = default;

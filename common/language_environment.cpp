@@ -159,8 +159,15 @@ std::vector<std::string> translationLanguages(const std::vector<std::string>& co
 {
     std::vector<std::string> languages;
     for (const std::string& code : codes) {
-        if (!code.empty())
-            languages.push_back(posixLanguage(code));
+        if (code.empty())
+            continue;
+        const std::string language = posixLanguage(code);
+        languages.push_back(language);
+        // Hong Kong reads Traditional Chinese and rarely has catalogs of its
+        // own; the Taiwanese ones are the ones that exist, so a zh_HK session
+        // falls through to them rather than to English.
+        if (language == "zh_HK")
+            languages.push_back("zh_TW");
     }
     removeDuplicates(languages);
     return languages;

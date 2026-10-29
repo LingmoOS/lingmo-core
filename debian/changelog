@@ -1,3 +1,11 @@
+lingmo-core (5.0.2+lingmo5u1) unstable; urgency=medium
+
+  * Add the Simplified Chinese translation.
+  * Fall back from zh_HK to the zh_TW catalogs.
+  * Give GTK applications Lingmo's palette, in light and dark.
+
+ -- Lingmo OS Team <team@lingmo.org>  Thu, 29 Oct 2026 12:30:00 +0800
+
 lingmo-core (5.0.1+lingmo5u1) unstable; urgency=medium
 
   * Start lingmo-compositor from where it is installed. The session and

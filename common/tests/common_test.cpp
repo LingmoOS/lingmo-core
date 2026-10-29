@@ -23,6 +23,12 @@ TEST(LanguageEnvironment, codesBecomePosixNames)
               (std::vector<std::string> {"ja_JP", "en_US", "uz_UZ@cyrillic", "hi_IN@latin", "nb_NO"}));
     // Not a language: left as it is.
     EXPECT_EQ(language::translationLanguages({"C"}), std::vector<std::string> {"C"});
+    // Hong Kong has no catalogs of its own, so it falls through to Taiwan's.
+    EXPECT_EQ(language::translationLanguages({"zh_Hant_HK"}),
+              (std::vector<std::string> {"zh_HK", "zh_TW"}));
+    // Already there: not added twice.
+    EXPECT_EQ(language::translationLanguages({"zh_Hant_HK", "zh_Hant_TW"}),
+              (std::vector<std::string> {"zh_HK", "zh_TW"}));
 }
 
 TEST(LanguageEnvironment, messagesStopAtEnglish)
