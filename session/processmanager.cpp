@@ -40,7 +40,10 @@ using namespace std::chrono_literals;
 using Lingmo::I18n::format;
 using Lingmo::I18n::tr;
 
-static constexpr char kCompositor[] = "/usr/lib/lingmo/lingmo-compositor";
+// lingmo-compositor installs to CMAKE_INSTALL_BINDIR, and lingmo-dm starts its
+// greeter from the same path. Anything else here makes the session exit before
+// the compositor is up, which reads as a login that bounces back to the DM.
+static constexpr char kCompositor[] = "/usr/bin/lingmo-compositor";
 
 namespace Lingmo {
 

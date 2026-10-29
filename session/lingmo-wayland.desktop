@@ -2,7 +2,7 @@
 Name=Lingmo (Wayland)
 Comment=Lingmo desktop session
 Exec=/usr/bin/lingmo-wayland-session
-TryExec=/usr/lib/lingmo/lingmo-compositor
+TryExec=/usr/bin/lingmo-compositor
 Type=Application
 DesktopNames=Lingmo;
 X-GDM-SessionRegisters=true
