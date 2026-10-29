@@ -1,3 +1,12 @@
+lingmo-core (5.0.1+lingmo5u1) unstable; urgency=medium
+
+  * Start lingmo-compositor from where it is installed. The session and
+    its wayland-sessions entry looked in /usr/lib/lingmo, but the package
+    installs to /usr/bin, so the entry was dropped for its TryExec and
+    the session never came up.
+
+ -- Lingmo OS Team <team@lingmo.org>  Thu, 29 Oct 2026 11:34:10 +0800
+
 lingmo-core (5.0.0+lingmo5u1) unstable; urgency=medium
 
   * Move the packaging to https://github.com/lingmoos/packaging.
