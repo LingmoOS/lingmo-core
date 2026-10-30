@@ -222,8 +222,13 @@ void SessionApplication::initEnvironments()
     // ~/.config/glib-2.0/settings/keyfile, so no dconf daemon is needed.
     setenv("GSETTINGS_BACKEND", "keyfile", 1);
 
-    setenv("QT_QPA_PLATFORM",    "wayland", 1);
-    setenv("GDK_BACKEND",        "wayland", 1);
+    // A list, not one name: Qt tries Wayland first, and an application whose
+    // Qt has no Wayland plugin, or that cannot reach the compositor (a root
+    // program under pkexec), starts on XWayland instead of failing to find a
+    // platform. Qt reads the names in order.
+    setenv("QT_QPA_PLATFORM",    "wayland;xcb", 1);
+    // GTK picks Wayland by itself in a Wayland session, and X11 elsewhere; a
+    // forced backend leaves GTK applications without a choice.
     if (isEmptyVariable("WAYLAND_DISPLAY"))
         setenv("WAYLAND_DISPLAY", "lingmo-0", 1);
     setenv("QT_QPA_PLATFORMTHEME", "lingmo", 1);
