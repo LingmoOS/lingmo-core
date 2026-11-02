@@ -1,3 +1,10 @@
+lingmo-core (5.0.3+lingmo5u1) unstable; urgency=medium
+
+  * thememanager: change default icon theme from "Lingmo" to "lingmo-light"
+    to match the installed directory name of lingmo-systemicons.
+
+ -- Lingmo OS Team <team@lingmo.org>  Mon, 02 Nov 2026 14:00:00 +0800
+
 lingmo-core (5.0.2+lingmo5u1) unstable; urgency=medium
 
   * Add the Simplified Chinese translation.

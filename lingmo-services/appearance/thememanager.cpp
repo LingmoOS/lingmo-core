@@ -50,7 +50,7 @@ ThemeManager::ThemeManager(Settings &settings, dbus::Connection *session, dbus::
     m_accentColor = int(m_settings.intValue("Appearance/AccentColor", 0));
     m_cursorTheme = m_settings.stringValue("Appearance/CursorTheme", "default");
     m_cursorSize = int(m_settings.intValue("Appearance/CursorSize", 24));
-    m_iconTheme = m_settings.stringValue("Appearance/IconTheme", "Lingmo");
+    m_iconTheme = m_settings.stringValue("Appearance/IconTheme", "lingmo-light");
 
     // Init fonts.
     if (!m_settings.contains(s_systemFixedFontName))
@@ -373,7 +373,7 @@ void ThemeManager::updateGtk3Config()
     gtk.fontRgba = font.rgba;
 
     gtk.darkMode = isDarkMode();
-    gtk.iconTheme = m_iconTheme.empty() ? std::string("Lingmo") : m_iconTheme;
+    gtk.iconTheme = m_iconTheme.empty() ? std::string("lingmo-light") : m_iconTheme;
     gtk.cursorTheme = m_cursorTheme;
     gtk.cursorSize = m_cursorSize;
     writeGtkSettings(gtk);
