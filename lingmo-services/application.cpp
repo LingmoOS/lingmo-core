@@ -16,6 +16,7 @@
 #include "idle/waylandidle.h"
 #include "power/powermanager.h"
 #include "proxy/proxyservice.h"
+#include "update/updatemanager.h"
 
 #include "base/dbus.h"
 #include "base/paths.h"
@@ -71,6 +72,7 @@ ServicesApplication::ServicesApplication()
     m_permissionManager = std::make_unique<PermissionManager>(m_session);
     m_crashManager = std::make_unique<CrashManager>([this] { return m_themeManager->systemFixedFont(); });
     m_proxyService = std::make_unique<ProxyService>(m_session);
+    m_updateManager = std::make_unique<UpdateManager>(m_settings, m_session);
 
     initTrash();
 
@@ -91,6 +93,7 @@ ServicesApplication::ServicesApplication()
     published(m_powerManager->publish(), "Power");
     published(m_nightLight->publish(m_session), "NightLight");
     published(m_permissionManager->publish(), "Permissions");
+    published(m_updateManager->publish(), "Update");
 
     if (!m_session || !m_session->requestName("org.lingmo.Services"))
         LM_WARNING(services::log()) << "Cannot own org.lingmo.Services";

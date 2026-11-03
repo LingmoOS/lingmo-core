@@ -66,6 +66,8 @@ add_executable(${TARGET}
     power/powermanager.h
     proxy/proxyservice.cpp
     proxy/proxyservice.h
+    update/updatemanager.cpp
+    update/updatemanager.h
     schedule/scheduledfeature.cpp
     schedule/scheduledfeature.h
     schedule/scheduleutils.cpp

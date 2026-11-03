@@ -20,6 +20,7 @@ class PowerManager;
 class PowerSupply;
 class ProxyService;
 class ThemeManager;
+class UpdateManager;
 class WaylandIdle;
 
 namespace Lingmo::base::dbus {
@@ -58,6 +59,7 @@ private:
     std::unique_ptr<PermissionManager> m_permissionManager;
     std::unique_ptr<CrashManager> m_crashManager;
     std::unique_ptr<ProxyService> m_proxyService;
+    std::unique_ptr<UpdateManager> m_updateManager;
     Lingmo::Base::Subscription m_themeChanged;
 };
 

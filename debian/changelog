@@ -1,4 +1,13 @@
-lingmo-core (5.0.3+lingmo5u1) unstable; urgency=medium
+lingmo-core (5.0.4+lingmo5u1) unstable; urgency=medium
+
+  * lingmo-services: add UpdateManager, a new system update service on
+    org.lingmo.Services.Update. It checks the lingmo.org API and apt in
+    two stages, distinguishes system upgrades from regular software
+    updates, and reports download and install progress via D-Bus signals.
+
+ -- Lingmo OS Team <team@lingmo.org>  Tue, 03 Nov 2026 17:30:00 +0800
+
+
 
   * thememanager: change default icon theme from "Lingmo" to "lingmo-light"
     to match the installed directory name of lingmo-systemicons.
