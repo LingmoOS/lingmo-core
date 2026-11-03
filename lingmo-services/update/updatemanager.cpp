@@ -17,10 +17,19 @@ using namespace std::chrono_literals;
 using namespace Lingmo::Base;
 using Lingmo::I18n::tr;
 
-static constexpr auto s_channelKey    = "Update/Channel";
-static constexpr auto s_apiBase       = "https://lingmo.org/api/v1/update";
-static constexpr auto s_checkInterval = 6h;
-static constexpr auto s_startDelay    = 30s;
+static int64_t nowSeconds()
+{
+    return std::chrono::duration_cast<std::chrono::seconds>(
+                   std::chrono::system_clock::now().time_since_epoch())
+            .count();
+}
+
+static constexpr auto s_channelKey       = "Update/Channel";
+static constexpr auto s_lastCheckTimeKey = "Update/LastCheckTime";
+static constexpr auto s_apiBase          = "https://lingmo.org/api/v1/update";
+static constexpr auto s_releasesUrl      = "https://lingmo.org/content/releases.json";
+static constexpr auto s_checkInterval   = 6h;
+static constexpr auto s_startDelay      = 30s;
 
 static const char *channelName(UpdateManager::Channel ch)
 {
@@ -128,6 +137,12 @@ bool UpdateManager::publish()
     object->addProperty("upgradeProgress",     [this] { return int32_t(m_upgradeProgress); });
     // upgradePhase: 0 = not upgrading, 1 = downloading, 2 = installing.
     object->addProperty("upgradePhase",        [this] { return int32_t(m_upgradePhase); });
+    // Unix timestamp of the last completed check (0 if none yet).
+    object->addProperty("lastCheckTime",       [this] { return m_lastCheckTime; });
+    // Changelog text (Markdown) for the available version; empty when up-to-date.
+    object->addProperty("changelogText",       [this] { return m_changelogText; });
+    // Error log from the last failed upgrade; empty unless state == Error.
+    object->addProperty("errorLog",            [this] { return m_errorLog; });
 
     object->addSignal("stateChanged",    "i",  {"state"});
     // Fired whenever phase or progress changes.
@@ -236,8 +251,52 @@ void UpdateManager::parseApiResponse(const std::string &text)
         }
     }
 
-    // Always proceed to the apt stage regardless of the API result.
-    runAptUpdate();
+    // When a new version is available, fetch its changelog before moving to
+    // the apt stage so the UI can show release notes right away.
+    if (m_apiHasUpdate) {
+        fetchChangelog();
+    } else {
+        runAptUpdate();
+    }
+}
+
+// ── stage 1b: fetch changelog ────────────────────────────────────────────────
+
+void UpdateManager::fetchChangelog()
+{
+    // releases.json holds an array of {version, date, title, content, type}.
+    // We match on newVersion to get the Markdown changelog for the UI card.
+    m_process = std::make_unique<Process>();
+    m_process->setOomProtectionDropped(true);
+    m_process->onFinished = [this](int exitCode, bool crashed) {
+        const std::string output = m_process->standardOutput();
+        m_process.reset();
+        // A changelog fetch failure is non-fatal; just proceed without text.
+        if (!crashed && exitCode == 0)
+            parseChangelog(output);
+        runAptUpdate();
+    };
+
+    if (!m_process->start("curl", {"--max-time", "10", "--silent", s_releasesUrl})) {
+        LM_WARNING(services::log()) << "Cannot start curl for changelog fetch";
+        runAptUpdate();
+        m_process.reset();
+    }
+}
+
+void UpdateManager::parseChangelog(const std::string &text)
+{
+    const auto root = json::Value::parse(text);
+    if (!root || !root->isArray())
+        return;
+
+    for (const auto &entry : root->toArray()) {
+        if (entry["version"].toString() == m_newVersion) {
+            m_changelogText = entry["content"].toString();
+            m_releaseDate   = entry["date"].toString();  // authoritative date
+            return;
+        }
+    }
 }
 
 // ── stage 2a: apt-get update ─────────────────────────────────────────────────
@@ -327,14 +386,18 @@ void UpdateManager::parseUpgradableList(const std::string &text)
     if (m_apiHasUpdate && m_aptHasUpdate) {
         setState(SystemUpgrade);
     } else if (!m_apiHasUpdate && m_aptHasUpdate) {
-        // Regular update: show current version, generic release notes string.
-        m_newVersion   = readCurrentVersion();
-        m_releaseNotes = tr("Regular software update");
+        // Regular update: show current version, generic changelog string.
+        m_newVersion    = readCurrentVersion();
+        m_changelogText = tr("Regular software update");
         m_releaseDate.clear();
         setState(SoftwareUpdate);
     } else {
         setState(UpToDate);
     }
+
+    // Record the time this check completed and persist it.
+    m_lastCheckTime = nowSeconds();
+    saveLastCheckTime();
 
     emitInfoChanged();
 }
@@ -384,10 +447,15 @@ void UpdateManager::runAptUpgrade()
     };
 
     m_process->onFinished = [this](int exitCode, bool crashed) {
+        // Collect stderr for the error log before resetting the process.
+        const std::string errOutput = m_process->standardError();
         m_process.reset();
         if (crashed || exitCode != 0) {
             LM_WARNING(services::log())
                     << "apt-get upgrade failed (exit" << exitCode << ")";
+            m_errorLog        = errOutput.empty()
+                                    ? "apt-get upgrade exited with code " + std::to_string(exitCode)
+                                    : errOutput;
             m_upgradePhase    = 0;
             m_upgradeProgress = -1;
             if (m_object)
@@ -395,6 +463,7 @@ void UpdateManager::runAptUpgrade()
                                      int32_t(m_upgradePhase), int32_t(m_upgradeProgress));
             setState(Error);
         } else {
+            m_errorLog.clear();
             // Finish the install phase at 100%.
             m_upgradePhase    = 2;
             m_upgradeProgress = 100;
@@ -427,11 +496,18 @@ void UpdateManager::loadSettings()
 {
     const int ch = int(m_settings.intValue(s_channelKey, int64_t(Stable)));
     m_channel = (ch >= Stable && ch <= Nightly) ? static_cast<Channel>(ch) : Stable;
+    m_lastCheckTime = m_settings.intValue(s_lastCheckTimeKey, 0);
 }
 
 void UpdateManager::saveChannel()
 {
     m_settings.setValue(s_channelKey, int64_t(m_channel));
+    m_settings.sync();
+}
+
+void UpdateManager::saveLastCheckTime()
+{
+    m_settings.setValue(s_lastCheckTimeKey, m_lastCheckTime);
     m_settings.sync();
 }
 
@@ -498,5 +574,7 @@ void UpdateManager::emitInfoChanged()
         return;
     m_object->emitPropertiesChanged({"newVersion", "newBuild", "mandatory",
                                      "releaseNotes", "downloadUrl", "releaseDate",
-                                     "upgradableCount", "upgradablePackages"});
+                                     "changelogText", "upgradableCount",
+                                     "upgradablePackages", "lastCheckTime",
+                                     "errorLog"});
 }

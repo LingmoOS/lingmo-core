@@ -71,6 +71,9 @@ private:
     // --- stage 1: API check ---
     void fetchApi();
     void parseApiResponse(const std::string &text);
+    // 1b. Fetch changelog from releases.json after API confirms a new version.
+    void fetchChangelog();
+    void parseChangelog(const std::string &text);
 
     // --- stage 2: apt check (two sub-steps) ---
     // 2a. pkexec apt-get update  — refreshes package lists from the mirrors.
@@ -85,6 +88,7 @@ private:
     // --- helpers ---
     void loadSettings();
     void saveChannel();
+    void saveLastCheckTime();
     static std::string machineArchitecture();
     static int64_t readLocalBuild();
     static std::string readCurrentVersion();
@@ -111,6 +115,7 @@ private:
     std::string m_releaseNotes;  // full URL
     std::string m_downloadUrl;
     std::string m_releaseDate;
+    std::string m_changelogText; // Markdown, fetched from releases.json
 
     // Set by the apt stage.
     bool m_aptHasUpdate    = false;
@@ -118,9 +123,16 @@ private:
     // The package names, space-separated, for the UI to display if desired.
     std::string m_upgradablePackages;
 
+    // Set when an upgrade fails (state == Error after Upgrading).
+    std::string m_errorLog;
+
     // Upgrade phase and progress.
     // Phase: 0 = not upgrading, 1 = downloading, 2 = installing.
     // Progress: 0–100 within the current phase, -1 when not upgrading.
     int m_upgradePhase    = 0;
     int m_upgradeProgress = -1;
+
+    // Unix timestamp (seconds since epoch) of the last completed check, 0 if
+    // none has run yet this session. Persisted across restarts in Settings.
+    int64_t m_lastCheckTime = 0;
 };

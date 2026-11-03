@@ -1,3 +1,13 @@
+lingmo-core (5.0.5+lingmo5u1) unstable; urgency=medium
+
+  * lingmo-services: UpdateManager: add lastCheckTime, changelogText and
+    errorLog properties; fetch Markdown changelog from releases.json when
+    the API reports a new version; collect apt-get stderr into errorLog on
+    upgrade failure; add installing phase (5) to state and expose it via
+    D-Bus upgradePhase property.
+
+ -- Lingmo OS Team <team@lingmo.org>  Tue, 03 Nov 2026 23:00:00 +0800
+
 lingmo-core (5.0.4+lingmo5u1) unstable; urgency=medium
 
   * lingmo-services: add UpdateManager, a new system update service on
