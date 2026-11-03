@@ -60,6 +60,11 @@ ThemeManager::ThemeManager(Settings &settings, dbus::Connection *session, dbus::
         const std::string fontName = fontForLocale(Lingmo::Core::language::preferredLanguages().front());
         m_settings.setValue(s_systemFontName, fontName.empty() ? std::string("Noto Sans") : fontName);
     }
+
+    // Init icon theme - ensure default is written to config file.
+    if (!m_settings.contains("Appearance/IconTheme"))
+        m_settings.setValue("Appearance/IconTheme", "lingmo-light");
+
     m_settings.sync();
 
     // Ash's DarkLightModeControllerImpl: the same schedule as the night
