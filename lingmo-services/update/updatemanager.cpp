@@ -320,7 +320,7 @@ void UpdateManager::runAptUpdate()
         runAptListUpgradable();
     };
 
-    if (!m_process->start("pkexec", {"apt-get", "update", "-qq"})) {
+    if (!m_process->start("pkexec", {"/usr/bin/apt-get", "update", "-qq"})) {
         LM_WARNING(services::log()) << "Cannot start pkexec apt-get update";
         // Fallback: list with whatever is cached.
         runAptListUpgradable();
@@ -478,7 +478,7 @@ void UpdateManager::runAptUpgrade()
 
     const bool started = m_process->start(
             "pkexec",
-            {"apt-get", "upgrade", "-y",
+            {"/usr/bin/apt-get", "upgrade", "-y",
              "-o", "APT::Status-Fd=1",
              "-o", "Dpkg::Progress=1"});
 

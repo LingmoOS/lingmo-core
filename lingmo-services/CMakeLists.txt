@@ -101,3 +101,4 @@ install(FILES appearance/gtk/gtk-3.0.css appearance/gtk/gtk-3.0-dark.css
         DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${TARGET}/gtk)
 install(FILES brightness/60-lingmo-ddc.rules DESTINATION lib/udev/rules.d)
 install(FILES brightness/lingmo-ddc.conf DESTINATION lib/modules-load.d)
+install(FILES update/org.lingmo.update.policy DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/polkit-1/actions)

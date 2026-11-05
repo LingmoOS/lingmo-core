@@ -1,3 +1,16 @@
+lingmo-core (5.0.6+lingmo5u1) unstable; urgency=medium
+
+  * lingmo-services: add polkit policy for apt-get (org.lingmo.update.apt),
+    allowing the update service to run apt-get update and apt-get upgrade
+    without a password prompt in active sessions.
+  * lingmo-services: use absolute path /usr/bin/apt-get in pkexec calls so
+    polkit can match the exec.path annotation reliably.
+  * session: rename session description to "Lingmo desktop".
+  * po/zh_CN: update session translation to match.
+  * debian/control: fix homepage URL capitalisation.
+
+ -- Lingmo OS Team <team@lingmo.org>  Thu, 05 Nov 2026 05:30:00 +0800
+
 lingmo-core (5.0.5+lingmo5u1) unstable; urgency=medium
 
   * lingmo-services: UpdateManager: add lastCheckTime, changelogText and

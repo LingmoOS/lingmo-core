@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=Lingmo (Wayland)
-Comment=Lingmo desktop session
+Comment=Lingmo desktop
 Exec=/usr/bin/lingmo-wayland-session
 TryExec=/usr/bin/lingmo-compositor
 Type=Application

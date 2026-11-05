@@ -24,7 +24,7 @@ Build-Depends: cmake (>= 3.22),
                libpipewire-0.3-dev,
                libspa-0.2-dev
 Standards-Version: 4.7.2
-Homepage: https://github.com/lingmoos/lingmo-core
+Homepage: https://github.com/LingmoOS/lingmo-core
 
 Package: lingmo-core
 Architecture: any

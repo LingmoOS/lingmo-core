@@ -253,9 +253,9 @@ msgid "System"
 msgstr "系统"
 
 #: session/lingmo-wayland.desktop
-msgid "Cutefish (Wayland)"
-msgstr "Cutefish (Wayland)"
+msgid "Lingmo (Wayland)"
+msgstr "Lingmo (Wayland)"
 
 #: session/lingmo-wayland.desktop
-msgid "Cutefish desktop session"
-msgstr "Cutefish 桌面会话"
+msgid "Lingmo desktop"
+msgstr "Lingmo 桌面"
