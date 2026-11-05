@@ -33,6 +33,7 @@ Depends: accountsservice,
          gsettings-desktop-schemas,
          lingmo-sdk-dev,
          lingmo-framework,
+         curl,
          ${misc:Depends},
          ${shlibs:Depends}
 Recommends: va-driver-all | va-driver,

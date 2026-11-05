@@ -1,3 +1,11 @@
+lingmo-core (5.0.7+lingmo5u1) unstable; urgency=medium
+
+  * debian/control: add curl to runtime Depends so lingmo-services can
+    run the update API check (fetchApi uses curl; without it the service
+    goes to Error state immediately on every check attempt).
+
+ -- Lingmo OS Team <team@lingmo.org>  Thu, 05 Nov 2026 07:00:00 +0800
+
 lingmo-core (5.0.6+lingmo5u1) unstable; urgency=medium
 
   * lingmo-services: add polkit policy for apt-get (org.lingmo.update.apt),
