@@ -29,6 +29,8 @@ Homepage: https://github.com/LingmoOS/lingmo-core
 Package: lingmo-core
 Architecture: any
 Depends: accountsservice,
+         apt,
+         pkexec,
          polkitd,
          gsettings-desktop-schemas,
          lingmo-sdk-dev,

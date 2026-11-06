@@ -1,3 +1,9 @@
+lingmo-core (5.0.7+lingmo5u2) unstable; urgency=medium
+
+  * fix: report update failures and localize authentication.
+
+ -- Lingmo OS Team <team@lingmo.org>  Sat, 07 Nov 2026 12:00:00 +0800
+
 lingmo-core (5.0.7+lingmo5u1) unstable; urgency=medium
 
   * debian/control: add curl to runtime Depends so lingmo-services can

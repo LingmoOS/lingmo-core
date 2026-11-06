@@ -5,12 +5,14 @@
 #include "polkitagentlistener.h"
 
 #include "base/dbus.h"
+#include "base/i18n.h"
 #include "ui/application.h"
 
 int main(int argc, char *argv[])
 {
     Lingmo::UI::Application app(argc, argv);
     app.setApplicationId("lingmo-polkit-agent");
+    Lingmo::I18n::setDomain("lingmo-core");
 
     PolKitAgentListener listener(Lingmo::Base::DBus::Connection::system());
 

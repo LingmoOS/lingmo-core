@@ -259,3 +259,46 @@ msgstr "Lingmo (Wayland)"
 #: session/lingmo-wayland.desktop
 msgid "Lingmo desktop"
 msgstr "Lingmo 桌面"
+
+msgid "Regular software update"
+msgstr "常规软件更新"
+
+msgid "Authentication Required"
+msgstr "需要身份验证"
+
+msgid "Password"
+msgstr "密码"
+
+msgid "Authenticate"
+msgstr "验证身份"
+
+msgid "Cannot start curl. Install curl and check the update service PATH."
+msgstr "无法启动 curl。请安装 curl 并检查更新服务的 PATH 环境变量。"
+
+msgid "Update API returned an invalid response (expected success=true)."
+msgstr "更新接口返回了无效响应（预期 success=true）。"
+
+msgid "Cannot start pkexec to refresh package lists. Check polkit installation."
+msgstr "无法启动 pkexec 刷新软件包列表。请检查 polkit 是否已安装。"
+
+msgid "Cannot start apt to list upgradable packages."
+msgstr "无法启动 apt 获取可升级的软件包列表。"
+
+msgid "Cannot start pkexec to install updates. Check polkit installation."
+msgstr "无法启动 pkexec 安装更新。请检查 polkit 是否已安装。"
+
+#, python-brace-format
+msgid "Update API request failed (curl exit {code}): {error}"
+msgstr "更新接口请求失败（curl 退出码 {code}）：{error}"
+
+#, python-brace-format
+msgid "Refreshing package lists failed (pkexec/apt-get exit {code}): {error}"
+msgstr "刷新软件包列表失败（pkexec/apt-get 退出码 {code}）：{error}"
+
+#, python-brace-format
+msgid "Listing upgradable packages failed (apt exit {code}): {error}"
+msgstr "获取可升级的软件包列表失败（apt 退出码 {code}）：{error}"
+
+#, python-brace-format
+msgid "apt-get upgrade exited with code {code}"
+msgstr "apt-get upgrade 已退出，退出码为 {code}"

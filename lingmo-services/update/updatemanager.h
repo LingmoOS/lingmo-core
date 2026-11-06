@@ -95,6 +95,7 @@ private:
     std::string apiUrl() const;
     void setState(State state);
     void emitInfoChanged();
+    void failOperation(const std::string &message);
 
     Lingmo::Base::Settings &m_settings;
     Lingmo::Base::DBus::Connection *m_session;
@@ -123,7 +124,7 @@ private:
     // The package names, space-separated, for the UI to display if desired.
     std::string m_upgradablePackages;
 
-    // Set when an upgrade fails (state == Error after Upgrading).
+    // Failure details for every check/upgrade stage, cleared on retry.
     std::string m_errorLog;
 
     // Upgrade phase and progress.

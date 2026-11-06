@@ -21,6 +21,6 @@ add_subdirectory(screenrecorder)
 add_subdirectory(polkit-agent)
 add_subdirectory(lingmo-services)
 
-lingmo_add_translations(lingmo-core SOURCES lingmo-services session
+lingmo_add_translations(lingmo-core SOURCES lingmo-services session polkit-agent
                           DESKTOP_FILES session/lingmo-wayland.desktop)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lingmo-wayland.desktop DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/wayland-sessions/)

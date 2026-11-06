@@ -6,6 +6,8 @@
 #include <sys/utsname.h>
 
 #include <chrono>
+#include <algorithm>
+#include <cmath>
 #include <fstream>
 #include <sstream>
 
@@ -16,6 +18,7 @@
 using namespace std::chrono_literals;
 using namespace Lingmo::Base;
 using Lingmo::I18n::tr;
+using Lingmo::I18n::format;
 
 static int64_t nowSeconds()
 {
@@ -71,6 +74,7 @@ static bool parseAptStatusFd(const std::string &line, int &outPhase, int &outPer
 
     double pct = 0;
     try { pct = std::stod(pctStr); } catch (...) { return false; }
+    if (!std::isfinite(pct)) return false;
     pct = std::max(0.0, std::min(100.0, pct));
 
     if (type == "dlstatus") {
@@ -161,6 +165,10 @@ void UpdateManager::checkForUpdate()
     if (m_state == Checking || m_state == Upgrading)
         return;
 
+    m_errorLog.clear();
+    m_newVersion.clear(); m_newBuild = 0; m_mandatory = false;
+    m_releaseNotes.clear(); m_downloadUrl.clear(); m_releaseDate.clear(); m_changelogText.clear();
+    m_upgradePhase = 0; m_upgradeProgress = -1;
     m_apiHasUpdate       = false;
     m_aptHasUpdate       = false;
     m_upgradableCount    = 0;
@@ -174,6 +182,8 @@ void UpdateManager::startUpgrade()
 {
     if (m_state != SystemUpgrade && m_state != SoftwareUpdate)
         return;
+
+    m_errorLog.clear();
 
     // Upgrade begins in the download phase; apt may emit dlstatus lines
     // first, then switch to pmstatus for the install phase.
@@ -189,6 +199,7 @@ void UpdateManager::startUpgrade()
 
 void UpdateManager::setChannel(int channel)
 {
+    if (m_state == Checking || m_state == Upgrading) return;
     const Channel ch = (channel >= Stable && channel <= Nightly)
                            ? static_cast<Channel>(channel)
                            : Stable;
@@ -211,20 +222,21 @@ void UpdateManager::fetchApi()
     m_process->setOomProtectionDropped(true);
     m_process->onFinished = [this](int exitCode, bool crashed) {
         const std::string output = m_process->standardOutput();
+        const std::string error = m_process->standardError();
         m_process.reset();
         if (crashed || exitCode != 0) {
             LM_WARNING(services::log())
                     << "Update API request failed (curl exited" << exitCode << ")";
-            setState(Error);
+            failOperation(format(tr("Update API request failed (curl exit {code}): {error}"), {{"code", std::to_string(exitCode)}, {"error", error}}));
             return;
         }
         parseApiResponse(output);
     };
 
-    if (!m_process->start("curl", {"--max-time", "15", "--silent", apiUrl()})) {
+    if (!m_process->start("curl", {"--max-time", "15", "--location", "--fail", "--silent", "--show-error", apiUrl()})) {
         LM_WARNING(services::log()) << "Cannot start curl for update API check";
-        setState(Error);
         m_process.reset();
+        failOperation(tr("Cannot start curl. Install curl and check the update service PATH."));
     }
 }
 
@@ -233,7 +245,7 @@ void UpdateManager::parseApiResponse(const std::string &text)
     const auto root = json::Value::parse(text);
     if (!root || !root->operator[]("success").toBool()) {
         LM_WARNING(services::log()) << "Update API returned an unexpected response";
-        setState(Error);
+        failOperation(tr("Update API returned an invalid response (expected success=true)."));
         return;
     }
 
@@ -277,10 +289,10 @@ void UpdateManager::fetchChangelog()
         runAptUpdate();
     };
 
-    if (!m_process->start("curl", {"--max-time", "10", "--silent", s_releasesUrl})) {
+    if (!m_process->start("curl", {"--max-time", "10", "--location", "--fail", "--silent", "--show-error", s_releasesUrl})) {
         LM_WARNING(services::log()) << "Cannot start curl for changelog fetch";
-        runAptUpdate();
         m_process.reset();
+        runAptUpdate();
     }
 }
 
@@ -310,20 +322,18 @@ void UpdateManager::runAptUpdate()
     m_process->setEnvironment({"LANG=C", "LANGUAGE=C", "LC_ALL=C",
                                "DEBIAN_FRONTEND=noninteractive"});
     m_process->onFinished = [this](int exitCode, bool crashed) {
+        const std::string error = m_process->standardError();
         m_process.reset();
-        if (crashed || exitCode != 0)
-            LM_WARNING(services::log())
-                    << "apt-get update failed (exit" << exitCode
-                    << ") — checking with possibly stale lists";
-        // Continue to the list step even when update failed: stale data is
-        // better than reporting an error when the network is just slow.
+        if (crashed || exitCode != 0) {
+            failOperation(format(tr("Refreshing package lists failed (pkexec/apt-get exit {code}): {error}"), {{"code", std::to_string(exitCode)}, {"error", error}}));
+            return;
+        }
         runAptListUpgradable();
     };
 
-    if (!m_process->start("pkexec", {"/usr/bin/apt-get", "update", "-qq"})) {
-        LM_WARNING(services::log()) << "Cannot start pkexec apt-get update";
-        // Fallback: list with whatever is cached.
-        runAptListUpgradable();
+    if (!m_process->start("pkexec", {"/usr/bin/apt-get", "update", "-qq", "-o", "APT::Update::Error-Mode=any"})) {
+        m_process.reset();
+        failOperation(tr("Cannot start pkexec to refresh package lists. Check polkit installation."));
     }
 }
 
@@ -339,19 +349,18 @@ void UpdateManager::runAptListUpgradable()
     m_process->setEnvironment({"LANG=C", "LANGUAGE=C", "LC_ALL=C"});
     m_process->onFinished = [this](int exitCode, bool crashed) {
         const std::string output = m_process->standardOutput();
+        const std::string error = m_process->standardError();
         m_process.reset();
-        if (crashed) {
-            LM_WARNING(services::log()) << "apt list --upgradable crashed";
-            setState(Error);
+        if (crashed || exitCode != 0) {
+            failOperation(format(tr("Listing upgradable packages failed (apt exit {code}): {error}"), {{"code", std::to_string(exitCode)}, {"error", error}}));
             return;
         }
         parseUpgradableList(output);
     };
 
     if (!m_process->start("apt", {"list", "--upgradable"})) {
-        LM_WARNING(services::log()) << "Cannot start apt list --upgradable";
-        setState(Error);
         m_process.reset();
+        failOperation(tr("Cannot start apt to list upgradable packages."));
     }
 }
 
@@ -382,6 +391,10 @@ void UpdateManager::parseUpgradableList(const std::string &text)
         m_upgradablePackages += n;
     }
 
+    // Publish completion metadata before announcing the resulting state.
+    m_lastCheckTime = nowSeconds();
+    saveLastCheckTime();
+
     // Apply the decision matrix.
     if (m_apiHasUpdate && m_aptHasUpdate) {
         setState(SystemUpgrade);
@@ -394,10 +407,6 @@ void UpdateManager::parseUpgradableList(const std::string &text)
     } else {
         setState(UpToDate);
     }
-
-    // Record the time this check completed and persist it.
-    m_lastCheckTime = nowSeconds();
-    saveLastCheckTime();
 
     emitInfoChanged();
 }
@@ -454,14 +463,14 @@ void UpdateManager::runAptUpgrade()
             LM_WARNING(services::log())
                     << "apt-get upgrade failed (exit" << exitCode << ")";
             m_errorLog        = errOutput.empty()
-                                    ? "apt-get upgrade exited with code " + std::to_string(exitCode)
+                                    ? format(tr("apt-get upgrade exited with code {code}"), {{"code", std::to_string(exitCode)}})
                                     : errOutput;
             m_upgradePhase    = 0;
             m_upgradeProgress = -1;
             if (m_object)
                 m_object->emitSignal("upgradeProgress",
                                      int32_t(m_upgradePhase), int32_t(m_upgradeProgress));
-            setState(Error);
+            failOperation(m_errorLog);
         } else {
             m_errorLog.clear();
             // Finish the install phase at 100%.
@@ -484,9 +493,8 @@ void UpdateManager::runAptUpgrade()
 
     if (!started) {
         LM_WARNING(services::log()) << "Cannot start pkexec apt-get upgrade";
-        m_upgradeProgress = -1;
-        setState(Error);
         m_process.reset();
+        failOperation(tr("Cannot start pkexec to install updates. Check polkit installation."));
     }
 }
 
@@ -557,6 +565,16 @@ std::string UpdateManager::apiUrl() const
     return std::string(s_apiBase)
          + "?channel=" + channelName(m_channel)
          + "&arch="    + m_arch;
+}
+
+void UpdateManager::failOperation(const std::string &message)
+{
+    m_errorLog = message;
+    m_upgradePhase = 0;
+    m_upgradeProgress = -1;
+    LM_WARNING(services::log()) << m_errorLog;
+    setState(Error);
+    emitInfoChanged();
 }
 
 void UpdateManager::setState(State state)

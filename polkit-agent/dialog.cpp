@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "dialog.h"
+#include "base/i18n.h"
 
 #include <cmath>
 
@@ -17,6 +18,7 @@
 #include "ui/window.h"
 
 using namespace Lingmo::UI;
+using Lingmo::I18n::tr;
 
 static constexpr double kWidth = 420;
 static constexpr double kMargin = 16;
@@ -72,7 +74,7 @@ Dialog::~Dialog() = default;
 void Dialog::show()
 {
     m_window = std::make_unique<Window>();
-    m_window->setTitle("Authentication Required");
+    m_window->setTitle(tr("Authentication Required"));
     m_window->setSkipTaskbar(true);
     // Text lays out unhinted at every scale, so lines wrap where they always did.
     m_window->setHintedTextLayout(false);
@@ -91,7 +93,7 @@ void Dialog::show()
     auto *texts = content->addChild<Column>();
     texts->setSpacing(4);
     texts->setLayoutHints({.fillWidth = true});
-    auto *title = texts->addChild<Label>("Authentication Required");
+    auto *title = texts->addChild<Label>(tr("Authentication Required"));
     title->setLayoutHints({.fillWidth = true});
     title->setFontSize(14);
     title->setWeight(600);
@@ -108,7 +110,7 @@ void Dialog::show()
 
     m_passwordInput = content->addChild<TextField>();
     m_passwordInput->setLayoutHints({.fillWidth = true});
-    m_passwordInput->setPlaceholder(m_prompt.empty() ? std::string("Password") : m_prompt);
+    m_passwordInput->setPlaceholder(m_prompt.empty() ? std::string(tr("Password")) : m_prompt);
     m_passwordInput->setEchoMode(m_echo ? TextField::EchoMode::Normal : TextField::EchoMode::Password);
     m_passwordInput->onAccepted = [this] {
         submit();
@@ -122,12 +124,12 @@ void Dialog::show()
     auto *buttons = content->addChild<RowLayout>();
     buttons->setSpacing(8);
     buttons->setLayoutHints({.horizontalAlignment = Alignment::End});
-    auto *cancel = buttons->addChild<DialogButton>("Cancel");
+    auto *cancel = buttons->addChild<DialogButton>(tr("Cancel"));
     cancel->onClicked = [this] {
         if (onCancel)
             onCancel();
     };
-    m_doneButton = buttons->addChild<DialogButton>("Authenticate", true);
+    m_doneButton = buttons->addChild<DialogButton>(tr("Authenticate"), true);
     m_doneButton->onClicked = [this] {
         submit();
     };
@@ -188,7 +190,7 @@ void Dialog::setRequest(const std::string &prompt, bool echo)
 
     if (!m_passwordInput)
         return;
-    m_passwordInput->setPlaceholder(m_prompt.empty() ? std::string("Password") : m_prompt);
+    m_passwordInput->setPlaceholder(m_prompt.empty() ? std::string(tr("Password")) : m_prompt);
     m_passwordInput->setEchoMode(m_echo ? TextField::EchoMode::Normal : TextField::EchoMode::Password);
 
     // Each further PAM question starts empty; a field still being typed in is
