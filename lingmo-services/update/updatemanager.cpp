@@ -623,7 +623,7 @@ void UpdateManager::runAptUpgrade()
 {
     // A system upgrade may bring new dependencies or require removals, so it
     // uses dist-upgrade; a regular package update stays with upgrade.
-    const char *action = m_systemUpgrade ? "dist-upgrade" : "upgrade";
+    const std::string action = m_systemUpgrade ? "dist-upgrade" : "upgrade";
 
     // Run the real apt-get action with root via pkexec.
     //
@@ -684,7 +684,7 @@ void UpdateManager::runAptUpgrade()
                     << "apt-get" << action << "failed (exit" << exitCode << ")";
             m_errorLog        = errOutput.empty()
                                     ? format(tr("apt-get {command} exited with code {code}"),
-                                             {{"command", std::string(action)}, {"code", std::to_string(exitCode)}})
+                                             {{"command", action}, {"code", std::to_string(exitCode)}})
                                     : errOutput;
             m_upgradePhase    = 0;
             m_upgradeProgress = -1;
