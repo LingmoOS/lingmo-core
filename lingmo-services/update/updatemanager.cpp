@@ -8,12 +8,14 @@
 #include <chrono>
 #include <algorithm>
 #include <cmath>
+#include <ctime>
 #include <fstream>
 #include <sstream>
 
 #include "base/i18n.h"
 #include "base/json.h"
 #include "log.h"
+#include "notification.h"
 
 using namespace std::chrono_literals;
 using namespace Lingmo::Base;
@@ -27,12 +29,47 @@ static int64_t nowSeconds()
             .count();
 }
 
+// Seconds from now until the next local occurrence of hour:minute.
+static std::chrono::seconds secondsUntilDailyCheck(int hour, int minute)
+{
+    const std::time_t now = std::time(nullptr);
+    std::tm local {};
+    localtime_r(&now, &local);
+    local.tm_hour = std::clamp(hour, 0, 23);
+    local.tm_min = std::clamp(minute, 0, 59);
+    local.tm_sec = 0;
+
+    std::time_t target = std::mktime(&local);
+    if (target <= now) {
+        local.tm_mday += 1;
+        target = std::mktime(&local);
+    }
+    return std::chrono::seconds(std::max<int64_t>(1, int64_t(target - now)));
+}
+
+// The single 0-100 bar the notification shows across both apt phases.
+static int overallProgress(int phase, int percent)
+{
+    if (percent < 0)
+        return 0;
+    if (phase == 1)
+        return std::clamp(percent / 2, 0, 50);
+    if (phase == 2)
+        return std::clamp(50 + percent / 2, 50, 100);
+    return 0;
+}
+
 static constexpr auto s_channelKey       = "Update/Channel";
 static constexpr auto s_lastCheckTimeKey = "Update/LastCheckTime";
+static constexpr auto s_autoCheckKey     = "Update/AutoCheck";
+static constexpr auto s_checkModeKey     = "Update/CheckMode";
+static constexpr auto s_checkIntervalKey = "Update/CheckIntervalMinutes";
+static constexpr auto s_checkHourKey     = "Update/CheckHour";
+static constexpr auto s_checkMinuteKey   = "Update/CheckMinute";
 static constexpr auto s_apiBase          = "https://lingmo.org/api/v1/update";
 static constexpr auto s_releasesUrl      = "https://lingmo.org/content/releases.json";
-static constexpr auto s_checkInterval   = 6h;
 static constexpr auto s_startDelay      = 30s;
+static constexpr int  s_defaultIntervalMinutes = 360;
 
 static const char *channelName(UpdateManager::Channel ch)
 {
@@ -100,20 +137,16 @@ UpdateManager::UpdateManager(Settings &settings, dbus::Connection *session)
 {
     loadSettings();
 
-    // First check fires after a short startup delay; subsequent checks repeat
-    // on the regular interval.
     m_timer.setSingleShot(true);
-    m_timer.setInterval(s_startDelay);
-    m_timer.onTimeout = [this] {
-        checkForUpdate();
-        m_timer.setSingleShot(false);
-        m_timer.setInterval(s_checkInterval);
-        m_timer.start();
-    };
-    m_timer.start();
+    m_timer.onTimeout = [this] { startCheck(true); };
+    scheduleNextCheck();
 }
 
-UpdateManager::~UpdateManager() = default;
+UpdateManager::~UpdateManager()
+{
+    if (m_notification)
+        m_notification->close();
+}
 
 bool UpdateManager::publish()
 {
@@ -127,8 +160,21 @@ bool UpdateManager::publish()
     object->addMethod("startUpgrade",   [this] { startUpgrade(); });
     object->addMethod("setChannel", [this](int32_t ch) { setChannel(ch); },
                       {{"channel"}, {}});
+    object->addMethod("setAutoCheck", [this](bool enabled) { setAutoCheck(enabled); },
+                      {{"enabled"}, {}});
+    object->addMethod("setCheckSchedule", [this](int32_t mode, int32_t minutes) {
+        setCheckSchedule(mode, minutes);
+    }, {{"mode", "minutes"}, {}});
+    object->addMethod("setCheckTime", [this](int32_t hour, int32_t minute) {
+        setCheckTime(hour, minute);
+    }, {{"hour", "minute"}, {}});
 
     object->addProperty("state",               [this] { return int32_t(m_state); });
+    object->addProperty("autoCheck",           [this] { return m_autoCheck; });
+    object->addProperty("checkMode",           [this] { return int32_t(m_checkMode); });
+    object->addProperty("checkInterval",       [this] { return int32_t(m_checkIntervalMinutes); });
+    object->addProperty("checkHour",           [this] { return int32_t(m_checkHour); });
+    object->addProperty("checkMinute",         [this] { return int32_t(m_checkMinute); });
     object->addProperty("channel",             [this] { return int32_t(m_channel); });
     object->addProperty("newVersion",          [this] { return m_newVersion; });
     object->addProperty("newBuild",            [this] { return m_newBuild; });
@@ -162,9 +208,18 @@ bool UpdateManager::publish()
 
 void UpdateManager::checkForUpdate()
 {
-    if (m_state == Checking || m_state == Upgrading)
+    startCheck(false);
+}
+
+void UpdateManager::startCheck(bool automatic)
+{
+    // Once an upgrade has completed, only a restart clears the prompt; a
+    // scheduled or manual check must not turn it back into "up to date".
+    if (m_state == Checking || m_state == Upgrading || m_state == RestartRequired)
         return;
 
+    m_automaticCheck = automatic;
+    m_firstCheck = false;
     m_errorLog.clear();
     m_newVersion.clear(); m_newBuild = 0; m_mandatory = false;
     m_releaseNotes.clear(); m_downloadUrl.clear(); m_releaseDate.clear(); m_changelogText.clear();
@@ -193,13 +248,18 @@ void UpdateManager::startUpgrade()
         m_object->emitSignal("upgradeProgress", int32_t(m_upgradePhase),
                             int32_t(m_upgradeProgress));
 
+    m_lastNotifiedKey.clear();
+    m_notifiedPhase = m_upgradePhase;
+    m_notifiedPercent = m_upgradeProgress;
     setState(Upgrading);
+    notifyProgress();
     runAptUpgrade();
 }
 
 void UpdateManager::setChannel(int channel)
 {
-    if (m_state == Checking || m_state == Upgrading) return;
+    if (m_state == Checking || m_state == Upgrading || m_state == RestartRequired)
+        return;
     const Channel ch = (channel >= Stable && channel <= Nightly)
                            ? static_cast<Channel>(channel)
                            : Stable;
@@ -210,8 +270,181 @@ void UpdateManager::setChannel(int channel)
     if (m_object)
         m_object->emitPropertiesChanged({"channel"});
 
-    m_timer.start();
     checkForUpdate();
+}
+
+void UpdateManager::setAutoCheck(bool enabled)
+{
+    if (m_autoCheck == enabled)
+        return;
+    m_autoCheck = enabled;
+    // Turning checks back on should not wait a whole interval.
+    m_firstCheck = enabled;
+    saveSchedule();
+    if (m_object)
+        m_object->emitPropertiesChanged({"autoCheck"});
+    scheduleNextCheck();
+}
+
+void UpdateManager::setCheckSchedule(int mode, int minutes)
+{
+    const CheckMode newMode = mode == Daily ? Daily : Interval;
+    const int newMinutes = std::clamp(minutes, 1, 24 * 60);
+    if (newMode == m_checkMode && newMinutes == m_checkIntervalMinutes)
+        return;
+    m_checkMode = newMode;
+    m_checkIntervalMinutes = newMinutes;
+    saveSchedule();
+    if (m_object)
+        m_object->emitPropertiesChanged({"checkMode", "checkInterval"});
+    scheduleNextCheck();
+}
+
+void UpdateManager::setCheckTime(int hour, int minute)
+{
+    hour = std::clamp(hour, 0, 23);
+    minute = std::clamp(minute, 0, 59);
+    if (hour == m_checkHour && minute == m_checkMinute)
+        return;
+    m_checkHour = hour;
+    m_checkMinute = minute;
+    saveSchedule();
+    if (m_object)
+        m_object->emitPropertiesChanged({"checkHour", "checkMinute"});
+    scheduleNextCheck();
+}
+
+void UpdateManager::scheduleNextCheck()
+{
+    m_timer.stop();
+    if (!m_autoCheck || m_state == RestartRequired || m_state == Upgrading)
+        return;
+
+    std::chrono::nanoseconds delay;
+    if (m_checkMode == Daily) {
+        delay = secondsUntilDailyCheck(m_checkHour, m_checkMinute);
+    } else if (m_firstCheck) {
+        delay = s_startDelay;
+    } else {
+        delay = std::chrono::minutes(std::max(1, m_checkIntervalMinutes));
+    }
+    m_timer.start(delay);
+}
+
+void UpdateManager::saveSchedule()
+{
+    m_settings.setValue(s_autoCheckKey, m_autoCheck);
+    m_settings.setValue(s_checkModeKey, int64_t(m_checkMode));
+    m_settings.setValue(s_checkIntervalKey, int64_t(m_checkIntervalMinutes));
+    m_settings.setValue(s_checkHourKey, int64_t(m_checkHour));
+    m_settings.setValue(s_checkMinuteKey, int64_t(m_checkMinute));
+    m_settings.sync();
+}
+
+Notification &UpdateManager::updateNotification()
+{
+    if (!m_notification) {
+        m_notification = std::make_unique<Notification>(m_session);
+        m_notification->setAppName(tr("System Update"));
+        m_notification->setIconName("system-software-update");
+        m_notification->setDesktopEntry("lingmo-settings");
+        m_notificationAction = m_notification->actionInvoked.connect(
+                [this](uint32_t, const std::string &action) {
+                    if (action == "restart")
+                        requestRestart();
+                });
+    }
+    return *m_notification;
+}
+
+void UpdateManager::notifyUpdatesAvailable()
+{
+    const std::string key = std::to_string(int(m_state)) + ':' + m_newVersion + ':'
+                          + std::to_string(m_upgradableCount);
+    if (key == m_lastNotifiedKey)
+        return;
+    m_lastNotifiedKey = key;
+
+    Notification &notification = updateNotification();
+    notification.setSummary(tr("Updates available"));
+    if (m_state == SystemUpgrade && !m_newVersion.empty()) {
+        notification.setBody(format(tr("System version {version} is available."),
+                                    {{"version", m_newVersion}}));
+    } else if (m_upgradableCount == 1) {
+        notification.setBody(tr("1 package can be updated."));
+    } else {
+        notification.setBody(format(tr("{count} packages can be updated."),
+                                    {{"count", std::to_string(m_upgradableCount)}}));
+    }
+    notification.setValue(-1);
+    notification.setActions({});
+    notification.setTimeout(-1);
+    notification.setUrgency(Notification::Normal);
+    m_notificationKind = NotificationKind::UpdatesAvailable;
+    notification.show();
+}
+
+void UpdateManager::notifyProgress()
+{
+    Notification &notification = updateNotification();
+    const std::string phase = m_upgradePhase == 1 ? tr("Downloading")
+                            : m_upgradePhase == 2 ? tr("Installing")
+                                                  : tr("Preparing");
+    notification.setSummary(tr("Updating system"));
+    notification.setBody(m_upgradeProgress >= 0
+                                 ? phase + " " + std::to_string(m_upgradeProgress) + "%"
+                                 : phase);
+    notification.setValue(overallProgress(m_upgradePhase, m_upgradeProgress));
+    notification.setActions({});
+    notification.setTimeout(0);
+    notification.setUrgency(Notification::Normal);
+    m_notificationKind = NotificationKind::UpgradeProgress;
+    notification.show();
+}
+
+void UpdateManager::notifyRestartRequired()
+{
+    Notification &notification = updateNotification();
+    notification.setSummary(tr("Restart required"));
+    notification.setBody(tr("The update has been installed. Restart the computer to finish."));
+    notification.setValue(-1);
+    notification.setActions({"restart", tr("Restart now")});
+    notification.setTimeout(0);
+    notification.setUrgency(Notification::Normal);
+    m_notificationKind = NotificationKind::RestartNotice;
+    notification.show();
+}
+
+void UpdateManager::notifyError()
+{
+    Notification &notification = updateNotification();
+    notification.setSummary(tr("Update failed"));
+    notification.setBody(m_errorLog.empty() ? tr("The update could not be installed.") : m_errorLog);
+    notification.setValue(-1);
+    notification.setActions({});
+    notification.setTimeout(0);
+    notification.setUrgency(Notification::Normal);
+    m_notificationKind = NotificationKind::UpgradeError;
+    notification.show();
+}
+
+void UpdateManager::clearUpdatesNotification()
+{
+    m_lastNotifiedKey.clear();
+    if (m_notificationKind != NotificationKind::UpdatesAvailable)
+        return;
+    if (m_notification)
+        m_notification->close();
+    m_notificationKind = NotificationKind::None;
+}
+
+void UpdateManager::requestRestart()
+{
+    if (!m_session)
+        return;
+    dbus::Proxy session(m_session, "org.lingmo.Session", "/org/lingmo/Session",
+                        "org.lingmo.Session");
+    session.send("reboot");
 }
 
 // ── stage 1: API ─────────────────────────────────────────────────────────────
@@ -409,6 +642,15 @@ void UpdateManager::parseUpgradableList(const std::string &text)
     }
 
     emitInfoChanged();
+
+    if (m_state == UpToDate)
+        clearUpdatesNotification();
+
+    if (m_automaticCheck && m_autoCheck
+        && (m_state == SystemUpgrade || m_state == SoftwareUpdate))
+        notifyUpdatesAvailable();
+    m_automaticCheck = false;
+    scheduleNextCheck();
 }
 
 // ── upgrade ───────────────────────────────────────────────────────────────────
@@ -449,6 +691,16 @@ void UpdateManager::runAptUpgrade()
                     if (m_object)
                         m_object->emitSignal("upgradeProgress",
                                              int32_t(phase), int32_t(percent));
+
+                    // The notification coalesces calls already; still update
+                    // it only on a phase change or every few percent.
+                    const bool phaseChanged = phase != m_notifiedPhase;
+                    if (phaseChanged || percent < m_notifiedPercent
+                        || percent >= m_notifiedPercent + 5 || percent == 100) {
+                        m_notifiedPhase = phase;
+                        m_notifiedPercent = percent;
+                        notifyProgress();
+                    }
                 }
             }
         }
@@ -471,6 +723,7 @@ void UpdateManager::runAptUpgrade()
                 m_object->emitSignal("upgradeProgress",
                                      int32_t(m_upgradePhase), int32_t(m_upgradeProgress));
             failOperation(m_errorLog);
+            notifyError();
         } else {
             m_errorLog.clear();
             // Finish the install phase at 100%.
@@ -481,7 +734,13 @@ void UpdateManager::runAptUpgrade()
                                      int32_t(m_upgradePhase), int32_t(m_upgradeProgress));
             m_upgradePhase    = 0;
             m_upgradeProgress = -1;
-            setState(UpToDate);
+            // The new packages are on disk but the running session still uses
+            // the old ones. Keep the prompt until the machine is restarted.
+            m_upgradableCount = 0;
+            m_upgradablePackages.clear();
+            setState(RestartRequired);
+            m_lastNotifiedKey.clear();
+            notifyRestartRequired();
         }
     };
 
@@ -495,6 +754,7 @@ void UpdateManager::runAptUpgrade()
         LM_WARNING(services::log()) << "Cannot start pkexec apt-get upgrade";
         m_process.reset();
         failOperation(tr("Cannot start pkexec to install updates. Check polkit installation."));
+        notifyError();
     }
 }
 
@@ -505,6 +765,15 @@ void UpdateManager::loadSettings()
     const int ch = int(m_settings.intValue(s_channelKey, int64_t(Stable)));
     m_channel = (ch >= Stable && ch <= Nightly) ? static_cast<Channel>(ch) : Stable;
     m_lastCheckTime = m_settings.intValue(s_lastCheckTimeKey, 0);
+
+    m_autoCheck = m_settings.boolValue(s_autoCheckKey, true);
+    const int mode = int(m_settings.intValue(s_checkModeKey, int64_t(Interval)));
+    m_checkMode = mode == Daily ? Daily : Interval;
+    m_checkIntervalMinutes = std::clamp(
+            int(m_settings.intValue(s_checkIntervalKey, int64_t(s_defaultIntervalMinutes))),
+            1, 24 * 60);
+    m_checkHour = std::clamp(int(m_settings.intValue(s_checkHourKey, 3)), 0, 23);
+    m_checkMinute = std::clamp(int(m_settings.intValue(s_checkMinuteKey, 0)), 0, 59);
 }
 
 void UpdateManager::saveChannel()
@@ -575,6 +844,9 @@ void UpdateManager::failOperation(const std::string &message)
     LM_WARNING(services::log()) << m_errorLog;
     setState(Error);
     emitInfoChanged();
+
+    m_automaticCheck = false;
+    scheduleNextCheck();
 }
 
 void UpdateManager::setState(State state)

@@ -302,3 +302,47 @@ msgstr "获取可升级的软件包列表失败（apt 退出码 {code}）：{err
 #, python-brace-format
 msgid "apt-get upgrade exited with code {code}"
 msgstr "apt-get upgrade 已退出，退出码为 {code}"
+
+msgid "System Update"
+msgstr "系统更新"
+
+msgid "Updates available"
+msgstr "有可用更新"
+
+#, python-brace-format
+msgid "System version {version} is available."
+msgstr "系统版本 {version} 可用。"
+
+msgid "1 package can be updated."
+msgstr "有 1 个软件包可以更新。"
+
+#, python-brace-format
+msgid "{count} packages can be updated."
+msgstr "有 {count} 个软件包可以更新。"
+
+msgid "Updating system"
+msgstr "正在更新系统"
+
+msgid "Preparing"
+msgstr "准备中"
+
+msgid "Downloading"
+msgstr "正在下载"
+
+msgid "Installing"
+msgstr "正在安装"
+
+msgid "Restart required"
+msgstr "需要重启"
+
+msgid "The update has been installed. Restart the computer to finish."
+msgstr "更新已安装，请重启电脑以完成。"
+
+msgid "Restart now"
+msgstr "立即重启"
+
+msgid "Update failed"
+msgstr "更新失败"
+
+msgid "The update could not be installed."
+msgstr "无法安装更新。"

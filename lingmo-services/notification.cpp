@@ -61,15 +61,26 @@ void Notification::send()
             closed.emit();
         });
     }
+    if (m_actionMatch.isNull() && !m_actions.empty()) {
+        m_actionMatch = m_proxy.onSignal("ActionInvoked", [this](const dbus::Message &message) {
+            uint32_t id = 0;
+            std::string action;
+            if (!message.read(id, action) || id == 0 || id != m_id)
+                return;
+            actionInvoked.emit(id, action);
+        });
+    }
 
     dbus::VariantMap hints {{"urgency", dbus::Variant(uint8_t(m_urgency))}};
     if (!m_desktopEntry.empty())
         hints.emplace("desktop-entry", dbus::Variant(m_desktopEntry));
+    if (m_value >= 0)
+        hints.emplace("value", dbus::Variant(int32_t(m_value)));
 
     dbus::Message call = m_bus->newMethodCall(kService, kPath, kService, "Notify");
     // Only a running notification server shows it; none is started for it.
     sd_bus_message_set_auto_start(call.get(), 0);
-    call.append(std::string(), m_id, m_iconName, m_summary, m_body, std::vector<std::string>(), hints,
+    call.append(m_appName, m_id, m_iconName, m_summary, m_body, m_actions, hints,
                 int32_t(m_timeout));
 
     m_pending = true;

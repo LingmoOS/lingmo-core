@@ -9,7 +9,7 @@ set(FRAMEWORK_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../lingmo-framework CACHE PA
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/lingmo)
 file(CREATE_LINK ${FRAMEWORK_DIR}/clients/update ${CMAKE_CURRENT_BINARY_DIR}/include/lingmo/update SYMBOLIC)
 add_executable(update-test update_test.cpp ${SERVICE_DIR}/update/updatemanager.cpp ${SERVICE_DIR}/log.cpp
-    ${FRAMEWORK_DIR}/clients/update/update_status.cpp)
+    ${SERVICE_DIR}/notification.cpp ${FRAMEWORK_DIR}/clients/update/update_status.cpp)
 target_include_directories(update-test PRIVATE ${SERVICE_DIR} ${SERVICE_DIR}/update ${CMAKE_CURRENT_BINARY_DIR}/include)
 target_link_libraries(update-test PRIVATE Lingmo::SDKBase)
 enable_testing()
