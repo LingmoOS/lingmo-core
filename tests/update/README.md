@@ -5,9 +5,9 @@ This test builds the real UpdateManager with the Framework UpdateStatus client a
 Covered scenarios:
 
 - API transport failure and malformed response expose a diagnostic.
+- The API check sends BUILD_VERSION and reads updateAvailable, summary and releaseDate.
 - Retrying a failed check reaches an available-update state and clears the old error.
 - Failed APT refresh or package listing remains a failure, rather than reporting stale data as up to date.
-- Failure to start the optional changelog download does not destroy the next APT process.
 - Upgrade failure exposes stderr and can recover after a successful new check.
 - A system upgrade runs dist-upgrade; a software update runs upgrade.
 - A successful upgrade reports RestartRequired and later checks do not clear it.

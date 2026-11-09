@@ -18,9 +18,10 @@ class Notification;
 
 // Checks for system updates in two stages:
 //
-//   1. The lingmo.org API (GET /api/v1/update) — tells whether a new OS
-//      image is available and carries its version, build number, release
-//      notes URL and ISO download link.
+//   1. The lingmo.org API (GET /api/v1/update/check) — takes the local
+//      BUILD_VERSION from os-release and tells whether a new OS version is
+//      available, with its version, build code, release date, mandatory flag,
+//      release notes URL and HTML summary.
 //   2. apt — first "apt-get update" to refresh package lists, then
 //      "apt list --upgradable" to enumerate what is pending.
 //
@@ -118,9 +119,6 @@ private:
     // --- stage 1: API check ---
     void fetchApi();
     void parseApiResponse(const std::string &text);
-    // 1b. Fetch changelog from releases.json after API confirms a new version.
-    void fetchChangelog();
-    void parseChangelog(const std::string &text);
 
     // --- stage 2: apt check (two sub-steps) ---
     // 2a. pkexec apt-get update  — refreshes package lists from the mirrors.
@@ -137,7 +135,8 @@ private:
     void saveChannel();
     void saveLastCheckTime();
     static std::string machineArchitecture();
-    static int64_t readLocalBuild();
+    static std::string osReleaseValue(const char *key);
+    static std::string readLocalBuildVersion();
     static std::string readCurrentVersion();
     std::string apiUrl() const;
     void setState(State state);
@@ -155,7 +154,7 @@ private:
     Channel m_channel  = Stable;
     State   m_state    = Idle;
     std::string m_arch;
-    int64_t m_localBuild = 0;
+    std::string m_localBuildVersion;
 
     // Automatic check schedule.
     bool       m_autoCheck = true;
@@ -179,9 +178,8 @@ private:
     int64_t     m_newBuild     = 0;
     bool        m_mandatory    = false;
     std::string m_releaseNotes;  // full URL
-    std::string m_downloadUrl;
     std::string m_releaseDate;
-    std::string m_changelogText; // Markdown, fetched from releases.json
+    std::string m_changelogText; // HTML summary from the update API
 
     // Set by the apt stage.
     bool m_aptHasUpdate    = false;

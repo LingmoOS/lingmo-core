@@ -66,8 +66,7 @@ static constexpr auto s_checkModeKey     = "Update/CheckMode";
 static constexpr auto s_checkIntervalKey = "Update/CheckIntervalMinutes";
 static constexpr auto s_checkHourKey     = "Update/CheckHour";
 static constexpr auto s_checkMinuteKey   = "Update/CheckMinute";
-static constexpr auto s_apiBase          = "https://lingmo.org/api/v1/update";
-static constexpr auto s_releasesUrl      = "https://lingmo.org/content/releases.json";
+static constexpr auto s_apiBase          = "https://lingmo.org/api/v1/update/check";
 static constexpr auto s_startDelay      = 30s;
 static constexpr int  s_defaultIntervalMinutes = 360;
 
@@ -133,8 +132,14 @@ UpdateManager::UpdateManager(Settings &settings, dbus::Connection *session)
     : m_settings(settings)
     , m_session(session)
     , m_arch(machineArchitecture())
-    , m_localBuild(readLocalBuild())
+    , m_localBuildVersion(readLocalBuildVersion())
 {
+    if (m_localBuildVersion.empty()) {
+        // The API needs a parseable build version; let a missing os-release
+        // field ask for the update rather than fail the check.
+        m_localBuildVersion = "0a0";
+        LM_WARNING(services::log()) << "No BUILD_VERSION in os-release; using 0a0";
+    }
     loadSettings();
 
     m_timer.setSingleShot(true);
@@ -180,7 +185,6 @@ bool UpdateManager::publish()
     object->addProperty("newBuild",            [this] { return m_newBuild; });
     object->addProperty("mandatory",           [this] { return m_mandatory; });
     object->addProperty("releaseNotes",        [this] { return m_releaseNotes; });
-    object->addProperty("downloadUrl",         [this] { return m_downloadUrl; });
     object->addProperty("releaseDate",         [this] { return m_releaseDate; });
     object->addProperty("upgradableCount",     [this] { return int32_t(m_upgradableCount); });
     object->addProperty("upgradablePackages",  [this] { return m_upgradablePackages; });
@@ -222,7 +226,7 @@ void UpdateManager::startCheck(bool automatic)
     m_firstCheck = false;
     m_errorLog.clear();
     m_newVersion.clear(); m_newBuild = 0; m_mandatory = false;
-    m_releaseNotes.clear(); m_downloadUrl.clear(); m_releaseDate.clear(); m_changelogText.clear();
+    m_releaseNotes.clear(); m_releaseDate.clear(); m_changelogText.clear();
     m_upgradePhase = 0; m_upgradeProgress = -1;
     m_apiHasUpdate       = false;
     m_aptHasUpdate       = false;
@@ -485,66 +489,23 @@ void UpdateManager::parseApiResponse(const std::string &text)
         return;
     }
 
-    const auto &latest = root->operator[]("latest");
-    if (!latest.isNull()) {
-        const int64_t remoteBuild = latest["build"].toInt();
-        if (remoteBuild > m_localBuild) {
-            m_apiHasUpdate = true;
-            m_newVersion   = latest["version"].toString();
-            m_newBuild     = remoteBuild;
-            m_mandatory    = latest["mandatory"].toBool();
-            m_releaseNotes = "https://lingmo.org" + latest["releaseNotes"].toString();
-            m_downloadUrl  = latest["download"]["iso"].toString();
-            m_releaseDate  = latest["date"].toString();
+    if (root->operator[]("updateAvailable").toBool()) {
+        const auto &latest = root->operator[]("latest");
+        if (!latest.isNull()) {
+            m_apiHasUpdate  = true;
+            m_newVersion    = latest["version"].toString();
+            m_newBuild      = latest["buildCode"].toInt();
+            m_mandatory     = latest["mandatory"].toBool();
+            m_releaseDate   = latest["releaseDate"].toString();
+            // HTML release notes for the Settings card and notifications.
+            m_changelogText = root->operator[]("summary").toString();
+            const std::string notes = root->operator[]("releaseNotesUrl").toString();
+            if (!notes.empty())
+                m_releaseNotes = notes.starts_with("http") ? notes : "https://lingmo.org" + notes;
         }
     }
 
-    // When a new version is available, fetch its changelog before moving to
-    // the apt stage so the UI can show release notes right away.
-    if (m_apiHasUpdate) {
-        fetchChangelog();
-    } else {
-        runAptUpdate();
-    }
-}
-
-// ── stage 1b: fetch changelog ────────────────────────────────────────────────
-
-void UpdateManager::fetchChangelog()
-{
-    // releases.json holds an array of {version, date, title, content, type}.
-    // We match on newVersion to get the Markdown changelog for the UI card.
-    m_process = std::make_unique<Process>();
-    m_process->setOomProtectionDropped(true);
-    m_process->onFinished = [this](int exitCode, bool crashed) {
-        const std::string output = m_process->standardOutput();
-        m_process.reset();
-        // A changelog fetch failure is non-fatal; just proceed without text.
-        if (!crashed && exitCode == 0)
-            parseChangelog(output);
-        runAptUpdate();
-    };
-
-    if (!m_process->start("curl", {"--max-time", "10", "--location", "--fail", "--silent", "--show-error", s_releasesUrl})) {
-        LM_WARNING(services::log()) << "Cannot start curl for changelog fetch";
-        m_process.reset();
-        runAptUpdate();
-    }
-}
-
-void UpdateManager::parseChangelog(const std::string &text)
-{
-    const auto root = json::Value::parse(text);
-    if (!root || !root->isArray())
-        return;
-
-    for (const auto &entry : root->toArray()) {
-        if (entry["version"].toString() == m_newVersion) {
-            m_changelogText = entry["content"].toString();
-            m_releaseDate   = entry["date"].toString();  // authoritative date
-            return;
-        }
-    }
+    runAptUpdate();
 }
 
 // ── stage 2a: apt-get update ─────────────────────────────────────────────────
@@ -807,41 +768,50 @@ std::string UpdateManager::machineArchitecture()
     return "x86_64";
 }
 
-int64_t UpdateManager::readLocalBuild()
+static std::string unquote(std::string value)
 {
-    // /etc/lingmo-release written by the installer:
-    //   VERSION=2.0.26
-    //   BUILD=2026070101
-    std::ifstream file("/etc/lingmo-release");
-    if (!file.is_open())
-        return 0;
-    std::string line;
-    while (std::getline(file, line)) {
-        if (line.rfind("BUILD=", 0) == 0) {
-            try { return std::stoll(line.substr(6)); } catch (...) { return 0; }
+    if (value.size() >= 2
+        && ((value.front() == '"' && value.back() == '"')
+            || (value.front() == '\'' && value.back() == '\''))) {
+        value = value.substr(1, value.size() - 2);
+    }
+    return value;
+}
+
+std::string UpdateManager::osReleaseValue(const char *key)
+{
+    // /etc/os-release is a symlink to /usr/lib/os-release on installed
+    // systems; read both so an image without the link still works.
+    const std::string prefix = std::string(key) + "=";
+    for (const char *path : {"/etc/os-release", "/usr/lib/os-release"}) {
+        std::ifstream file(path);
+        if (!file.is_open())
+            continue;
+        std::string line;
+        while (std::getline(file, line)) {
+            if (line.rfind(prefix, 0) == 0)
+                return unquote(line.substr(prefix.size()));
         }
     }
-    return 0;
+    return {};
+}
+
+std::string UpdateManager::readLocalBuildVersion()
+{
+    return osReleaseValue("BUILD_VERSION");
 }
 
 std::string UpdateManager::readCurrentVersion()
 {
-    std::ifstream file("/etc/lingmo-release");
-    if (!file.is_open())
-        return {};
-    std::string line;
-    while (std::getline(file, line)) {
-        if (line.rfind("VERSION=", 0) == 0)
-            return line.substr(8);
-    }
-    return {};
+    return osReleaseValue("VERSION");
 }
 
 std::string UpdateManager::apiUrl() const
 {
     return std::string(s_apiBase)
          + "?channel=" + channelName(m_channel)
-         + "&arch="    + m_arch;
+         + "&arch="    + m_arch
+         + "&build="   + m_localBuildVersion;
 }
 
 void UpdateManager::failOperation(const std::string &message)
@@ -871,7 +841,7 @@ void UpdateManager::emitInfoChanged()
     if (!m_object)
         return;
     m_object->emitPropertiesChanged({"newVersion", "newBuild", "mandatory",
-                                     "releaseNotes", "downloadUrl", "releaseDate",
+                                     "releaseNotes", "releaseDate",
                                      "changelogText", "upgradableCount",
                                      "upgradablePackages", "lastCheckTime",
                                      "errorLog"});

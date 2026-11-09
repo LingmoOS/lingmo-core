@@ -33,11 +33,12 @@ int main() {
     const std::string prefix = "#!/bin/sh\nread mode < '" + temp + "/mode'\n";
     const auto curlScript = [&] {
         write(temp + "/curl", prefix +
+            "echo \"$7\" >> '" + temp + "/curl-urls'\n" +
             "case \"$mode\" in\n"
             " api-fail) echo 'TLS connection failed' >&2; exit 60;;\n"
             " invalid-api) echo '<html>unavailable</html>'; exit 0;;\n"
-            " changelog-start-fail) /bin/rm -- '" + temp + "/curl'; echo '{\"success\":true,\"latest\":{\"build\":999999999999,\"version\":\"test\"}}'; exit 0;;\n"
-            "esac\necho '{\"success\":true,\"latest\":false}'\n", true);
+            " system-upgrade) echo '{\"success\":true,\"updateAvailable\":true,\"latest\":{\"version\":\"5.0\",\"buildVersion\":\"26R01\",\"buildCode\":999999999,\"releaseDate\":\"2026-11-03\",\"mandatory\":false},\"summary\":\"<h2>What is New</h2><ul><li>Test</li></ul>\",\"releaseNotesUrl\":\"/releases/26R01\"}'; exit 0;;\n"
+            "esac\necho '{\"success\":true,\"updateAvailable\":false}'\n", true);
     };
     write(temp + "/pkexec", prefix +
         "echo \"$2\" >> '" + temp + "/apt-actions'\n" +
@@ -91,6 +92,14 @@ int main() {
             actions.push_back(line);
         return actions;
     };
+    const auto curlUrls = [&] {
+        std::ifstream file(temp + "/curl-urls");
+        std::vector<std::string> urls;
+        std::string line;
+        while (std::getline(file, line))
+            urls.push_back(line);
+        return urls;
+    };
     auto check = [&](const std::string& scenario, update::State expected) {
         mode(scenario); curlScript();
         bool observedChecking = false;
@@ -102,14 +111,24 @@ int main() {
     require(status.errorLog().find("TLS connection failed") != std::string::npos, "curl diagnostics visible");
     check("success", update::State::SoftwareUpdate);
     require(status.errorLog().empty() && status.upgradableCount() == 1, "retry clears error and finds update");
+    const auto urls = curlUrls();
+    require(std::any_of(urls.begin(), urls.end(), [](const std::string& url) {
+                return url.find("/api/v1/update/check") != std::string::npos
+                    && url.find("build=") != std::string::npos;
+            }),
+            "API uses the build-aware endpoint");
     check("refresh-fail", update::State::Error);
     require(status.errorLog().find("Authorization denied") != std::string::npos, "APT refresh failure visible");
     check("list-fail", update::State::Error);
     require(status.errorLog().find("Package cache unreadable") != std::string::npos, "nonzero apt exit not up-to-date");
     check("invalid-api", update::State::Error);
     require(!status.errorLog().empty(), "invalid API response has details");
-    check("changelog-start-fail", update::State::SystemUpgrade);
-    require(status.upgradableCount() == 1, "missing changelog process does not kill APT");
+    check("system-upgrade", update::State::SystemUpgrade);
+    require(status.upgradableCount() == 1, "system upgrade check reaches APT");
+    require(status.newVersion() == "5.0", "API version reaches the client");
+    require(status.releaseDate() == "2026-11-03", "API release date reaches the client");
+    require(status.changelogText().find("What is New") != std::string::npos,
+            "API summary reaches the client");
     mode("upgrade-fail"); status.startUpgrade();
     wait(loop, [&] { return status.state() == update::State::Error && !status.isRequestPending(); });
     require(status.errorLog().find("Package lock unavailable") != std::string::npos, "upgrade stderr visible");
