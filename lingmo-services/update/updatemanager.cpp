@@ -675,7 +675,7 @@ void UpdateManager::runAptUpgrade()
         lineBuf->erase(0, start);
     };
 
-    m_process->onFinished = [this](int exitCode, bool crashed) {
+    m_process->onFinished = [this, action](int exitCode, bool crashed) {
         // Collect stderr for the error log before resetting the process.
         const std::string errOutput = m_process->standardError();
         m_process.reset();
