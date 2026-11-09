@@ -238,6 +238,9 @@ void UpdateManager::startUpgrade()
     if (m_state != SystemUpgrade && m_state != SoftwareUpdate)
         return;
 
+    // A system upgrade may need new dependencies or removals; a regular
+    // package update stays the conservative apt-get upgrade.
+    m_systemUpgrade = m_state == SystemUpgrade;
     m_errorLog.clear();
 
     // Upgrade begins in the download phase; apt may emit dlstatus lines
@@ -657,7 +660,11 @@ void UpdateManager::parseUpgradableList(const std::string &text)
 
 void UpdateManager::runAptUpgrade()
 {
-    // Run a real apt-get upgrade with root via pkexec.
+    // A system upgrade may bring new dependencies or require removals, so it
+    // uses dist-upgrade; a regular package update stays with upgrade.
+    const char *action = m_systemUpgrade ? "dist-upgrade" : "upgrade";
+
+    // Run the real apt-get action with root via pkexec.
     //
     // Progress reporting uses the APT Status-Fd protocol:
     //   -o APT::Status-Fd=1  — write status lines to stdout (fd 1)
@@ -713,9 +720,10 @@ void UpdateManager::runAptUpgrade()
         m_process.reset();
         if (crashed || exitCode != 0) {
             LM_WARNING(services::log())
-                    << "apt-get upgrade failed (exit" << exitCode << ")";
+                    << "apt-get" << action << "failed (exit" << exitCode << ")";
             m_errorLog        = errOutput.empty()
-                                    ? format(tr("apt-get upgrade exited with code {code}"), {{"code", std::to_string(exitCode)}})
+                                    ? format(tr("apt-get {command} exited with code {code}"),
+                                             {{"command", std::string(action)}, {"code", std::to_string(exitCode)}})
                                     : errOutput;
             m_upgradePhase    = 0;
             m_upgradeProgress = -1;
@@ -746,12 +754,12 @@ void UpdateManager::runAptUpgrade()
 
     const bool started = m_process->start(
             "pkexec",
-            {"/usr/bin/apt-get", "upgrade", "-y",
+            {"/usr/bin/apt-get", action, "-y",
              "-o", "APT::Status-Fd=1",
              "-o", "Dpkg::Progress=1"});
 
     if (!started) {
-        LM_WARNING(services::log()) << "Cannot start pkexec apt-get upgrade";
+        LM_WARNING(services::log()) << "Cannot start pkexec apt-get" << action;
         m_process.reset();
         failOperation(tr("Cannot start pkexec to install updates. Check polkit installation."));
         notifyError();

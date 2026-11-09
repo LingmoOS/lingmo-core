@@ -9,6 +9,7 @@ Covered scenarios:
 - Failed APT refresh or package listing remains a failure, rather than reporting stale data as up to date.
 - Failure to start the optional changelog download does not destroy the next APT process.
 - Upgrade failure exposes stderr and can recover after a successful new check.
+- A system upgrade runs dist-upgrade; a software update runs upgrade.
 - A successful upgrade reports RestartRequired and later checks do not clear it.
 - Upgrade progress and the restart prompt are sent as notifications, with a
   restart action on the final one.

@@ -40,6 +40,7 @@ int main() {
             "esac\necho '{\"success\":true,\"latest\":false}'\n", true);
     };
     write(temp + "/pkexec", prefix +
+        "echo \"$2\" >> '" + temp + "/apt-actions'\n" +
         "if [ \"$2\" = update ]; then\n"
         " if [ \"$mode\" = refresh-fail ]; then echo 'Authorization denied' >&2; exit 126; fi\n"
         " /bin/sleep 0.05; exit 0\nfi\n"
@@ -82,6 +83,14 @@ int main() {
     auto manager = std::make_unique<UpdateManager>(settings, bus);
     require(manager->publish() && bus->requestName("org.lingmo.Services"), "publish update service");
     wait(loop, [&] { return status.isAvailable(); });
+    const auto aptActions = [&] {
+        std::ifstream file(temp + "/apt-actions");
+        std::vector<std::string> actions;
+        std::string line;
+        while (std::getline(file, line))
+            actions.push_back(line);
+        return actions;
+    };
     auto check = [&](const std::string& scenario, update::State expected) {
         mode(scenario); curlScript();
         bool observedChecking = false;
@@ -104,6 +113,9 @@ int main() {
     mode("upgrade-fail"); status.startUpgrade();
     wait(loop, [&] { return status.state() == update::State::Error && !status.isRequestPending(); });
     require(status.errorLog().find("Package lock unavailable") != std::string::npos, "upgrade stderr visible");
+    const auto systemActions = aptActions();
+    require(std::find(systemActions.begin(), systemActions.end(), "dist-upgrade") != systemActions.end(),
+            "system upgrade uses dist-upgrade");
     wait(loop, [&] { return !summaries.empty() && summaries.back() == "Update failed"; });
     check("success", update::State::SoftwareUpdate);
     status.startUpgrade(); wait(loop, [&] { return status.state() == update::State::RestartRequired && !status.isRequestPending(); });
@@ -116,6 +128,9 @@ int main() {
             "progress notification");
     require(std::any_of(values.begin(), values.end(), [](int value) { return value >= 0; }),
             "progress notification carries a progress bar");
+    const auto softwareActions = aptActions();
+    require(std::find(softwareActions.begin(), softwareActions.end(), "upgrade") != softwareActions.end(),
+            "software update uses upgrade");
 
     // A check must not clear the restart prompt; only a new session does.
     bool checking = false;

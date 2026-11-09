@@ -47,7 +47,7 @@ public:
         SystemUpgrade  = 2,  // New OS version available (API + apt both positive).
         SoftwareUpdate = 3,  // Regular package upgrades only (apt positive, API negative).
         UpToDate       = 4,  // Nothing to install.
-        Upgrading      = 5,  // apt-get upgrade is running.
+        Upgrading      = 5,  // apt-get upgrade/dist-upgrade is running.
         Error          = 6,
         // The upgrade finished; the running system still uses the old
         // packages until it is restarted.
@@ -86,7 +86,8 @@ public:
     // while an upgrade is in progress, or while a restart is pending.
     void checkForUpdate();
 
-    // Starts apt-get upgrade; ignored unless state is SystemUpgrade or
+    // Starts apt-get dist-upgrade for a system upgrade or upgrade for a
+    // software update; ignored unless state is SystemUpgrade or
     // SoftwareUpdate. Progress is reported via the upgradeProgress signal.
     void startUpgrade();
 
@@ -190,6 +191,10 @@ private:
 
     // Failure details for every check/upgrade stage, cleared on retry.
     std::string m_errorLog;
+
+    // Whether the running upgrade is a system upgrade (dist-upgrade) rather
+    // than a regular package update (upgrade).
+    bool m_systemUpgrade = false;
 
     // Upgrade phase and progress.
     // Phase: 0 = not upgrading, 1 = downloading, 2 = installing.
