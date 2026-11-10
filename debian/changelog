@@ -1,3 +1,11 @@
+lingmo-core (5.0.7+lingmo5u3) unstable; urgency=medium
+
+  * Add scheduled update checks, progress notifications and the restart prompt.
+  * Use the build-aware update API with BUILD_VERSION from os-release.
+  * Run dist-upgrade for system updates and keep upgrade for software updates.
+
+ -- Lingmo OS Team <team@lingmo.org>  Tue, 10 Nov 2026 14:29:04 +0800
+
 lingmo-core (5.0.7+lingmo5u2) unstable; urgency=medium
 
   * fix: report update failures and localize authentication.
