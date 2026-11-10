@@ -36,6 +36,8 @@ Depends: accountsservice,
          lingmo-sdk-dev,
          lingmo-framework,
          curl,
+         pipewire-bin,
+         sound-theme-freedesktop,
          ${misc:Depends},
          ${shlibs:Depends}
 Recommends: va-driver-all | va-driver,

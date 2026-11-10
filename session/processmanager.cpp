@@ -426,6 +426,9 @@ void SessionProcessManager::startDesktopProcess()
         return;
     m_desktopStarted = true;
 
+    dbus::Proxy(dbus::Connection::session(), "org.lingmo.Services", "/org/lingmo/Services/Sound",
+                "org.lingmo.Services.Sound").send("playEvent", std::string("service-login"));
+
     UserDirectories::ensure(
         QString::fromStdString(base::paths::home()),
         QString::fromStdString(base::paths::configHome()));

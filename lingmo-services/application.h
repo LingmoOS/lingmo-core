@@ -18,6 +18,7 @@ class NightLight;
 class PermissionManager;
 class PowerManager;
 class PowerSupply;
+class SoundService;
 class ProxyService;
 class ThemeManager;
 class UpdateManager;
@@ -60,6 +61,7 @@ private:
     std::unique_ptr<CrashManager> m_crashManager;
     std::unique_ptr<ProxyService> m_proxyService;
     std::unique_ptr<UpdateManager> m_updateManager;
+    std::unique_ptr<SoundService> m_soundService;
     Lingmo::Base::Subscription m_themeChanged;
 };
 

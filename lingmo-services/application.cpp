@@ -17,6 +17,7 @@
 #include "power/powermanager.h"
 #include "proxy/proxyservice.h"
 #include "update/updatemanager.h"
+#include "sound/soundservice.h"
 
 #include "base/dbus.h"
 #include "base/paths.h"
@@ -73,6 +74,7 @@ ServicesApplication::ServicesApplication()
     m_crashManager = std::make_unique<CrashManager>([this] { return m_themeManager->systemFixedFont(); });
     m_proxyService = std::make_unique<ProxyService>(m_session);
     m_updateManager = std::make_unique<UpdateManager>(m_settings, m_session);
+    m_soundService = std::make_unique<SoundService>(m_settings, m_session);
 
     initTrash();
 
@@ -94,6 +96,7 @@ ServicesApplication::ServicesApplication()
     published(m_nightLight->publish(m_session), "NightLight");
     published(m_permissionManager->publish(), "Permissions");
     published(m_updateManager->publish(), "Update");
+    published(m_soundService->publish(), "Sound");
 
     if (!m_session || !m_session->requestName("org.lingmo.Services"))
         LM_WARNING(services::log()) << "Cannot own org.lingmo.Services";
