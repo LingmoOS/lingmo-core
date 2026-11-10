@@ -1,3 +1,9 @@
+lingmo-core (5.0.10+lingmo5u1) unstable; urgency=medium
+
+  * Send the session locale when checking for updates.
+
+ -- Lingmo OS Team <team@lingmo.org>  Tue, 10 Nov 2026 15:43:28 +0800
+
 lingmo-core (5.0.9+lingmo5u1) unstable; urgency=medium
 
   * Choose the default update channel from os-release VERSION_TYPE.
