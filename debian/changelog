@@ -1,4 +1,4 @@
-lingmo-core (5.0.7+lingmo5u3) unstable; urgency=medium
+lingmo-core (5.0.8+lingmo5u1) unstable; urgency=medium
 
   * Add scheduled update checks, progress notifications and the restart prompt.
   * Use the build-aware update API with BUILD_VERSION from os-release.
