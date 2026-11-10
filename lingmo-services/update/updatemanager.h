@@ -136,6 +136,7 @@ private:
     void saveLastCheckTime();
     static std::string machineArchitecture();
     static std::string osReleaseValue(const char *key);
+    static Channel channelFromOsRelease();
     static std::string readLocalBuildVersion();
     static std::string readCurrentVersion();
     std::string apiUrl() const;

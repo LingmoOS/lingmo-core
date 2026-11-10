@@ -7,6 +7,7 @@
 
 #include <chrono>
 #include <algorithm>
+#include <cctype>
 #include <cmath>
 #include <ctime>
 #include <fstream>
@@ -731,8 +732,15 @@ void UpdateManager::runAptUpgrade()
 
 void UpdateManager::loadSettings()
 {
-    const int ch = int(m_settings.intValue(s_channelKey, int64_t(Stable)));
-    m_channel = (ch >= Stable && ch <= Nightly) ? static_cast<Channel>(ch) : Stable;
+    const Channel detected = channelFromOsRelease();
+    const bool hadChannel = m_settings.contains(s_channelKey);
+    const int ch = int(m_settings.intValue(s_channelKey, int64_t(detected)));
+    m_channel = (ch >= Stable && ch <= Nightly) ? static_cast<Channel>(ch) : detected;
+    // No explicit choice yet, or one that this build no longer understands:
+    // seed the channel from the installed OS type so services.conf shows it.
+    if (!hadChannel || ch < Stable || ch > Nightly)
+        saveChannel();
+
     m_lastCheckTime = m_settings.intValue(s_lastCheckTimeKey, 0);
 
     m_autoCheck = m_settings.boolValue(s_autoCheckKey, true);
@@ -794,6 +802,27 @@ std::string UpdateManager::osReleaseValue(const char *key)
         }
     }
     return {};
+}
+
+UpdateManager::Channel UpdateManager::channelFromOsRelease()
+{
+    std::string type = osReleaseValue("VERSION_TYPE");
+    std::transform(type.begin(), type.end(), type.begin(),
+                   [](unsigned char c) { return char(std::tolower(c)); });
+    if (type == "beta")
+        return Beta;
+    if (type == "alpha" || type == "nightly")
+        return Nightly;
+    if (type == "release" || type == "stable")
+        return Stable;
+
+    // Older images without VERSION_TYPE: derive it from the build stage.
+    const std::string build = readLocalBuildVersion();
+    if (build.find('b') != std::string::npos)
+        return Beta;
+    if (build.find('a') != std::string::npos)
+        return Nightly;
+    return Stable;
 }
 
 std::string UpdateManager::readLocalBuildVersion()

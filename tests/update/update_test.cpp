@@ -82,6 +82,7 @@ int main() {
     update::UpdateStatus status; // Before the service exists: no synchronous self-call.
     base::Settings settings(temp + "/settings");
     auto manager = std::make_unique<UpdateManager>(settings, bus);
+    require(settings.contains("Update/Channel"), "channel seeded from os-release");
     require(manager->publish() && bus->requestName("org.lingmo.Services"), "publish update service");
     wait(loop, [&] { return status.isAvailable(); });
     const auto aptActions = [&] {
