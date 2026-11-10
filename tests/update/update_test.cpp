@@ -115,7 +115,8 @@ int main() {
     const auto urls = curlUrls();
     require(std::any_of(urls.begin(), urls.end(), [](const std::string& url) {
                 return url.find("/api/v1/update/check") != std::string::npos
-                    && url.find("build=") != std::string::npos;
+                    && url.find("build=") != std::string::npos
+                    && url.find("locale=") != std::string::npos;
             }),
             "API uses the build-aware endpoint");
     check("refresh-fail", update::State::Error);

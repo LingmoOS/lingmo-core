@@ -15,6 +15,7 @@
 
 #include "base/i18n.h"
 #include "base/json.h"
+#include "base/locale.h"
 #include "log.h"
 #include "notification.h"
 
@@ -837,10 +838,16 @@ std::string UpdateManager::readCurrentVersion()
 
 std::string UpdateManager::apiUrl() const
 {
+    std::string locale = base::Locale::system().name();
+    if (locale.empty() || locale == "C" || locale == "POSIX")
+        locale = "en";
+    std::replace(locale.begin(), locale.end(), '_', '-');
+
     return std::string(s_apiBase)
          + "?channel=" + channelName(m_channel)
          + "&arch="    + m_arch
-         + "&build="   + m_localBuildVersion;
+         + "&build="   + m_localBuildVersion
+         + "&locale="  + locale;
 }
 
 void UpdateManager::failOperation(const std::string &message)
