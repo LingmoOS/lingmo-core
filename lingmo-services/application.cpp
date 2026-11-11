@@ -18,6 +18,7 @@
 #include "proxy/proxyservice.h"
 #include "update/updatemanager.h"
 #include "sound/soundservice.h"
+#include "network/connectivity.h"
 
 #include "base/dbus.h"
 #include "base/paths.h"
@@ -76,6 +77,8 @@ ServicesApplication::ServicesApplication()
     m_updateManager = std::make_unique<UpdateManager>(m_settings, m_session);
     m_soundService = std::make_unique<SoundService>(m_settings, m_session);
 
+    m_connectivity = std::make_unique<Connectivity>(m_system, m_session);
+
     initTrash();
 
     applyTheme();
@@ -97,6 +100,7 @@ ServicesApplication::ServicesApplication()
     published(m_permissionManager->publish(), "Permissions");
     published(m_updateManager->publish(), "Update");
     published(m_soundService->publish(), "Sound");
+    published(m_connectivity->publish(), "Connectivity");
 
     if (!m_session || !m_session->requestName("org.lingmo.Services"))
         LM_WARNING(services::log()) << "Cannot own org.lingmo.Services";

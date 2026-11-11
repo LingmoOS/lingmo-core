@@ -259,3 +259,15 @@ msgstr ""
 #: session/lingmo-wayland.desktop
 msgid "Cutefish desktop session"
 msgstr ""
+
+msgid "Network"
+msgstr ""
+
+msgid "Network login required"
+msgstr ""
+
+msgid "Connected to Wi-Fi. Sign in to access the Internet."
+msgstr ""
+
+msgid "Open login page"
+msgstr ""

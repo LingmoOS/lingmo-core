@@ -38,6 +38,8 @@ Depends: accountsservice,
          curl,
          pipewire-bin,
          sound-theme-freedesktop,
+         network-manager-config-connectivity-debian,
+         xdg-utils,
          ${misc:Depends},
          ${shlibs:Depends}
 Recommends: va-driver-all | va-driver,

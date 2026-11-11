@@ -346,3 +346,15 @@ msgstr "更新失败"
 
 msgid "The update could not be installed."
 msgstr "无法安装更新。"
+
+msgid "Network"
+msgstr "网络"
+
+msgid "Network login required"
+msgstr "网络需要登录认证"
+
+msgid "Connected to Wi-Fi. Sign in to access the Internet."
+msgstr "已连接 Wi-Fi。请登录认证后访问互联网。"
+
+msgid "Open login page"
+msgstr "打开登录页面"

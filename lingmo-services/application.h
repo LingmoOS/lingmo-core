@@ -12,6 +12,7 @@
 class BatteryWarning;
 class BrightnessManager;
 class Clipboard;
+class Connectivity;
 class CrashManager;
 class Language;
 class NightLight;
@@ -62,6 +63,7 @@ private:
     std::unique_ptr<ProxyService> m_proxyService;
     std::unique_ptr<UpdateManager> m_updateManager;
     std::unique_ptr<SoundService> m_soundService;
+    std::unique_ptr<Connectivity> m_connectivity;
     Lingmo::Base::Subscription m_themeChanged;
 };
 

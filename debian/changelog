@@ -1,3 +1,12 @@
+lingmo-core (5.0.12+lingmo5u1) unstable; urgency=medium
+
+  * Detect captive Wi-Fi portals using NetworkManager connectivity state.
+  * Provide a deduplicated login notification and a session D-Bus login action.
+  * Enable distribution connectivity checking and add private D-Bus regression
+    coverage for portal transitions, disabled checks and login actions.
+
+ -- Lingmo OS Team <team@lingmo.org>  Wed, 11 Nov 2026 12:44:01 +0800
+
 lingmo-core (5.0.11+lingmo5u1) unstable; urgency=medium
 
   * Add the session sound service for themed system event playback, settings and

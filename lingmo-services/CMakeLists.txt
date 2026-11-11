@@ -68,6 +68,8 @@ add_executable(${TARGET}
     proxy/proxyservice.h
     update/updatemanager.cpp
     update/updatemanager.h
+    network/connectivity.cpp
+    network/connectivity.h
     sound/soundservice.cpp
     sound/soundservice.h
     schedule/scheduledfeature.cpp
