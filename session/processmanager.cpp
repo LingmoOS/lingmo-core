@@ -40,10 +40,10 @@ using namespace std::chrono_literals;
 using Lingmo::I18n::format;
 using Lingmo::I18n::tr;
 
-// lingmo-compositor installs to CMAKE_INSTALL_BINDIR, and lingmo-dm starts its
+// lingmo-aurora installs to CMAKE_INSTALL_BINDIR, and lingmo-dm starts its
 // greeter from the same path. Anything else here makes the session exit before
 // the compositor is up, which reads as a login that bounces back to the DM.
-static constexpr char kCompositor[] = "/usr/bin/lingmo-compositor";
+static constexpr char kAurora[] = "/usr/bin/lingmo-aurora";
 
 namespace Lingmo {
 
@@ -154,7 +154,7 @@ void SessionProcessManager::start()
         stopShellAndDaemons();
         base::EventLoop::current()->quit(code);
     };
-    m_compositorProcess->start(kCompositor, m_waylandSocket,
+    m_compositorProcess->start(kAurora, m_waylandSocket,
                                m_controlSocket, 15000,
                                m_xwaylandEnvironment->readinessFile());
 }

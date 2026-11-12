@@ -24,7 +24,7 @@ make
 sudo make install
 ```
 
-Install `lingmo-compositor` and `lingmo-filemanager` as well, then select
+Install `lingmo-aurora` and `lingmo-filemanager` as well, then select
 `Lingmo (Wayland)` in the display manager.
 
 ## License

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Session management stays in core/session; it supervises lingmo-compositor.
+# Session management stays in core/session; it supervises lingmo-aurora.
 export XDG_CURRENT_DESKTOP=Lingmo
 export XDG_SESSION_DESKTOP=Lingmo
 export DESKTOP_SESSION=Lingmo

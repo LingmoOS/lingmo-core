@@ -101,7 +101,7 @@ TEST(SessionLifecycle, missingExecutable)
     CompositorProcess process;
     Counts counts;
     track(process, counts);
-    process.start(QStringLiteral("/does-not-exist/lingmo-compositor"),
+    process.start(QStringLiteral("/does-not-exist/lingmo-aurora"),
                   QStringLiteral("test-socket"),
                   QStringLiteral("test-control"));
     EXPECT_EQ(counts.failed, 1);

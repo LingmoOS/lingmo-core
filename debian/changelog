@@ -1,3 +1,10 @@
+lingmo-core (5.0.13+lingmo5u1) unstable; urgency=medium
+
+  * Launch lingmo-aurora as the Wayland session compositor.
+  * Track the renamed compositor process in session lifecycle handling.
+
+ -- Lingmo OS Team <team@lingmo.org>  Fri, 13 Nov 2026 18:00:00 +0800
+
 lingmo-core (5.0.12+lingmo5u1) unstable; urgency=medium
 
   * Detect captive Wi-Fi portals using NetworkManager connectivity state.

@@ -44,7 +44,7 @@ bool isStartedBySession(const QString &executable)
         QStringLiteral("lingmo-services"),
         QStringLiteral("lingmo-appruntime"),
         QStringLiteral("lingmo-filemanager"),
-        QStringLiteral("lingmo-compositor"),
+        QStringLiteral("lingmo-aurora"),
         QStringLiteral("lingmo-polkit-agent"),
         QStringLiteral("xdg-user-dirs-update"),
     };
